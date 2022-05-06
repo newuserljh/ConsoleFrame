@@ -15,6 +15,7 @@ typedef struct _SM_SHARE_DATA
 	std::string cscript;
 	unsigned int send_rand =0;
 	unsigned int rcv_rand = 0;
+	bool server_alive = true;
 }SM_SHARE_DATA;
 
 struct _SM_ALL_SHARE_DATA

@@ -105,8 +105,12 @@ bool CAccountDlg::updateDate()
 
 		if (m_listCtl.GetCheck(i)&&(m_shareMemSer->m_pSMAllData->m_sm_data[i].ndPid!=0))
 		{
-			if ((m_shareMemSer->m_pSMAllData->m_sm_data[i].send_rand != m_shareMemSer->m_pSMAllData->m_sm_data[i].rcv_rand)&& (m_shareMemSer->m_pSMAllData->m_sm_data[i].send_rand != 0))
+
+			if ((m_shareMemSer->m_pSMAllData->m_sm_data[i].send_rand != m_shareMemSer->m_pSMAllData->m_sm_data[i].rcv_rand)&&
+				(m_shareMemSer->m_pSMAllData->m_sm_data[i].send_rand != 0)&& 
+				(!m_shareMemSer->m_pSMAllData->m_sm_data[i].server_alive))
 			{
+				m_shareMemSer->m_pSMAllData->m_sm_data[i].ndPid = 0;
 				::TerminateProcess(::OpenProcess(PROCESS_ALL_ACCESS, false, m_shareMemSer->m_pSMAllData->m_sm_data[i].ndPid),0);//强制关闭进程
 				log_inject(i);//重新登录
 			}
