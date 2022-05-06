@@ -34,10 +34,10 @@ public:
 	virtual BOOL OnInitDialog();
 	//更新共享内存的数据到表单中
 	bool updateDate();
-
 	afx_msg void OnBnClickedButton1();
 	CString m_userName;
 	CString m_password;
 	afx_msg void OnBnClickedButton2();
 	afx_msg void OnBnClickedButton3();
+	void log_inject(int i);
 };

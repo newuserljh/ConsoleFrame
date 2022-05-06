@@ -98,12 +98,28 @@ bool CAccountDlg::updateDate()
 		//更新数据到表单中
 		std::stringstream ss;
 		ss << m_shareMemSer->m_pSMAllData->m_sm_data[i].ndPid;
-		m_listCtl.SetItemText(i, 0,ss.str().c_str());
+		m_listCtl.SetItemText(i, 0, ss.str().c_str());
 		m_listCtl.SetItemText(i, 1, m_shareMemSer->m_pSMAllData->m_sm_data[i].userName.c_str());
 		m_listCtl.SetItemText(i, 2, m_shareMemSer->m_pSMAllData->m_sm_data[i].passWord.c_str());
+		m_listCtl.SetItemText(i, 3, m_shareMemSer->m_pSMAllData->m_sm_data[i].cscript.c_str());
+
+		if (m_listCtl.GetCheck(i)&&(m_shareMemSer->m_pSMAllData->m_sm_data[i].ndPid!=0))
+		{
+			if ((m_shareMemSer->m_pSMAllData->m_sm_data[i].send_rand != m_shareMemSer->m_pSMAllData->m_sm_data[i].rcv_rand)&& (m_shareMemSer->m_pSMAllData->m_sm_data[i].send_rand != 0))
+			{
+				::TerminateProcess(::OpenProcess(PROCESS_ALL_ACCESS, false, m_shareMemSer->m_pSMAllData->m_sm_data[i].ndPid),0);//强制关闭进程
+				log_inject(i);//重新登录
+			}
+			else
+			{
+				srand((unsigned int)time(0));//先设置种子
+				m_shareMemSer->m_pSMAllData->m_sm_data[i].send_rand = rand() + 1;
+			}
+		}
 	}
 	return true;
 }
+
 
 
 
@@ -120,6 +136,7 @@ void CAccountDlg::OnBnClickedButton1()
 	}
 	m_shareMemSer->m_pSMAllData->m_sm_data[index].userName = (std::string)m_userName.GetString();
 	m_shareMemSer->m_pSMAllData->m_sm_data[index].passWord =(std::string) m_password.GetString();
+
 }
 
 bool CAccountDlg::initMem()
@@ -134,7 +151,7 @@ void CAccountDlg::threadCallBack()
 	{
 		updateDate();
 		//TRACE("111\n");
-		Sleep(1000);
+		Sleep(3000);
 	}
 }
 
@@ -144,7 +161,6 @@ void CAccountDlg::OnBnClickedButton2()
 	// TODO:  删除账号，是删除复选框选中的账号信息
 
 
-
 }
 
 
@@ -152,14 +168,20 @@ void CAccountDlg::OnBnClickedButton3()
 {
 	// TODO:  开始脚本
 	//正常情况下，会判断当前复选框是否被选中，只登陆选中的
-	for (int i = 0; i < MORE_OPEN_NUMBER; i++)
-	{
 
-		exeLoad e("D:\\传奇世界2.9\\传奇世界\\Data\\woool.dat.update","D:\\传奇世界2.9\\传奇世界\\Data\\");
-		m_shareMemSer->m_pSMAllData->m_sm_data[i].ndPid = e.pi.dwProcessId;
-
-		EipInject in;
-		in.eipinjectDll(L"D:\\VS_PROJECT\\ConsoleFrame\\Debug\\TestDll.dll", e.pi);
+		for (int i = 0; i < MORE_OPEN_NUMBER; i++)
+	{		
+			if(m_listCtl.GetCheck(i))
+			log_inject(i);
 	}
 	
+}
+
+/*登录游戏并注入获取PID*/
+void CAccountDlg::log_inject(int i)
+{
+	exeLoad e("D:\\传奇世界2.9\\传奇世界\\Data\\woool.dat.update", "D:\\传奇世界2.9\\传奇世界\\Data\\");
+	m_shareMemSer->m_pSMAllData->m_sm_data[i].ndPid = e.pi.dwProcessId;
+	EipInject in;
+	in.eipinjectDll(L"D:\\VS_PROJECT\\ConsoleFrame\\Debug\\TestDll.dll", e.pi);
 }

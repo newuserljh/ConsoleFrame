@@ -80,12 +80,7 @@ LRESULT CALLBACK KeyBoardProc(int nCode, WPARAM wParam, LPARAM lParam)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	if ((wParam == VK_HOME) && ((lParam & 0x40000000) != 0))
 	{
-		if (pDlg == NULL)
-		{
-			pDlg = new CTestDlg;
-			pDlg->Create(IDD_DLGTEST);
-		}
-
+	
 		 pDlg->ShowWindow(SW_SHOW); //SW_SHOW
 
 	}
@@ -120,15 +115,17 @@ void threadFunc()
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	mhook = SetWindowsHookEx(WH_KEYBOARD, KeyBoardProc, 0, GetMainThreadId());
+	if (pDlg == NULL)
+	{
+		pDlg = new CTestDlg;
+		pDlg->Create(IDD_DLGTEST);
+	}
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0))
 
 	{
-
 		TranslateMessage(&msg);
-
 		DispatchMessage(&msg);
-
 	}
 	return;
 }

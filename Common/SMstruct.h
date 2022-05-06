@@ -12,6 +12,9 @@ typedef struct _SM_SHARE_DATA
 	DWORD ndPid; //½ø³Ìpid
 	std::string userName;
 	std::string passWord;
+	std::string cscript;
+	unsigned int send_rand =0;
+	unsigned int rcv_rand = 0;
 }SM_SHARE_DATA;
 
 struct _SM_ALL_SHARE_DATA

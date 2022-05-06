@@ -78,6 +78,7 @@
     <ClInclude Include="base.h" />
     <ClInclude Include="baseaddr.h" />
     <ClInclude Include="datastruct.h" />
+    <ClInclude Include="login.h" />
     <ClInclude Include="monster.h" />
     <ClInclude Include="role.h" />
     <ClInclude Include="skill.h" />
@@ -86,6 +87,7 @@
   <ItemGroup>
     <ClCompile Include="base.cpp" />
     <ClCompile Include="datastruct.cpp" />
+    <ClCompile Include="login.cpp" />
     <ClCompile Include="monster.cpp" />
     <ClCompile Include="role.cpp" />
     <ClCompile Include="skill.cpp" />

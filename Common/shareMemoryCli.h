@@ -14,6 +14,7 @@ public:
 	bool openShareMemory();
 	void destoryShareMemory();
 	int getPidEmptyIndex();
+	int getIndexByPID(DWORD pid);
 
 public:
 	_SM_ALL_SHARE_DATA *m_pSMAllData;

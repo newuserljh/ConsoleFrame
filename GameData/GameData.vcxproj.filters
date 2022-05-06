@@ -39,6 +39,9 @@
     <ClInclude Include="baseaddr.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="login.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="base.cpp">
@@ -57,6 +60,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="datastruct.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="login.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

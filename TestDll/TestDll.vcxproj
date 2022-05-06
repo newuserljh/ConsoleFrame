@@ -122,6 +122,14 @@
   <ItemGroup>
     <ResourceCompile Include="TestDll.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.vcxproj">
+      <Project>{a4a68adf-6355-485c-9563-56049dad2af5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\GameData\GameData.vcxproj">
+      <Project>{8cb02a26-c5fb-408a-bc23-ab6afbc54821}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

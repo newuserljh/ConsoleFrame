@@ -65,3 +65,16 @@ int shareMemoryCli::getPidEmptyIndex()
 	return -1;
 }
 
+int shareMemoryCli::getIndexByPID(DWORD pid)
+{
+	for (int i = 0; i < MORE_OPEN_NUMBER; i++)
+	{
+		if (m_pSMAllData->m_sm_data[i].ndPid == pid)
+		{
+			return i;
+		}
+	}
+
+	return -1;
+}
+
