@@ -72,6 +72,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <Text Include="C:\Users\37399\Desktop\2.9 call1.txt" />
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>

@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
+    <Text Include="C:\Users\37399\Desktop\2.9 call1.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base.h">
