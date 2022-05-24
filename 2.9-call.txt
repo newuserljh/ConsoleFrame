@@ -1,0 +1,27 @@
+=======使用背包物品================
+push 1
+push 0
+push 0
+push edi   //背包格子下标从0开始，快捷栏1-6为60-65  有VIP包裹 60-119 快捷栏120-125  
+mov ecx,dword ptr ds:[0x135FB10]   
+call 0x00718A10
+
+
+
+=======技能call================
+007AEF39    | 50                         | push eax                                  | 技能ID
+007AEF3A    | 8B45 48                | mov eax,dword ptr ss:[ebp+0x48]           |
+007AEF3D    | 51                         | push ecx                                  | Y
+007AEF3E    | 8B0D 10FB3501     | mov ecx,dword ptr ds:[0x135FB10]          |
+007AEF44    | 52                         | push edx                                  | X
+007AEF45    | 50                         | push eax                                  | 目标ID
+007AEF46    | E8 F546F8FF          | call woool.dat.733640                     | 技能call
+                                                    mov ecx, dword ptr ds:[0x0135FB30]
+                                                    call 420fe0
+
+=======寻路call================
+00C92D1D   | 8B0D C472E004              | mov ecx,dword ptr ds:[0x4E072C4]                                | 
+00C92D23   | 6A 00                      | push 0x0                                                        |
+00C92D25   | 53                         | push ebx                                                        | 目标Y
+00C92D26   | 57                         | push edi                                                        | 目标X
+00C92D27   | E8 34CBB1FF                | call <woool.dat.sub_7AF860>                                     | 寻路call

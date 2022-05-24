@@ -1,0 +1,93 @@
+主体人物基址 0x135fb30 /0x0135FB0C        0x135FB10 
+元神人物基址 0x135fb34
+                    
+
+人物信息:
+p_Role_ID==[0x135fb30  ]+8
+p_Role_Name==[0x135fb30  ]+0x10
+p_Role_Hp==[0x135fb30  ]+0x80
+p_Role_Hp_Max==Role_Hp+4
+p_Role_Mp==Role_Hp+8
+p_Role_Mp_Max==Role_Hp+c
+p_Role_Map_X==Role_Hp+2c
+p_Role_Map_Y==Role_Hp+30
+p_Role_GJL_L==[0x135fb30  ]+0xA5C  //攻击
+p_Role_GJL_H==[0x135fb30  ]+0xA60
+p_Role_MFL_L==[0x135fb30  ]+0xA64 //魔法
+p_Role_MFL_H==[0x135fb30  ]+0xA68
+p_Role_DSL_L==[0x135fb30  ]+0xA6c //道术
+p_Role_DSL_H==[0x135fb30  ]+0xA70
+p_Role_FY_L==[0x135fb30  ]+0xA7C //防御
+p_Role_FY_H==[0x135fb30  ]+0xA80
+p_Role_MF_L==[0x135fb30  ]+0xA84 //魔防
+p_Role_MF_H==[0x135fb30  ]+0xA88
+p_Role_BAG_W==[0x135fb30  ]+0xAA8 //ASIIC码 背包重量 2字节
+p_Role_BAG_W_MAX==[0x135fb30  ]+0xAAA //ASIIC码 背包最大附中 2字节
+p_Role_MFDB==[0x135fb30  ]+0xACC //魔法躲避
+p_Role_MZ==[0x135fb30  ]+0xAB4 //命中
+p_Role_MFMZ==[0x135fb30  ]+0xAB8//魔法命中
+p_Role_SW==[0x135fb30  ]+0xAD0 //声望
+p_Role_LL==[0x135fb30  ]+0x139C//灵力
+p_Role_ZDFB==[0x135fb30  ]+0xAD4 //中毒躲避
+ p_Current_Map==[135fb30]+0x8299C8//所在地图 CHAR*
+p_Role_ZB==[[0x135fb30  ]+0xc48]+ i* 0x688 //身上装备 0衣服，1武器，2勋章，3项链，4头盔，5右手镯，6左手镯，7右戒指，8左戒指，9靴子，10腰带，11宝石，12护符，13盾牌，14魂珠,15 极品御兽天衣 ，16 紋佩 ，18 神龙背饰 ，19 面具 ，20 仙翼 
+
+p_Role_Bag_Base==[0x135fb30  ]+0xc54 //背包基址，第一个格子指针
+p_Role_Bag_Size==[0x135fb30  ]+0xc58 //背包大小
+
+p_LR_Bag_Base==[0x135fb30  ]+0xc60 //灵兽背包基址，第一个格子指针 
+p_LR_Bag_Size==[0x135fb30  ]+0xc64 //灵兽背包大小  
+背包：
+p_Bag_Base( i )==0x135fb30]+0xC54]+ i * 0x688   (0-0x41)
+p_Target_ID==[0x135fb30 ]+0x458   //选中/攻击 目标ID
+p_Skill_Base( i )==0x135fb30]+0x1358]+ i * 0x88   //i为技能栏的顺序从0开始
+ p_Skill_Base( i )==0x135fb30]+0x1360]+ i * 0x88  
+DWORD Role_Job==0x135fb30]+0xe4] //职业 0/战士  1/法师 2/道士
+DWORD Role_Level==0x135fb30]+0xec] //等级
+DWORD Role_Sex ； //]+0xdc 性别 0男 1女
+Struct p_Bag
+{
+    char  Goods_Name_Length  +0
+    String  Goods_Name      +1
+    Char  Goods_WD_low    +1a    /物理防御下  /幸运武器
+    Char  Goods_WD_high    +1b  /物理防御上  /命中武器
+    Char  Goods_MD_low    +1c   /魔防
+    Char  Goods_MD_high    +1D
+    Char  Goods_PA_low    +1e        //物理攻击力
+    Char  Goods_PA_high    +1f
+    Char  Goods_Magic_low    +20   //魔法攻击力
+    Char  Goods_Magic_high    +21
+    Char  Goods_Tao_low    +22   //道术攻击0力
+    Char  Goods_Tao_high    +23
+    Char  Goods_Need_what   +24  佩戴需求 0等级 1攻击 2魔法 3道术
+    Char  Goods_Need_Num   +25  佩戴需求大小 等级/魔法。。
+    Long  Goods_ID                  +2c
+    Short   Goods_Use_Num  +30            耐久/使用次数
+    Short   Goods_Use_Num_Max  +32    最大耐久/使用次数    
+}
+
+
+技能
+p_Skill_Base( i )==0x135fb30]+0x1358]+ i * 0x88   //i为技能栏的顺序从0开始
+ p_Skill_Base( i )==0x135fb30]+0x1360]+ i * 0x88  
+Struct p_Skill
+{
+    Long  Skill_ID                  +0xe
+    String  Skill_Name      +14
+    Char  Skill_Level    +8   
+    Short  Skill_Level_exp    +c
+     Char  Skill_Need_MP   +e  
+    Short  Skill_Level_exp_max    +48 
+}
+
+怪物信息：
+Struct
+{
+    DWORD  ID                  +8
+    DWORD  Name      +0x10
+    DWORD  HP            +0x80
+    DWORD  HP_MAX    +0x84  
+    DWORD  X               +0xac
+    DWORD  Y            +0xb0
+    CHAR      Posion     +0x34b  //是否中毒 0没毒，0x40红毒，0x80绿毒，0xc0红绿毒
+}MONSTER
