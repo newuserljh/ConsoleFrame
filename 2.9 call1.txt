@@ -1,0 +1,99 @@
+007BCA00 | 5B                       | pop ebx                                                       |
+007BCA01 | 5F                       | pop edi                                                       |
+007BCA02 | 5E                       | pop esi                                                       |
+007BCA03 | B0 01                    | mov al,1                                                      |
+007BCA05 | 5D                       | pop ebp                                                       |
+007BCA06 | 83C4 14                  | add esp,14                                                    |
+007BCA09 | C2 0800                  | ret 8                                                         |
+007BCA0C | 50                       | push eax                                                      | NPC ID
+007BCA0D | E8 6EF8FFFF              | call woool.dat.7BC280                                         | 打开NPC
+007BCA12 | 5B                       | pop ebx                                                       |
+007BCA13 | 5F                       | pop edi                                                       |
+007BCA14 | 5E                       | pop esi                                                       |
+007BCA15 | B0 01                    | mov al,1                                                      |
+007BCA17 | 5D                       | pop ebp                                                       |
+007BCA18 | 83C4 14                  | add esp,14                                                    |
+007BCA1B | C2 0800                  | ret 8                                                         |
+007BCA1E | CC                       | int3                                                          |
+007BCA1F | CC                       | int3                                                          |
+007BCA20 | 83EC 7C                  | sub esp,7C                                                    |
+
+00CAC530 | 8D8424 2C010000          | lea eax,dword ptr ss:[esp+12C]                                |
+00CAC537 | 8B15 D4D91001            | mov edx,dword ptr ds:[110D9D4]                                |
+00CAC53D | 8B0D 10FB3501            | mov ecx,dword ptr ds:[135FB10]                                |
+00CAC543 | 68 FFFF0000              | push FFFF                                                     |
+00CAC548 | 68 FFFF0000              | push FFFF                                                     |
+00CAC54D | 6A 00                    | push 0                                                        |
+00CAC54F | 6A 00                    | push 0                                                        |
+00CAC551 | 50                       | push eax                                                      | eax:选择命令@
+00CAC552 | 52                       | push edx                                                      |
+00CAC553 | E8 78FD9FFF              | call woool.dat.6AC2D0                                         | 选择对话
+00CAC558 | 8D8424 28010000          | lea eax,dword ptr ss:[esp+128]                                |
+00CAC55F | 68 BCA5F600              | push woool.dat.F6A5BC                                         | F6A5BC:"@exit"
+00CAC564 | 50                       | push eax                                                      | eax:"@安全区域"
+00CAC565 | E8 D68875FF              | call woool.dat.404E40                                         |
+00CAC56A | 83C4 08                  | add esp,8                                                     |
+00CAC56D | 84C0                     | test al,al                                                    |
+
+
+0062D46C | 52                       | push edx                                                      |
+0062D46D | 53                       | push ebx                                                      |
+0062D46E | 57                       | push edi                                                      |
+0062D46F | 8B80 FC000000            | mov eax,dword ptr ds:[eax+FC]                                 |
+0062D475 | FFD0                     | call eax                                                      |
+0062D477 | 84C0                     | test al,al                                                    |
+0062D479 | 0F85 79FEFFFF            | jne woool.dat.62D2F8                                          |
+0062D47F | 8B4D E0                  | mov ecx,dword ptr ss:[ebp-20]                                 |
+0062D482 | 51                       | push ecx                                                      | 硬件扫描码
+0062D483 | 0FB7C3                   | movzx eax,bx                                                  |
+0062D486 | 50                       | push eax                                                      | 按键码
+0062D487 | 8BCE                     | mov ecx,esi                                                   | mov ecx, dword ptr ds:[0x0135FB08]
+0062D489 | E8 C2F2FFFF              | call woool.dat.62C750                                         | 按键call
+0062D48E | 84C0                     | test al,al                                                    |
+0062D490 | 0F85 62FEFFFF            | jne woool.dat.62D2F8                                          |
+0062D496 | 0FB7C3                   | movzx eax,bx                                                  |
+0062D499 | 0FB7C0                   | movzx eax,ax                                                  |
+0062D49C | 83C0 F3                  | add eax,FFFFFFF3                                              |
+0062D49F | 83F8 6A                  | cmp eax,6A                                                    | 6A:'j'
+
+007BC9D6 | 8B0D 10FB3501            | mov ecx,dword ptr ds:[135FB10]                                |
+007BC9DC | 55                       | push ebp                                                      | y
+007BC9DD | 57                       | push edi                                                      | x
+007BC9DE | E8 4DD0F0FF              | call woool.dat.6C9A30                                         | 捡物call
+007BC9E3 | 5B                       | pop ebx                                                       |
+007BC9E4 | 5F                       | pop edi                                                       |
+007BC9E5 | 5E                       | pop esi                                                       |
+007BC9E6 | B0 01                    | mov al,1                                                      |
+007BC9E8 | 5D                       | pop ebp                                                       |
+007BC9E9 | 83C4 14                  | add esp,14                                                    |
+007BC9EC | C2 0800                  | ret 8                                                         |
+007BC9EF | 8B4424 14                | mov eax,dword ptr ss:[esp+14]                                 | [esp+14]:"4傭"==&"Pk}}"
+007BC9F3 | 85C0                     | test eax,eax                                                  |
+007BC9F5 | 8BCE                     | mov ecx,esi                                                   |
+007BC9F7 | 75 13                    | jne woool.dat.7BCA0C                                          |
+007BC9F9 | 50                       | push eax                                                      |
+007BC9FA | 50                       | push eax                                                      |
+007BC9FB | E8 000EFFFF              | call woool.dat.7AD800                                         |
+007BCA00 | 5B                       | pop ebx                                                       |
+007BCA01 | 5F                       | pop edi                                                       |
+007BCA02 | 5E                       | pop esi                                                       |
+007BCA03 | B0 01                    | mov al,1                                                      |
+007BCA05 | 5D                       | pop ebp                                                       |
+007BCA06 | 83C4 14                  | add esp,14                                                    |
+
+006A5C33 | push 0x0                          |
+006A5C35 | push 0x1                          |
+006A5C37 | push 0x1                          |
+006A5C39 | push edi                          | 长度
+006A5C3A | push esi                          | 缓冲区
+006A5C3B | push 0x0                          |
+006A5C3D | call woool.dat.5C8C00             | 喊话 明文包
+
+    
+
+0075F37D | mov eax,dword ptr ds:[ebx+0x48]             |
+0075F380 | push eax                                    |
+0075F381 | push ecx                                    |
+0075F382 | mov ecx,dword ptr ds:[0x112F580]            |
+0075F388 | call woool.dat.6EF410                       | 普攻call
+0075F38D | jmp woool.dat.75F1F5                        |
