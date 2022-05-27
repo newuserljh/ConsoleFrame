@@ -4,41 +4,48 @@
 
 ROLE_PROPERTY::ROLE_PROPERTY()
 {
-	szpName = nullptr;
-	ndCurHp = 0;
-	ndMaxHp = 0;
 }
 
 ROLE_PROPERTY::~ROLE_PROPERTY()
 {
-	if (!szpName)
-	{
-		delete szpName;
-	}
+
 }
 
 MONSTER_PROPERTY::MONSTER_PROPERTY()
 {
-	szpName = nullptr;
+	pName = nullptr;
 }
 
 MONSTER_PROPERTY::~MONSTER_PROPERTY()
 {
-	if (!szpName)
+	if (!pName)
 	{
-		delete szpName;
+		delete pName;
 	}
 }
 
 SKILL_PROPERTY::SKILL_PROPERTY()
 {
-	szpName = nullptr;
+	pName = nullptr;
 }
 
 SKILL_PROPERTY::~SKILL_PROPERTY()
 {
-	if (!szpName)
+	if (!pName)
 	{
-		delete szpName;
+		delete pName;
+	}
+}
+
+GOODS_PROPERTY::GOODS_PROPERTY()
+{
+	pName = nullptr;
+}
+
+GOODS_PROPERTY::~GOODS_PROPERTY()
+{
+	if (!pName)
+	{
+		delete pName;
 	}
 }

@@ -15,7 +15,7 @@ bool monster::init()
 	
 	try{
 		std::shared_ptr<MONSTER_PROPERTY> temp(new MONSTER_PROPERTY);
-		temp->szpName = (char*)(0x5000);
+		temp->pName = (char*)(0x5000);
 		m_monsterList.push_back(temp);
 	}
 	catch(...)
@@ -33,7 +33,7 @@ std::string monster::message()
 	std::stringstream ss;
 	for (int i = 0; i != m_monsterList.size(); i++)
 	{
-		ss << "怪物名字：" << m_monsterList.at(i)->szpName << std::endl;
+		ss << "怪物名字：" << m_monsterList.at(i)->pName << std::endl;
 	}
 	return ss.str();
 }

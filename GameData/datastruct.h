@@ -1,26 +1,58 @@
 #pragma once
 #include <windows.h>
 
-//人物属性
-struct ROLE_PROPERTY
-{
-	ROLE_PROPERTY();
-	~ROLE_PROPERTY();
-	
-	char* szpName;
-	DWORD ndCurHp;
-	DWORD ndMaxHp;
-
-};
-
 //周围对象
-struct MONSTER_PROPERTY 
+struct MONSTER_PROPERTY
 {
 	MONSTER_PROPERTY();
 	~MONSTER_PROPERTY();
 
-	char* szpName;
+	DWORD*  ID;// +8
+	char*  pName;// +0x10
+	DWORD*  HP;// +0x80
+	DWORD*  HP_MAX;// +0x84
+	DWORD*  MP;// +0x88
+	DWORD*  MP_MAX;// +0x8c
+	DWORD*  X;// X;// +0xac 
+	DWORD*  Y;// Y;// +0xb0
+	BYTE*  IsPosion;// +0x34b  //是否中毒 0没毒，0x40红毒，0x80绿毒，0xc0红绿毒,
 };
+//人物属性
+struct ROLE_PROPERTY
+{
+	ROLE_PROPERTY();
+	~ROLE_PROPERTY();	
+	MONSTER_PROPERTY Object;
+	DWORD* Job;//  +0xe4 //职业 0/战士  1/法师 2/道士
+	DWORD* Level;// +0xec //等级
+	DWORD* Sex; //+0xdc 性别 0男 1女
+	DWORD* GJL_L;//攻击 0xA5C
+	DWORD* GJL_H;//+0xA60
+	DWORD* MFL_L;//魔法+0xA64
+	DWORD* MFL_H; //+0xA68
+	DWORD* DSL_L;//道术+0xA6c
+	DWORD* DSL_H;//+0xA70
+	DWORD* FY_L;//防御//+0xA7C
+	DWORD* FY_H;//+0xA80
+	DWORD* MF_L;//防御/+0xA84 
+	DWORD* MF_H;//0xA88
+	WORD* BAG_W; // 背包重量 低16位//+0xAA8
+	WORD* BAG_W_MAX; // 背包重量 低16位//+0xAA6
+	DWORD* SW; //声望//+0xAD0 
+	DWORD* p_Bag_Base; //背包基址，第一个格子指针0x135fb30]+0xC54]+ i * 0x688   (0-0x41)
+	DWORD* Bag_Size;//背包大小[0x135fb30  ]+0xc58 
+	DWORD* p_LR_Bag_Base;//灵兽背包基址，第一个格子指针[0x135fb30  ]+0xc60  
+	DWORD* LR_Bag_Size; //灵兽背包大小  +0xc64 
+	DWORD* p_Target_ID; //选中/攻击 目标ID +0x458 
+	DWORD* p_Skill_Base;//i为技能栏的顺序从0开始0x135fb30]+0x1358]+ i * 0x88
+	DWORD* p_ZB;/*== [[0x135fb30 ]+ 0xc48] + i * 0x688 //身上装备 0衣服，1武器，2勋章，3项链，4头盔
+					，5右手镯，6左手镯，7右戒指，8左戒指，9靴子，10腰带，11宝石，12护符，13盾牌，14魂珠,
+					15 极品御兽天衣 ，16 紋佩 ，18 神龙背饰 ，19 面具 ，20 仙翼*/
+	DWORD* LL; //[0x135fb30] + 0x139C//灵力
+	char* p_Current_Map;// [135fb30] + 0x8299C8//所在地图 CHAR*
+};
+
+
 
 //技能对象
 struct SKILL_PROPERTY 
@@ -28,7 +60,32 @@ struct SKILL_PROPERTY
 	SKILL_PROPERTY();
 	~SKILL_PROPERTY();
 
-	char* szpName;
+	WORD  ID;// + 0xe
+	char* pName;//+ 14
+};
+
+//物品对象
+struct GOODS_PROPERTY
+{
+	GOODS_PROPERTY();
+	~GOODS_PROPERTY();
+	BYTE Name_Length;// + 0
+	char* pName;//+ 1
+	BYTE  WD_low;//+ 1a / /物理防御下  /幸运武器
+	BYTE  WD_high;// + 1b 物理防御上  /命中武器
+	BYTE  MD_low;//+ 1c / 魔防
+	BYTE  MD_high;//+ 1D
+	BYTE  PA_low;//+ 1e        //攻击力
+	BYTE  PA_high;// + 1f
+	BYTE  Magic_low;// + 20   //魔法攻击
+	BYTE  Magic_high;// + 21
+	BYTE  Tao_low;//+ 22   //道术攻击
+	BYTE  Tao_high;//+ 23
+	BYTE  Need_what;// + 24  佩戴需求 0等级 1攻击 2魔法 3道术
+	BYTE  Need_Num;//+ 25  佩戴需求大小 等级 / 魔法。。
+	DWORD ID;//+ 2c
+	unsigned short Use_Num;//+ 30            耐久 / 使用次数
+	unsigned short Use_Num_Max;// + 32    最大耐久 / 使用次数
 };
 
 //任务对象
@@ -36,6 +93,5 @@ struct TASK_PROPERTY
 {
 	TASK_PROPERTY();
 	~TASK_PROPERTY();
-
-	char* szpName;
+	char* pName;
 };
