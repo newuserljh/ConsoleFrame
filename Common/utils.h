@@ -18,6 +18,7 @@
 #include <vector>
 #include <map>
 #include <list>
+#include <regex>
 #pragma comment(lib , "Psapi.lib")
 /*
 工具类
@@ -41,6 +42,8 @@ public:
 	bool bytes2hexstr(BYTE* src, DWORD ndSize, char* desc); //字节数组到hex数组的转换 
 	bool hexstr2bytes(char* src, char* desc); //hex字符串到字节数组的转换
 	bool fileIsexist(std::string fileName);
+	std::vector<std::string> ReadTxt(std::string file_Path/*文件路径*/);
+	std::vector<std::string> splitString(std::string str);
 public:
 	tools();
 	tools(const tools&);

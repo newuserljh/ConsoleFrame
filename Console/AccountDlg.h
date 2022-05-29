@@ -25,6 +25,7 @@ private:
 	bool initMem();
 	std::shared_ptr<shareMemorySer>m_shareMemSer;
 	void threadCallBack();
+	bool initAccount();
 
 public:
 	CListCtrl m_listCtl;

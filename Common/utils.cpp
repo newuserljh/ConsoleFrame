@@ -347,3 +347,44 @@ bool tools::fileIsexist(std::string fileName)
 	return result;
 }
 
+/*
+函数功能：按行读取文件
+参数1：文件名
+返回值：存储数据的vector
+*/
+std::vector<std::string> tools::ReadTxt(std::string file_Path/*文件路径*/)
+{
+	std::fstream f(file_Path);
+	std::vector<std::string> temp;
+	std::string line;
+	if (!f.is_open())
+	{
+		tools::getInstance()->message("文件打开失败！\n");
+	}
+	while (!f.eof())//会自动把换行符去掉
+	{
+		std::getline(f, line);
+		temp.push_back(line);
+	}
+	f.close();
+	return temp;
+}
+
+
+/*
+函数功能：分割整行字符串
+参数1：字符串
+返回值：存储数据的vector
+*/
+std::vector<std::string> tools::splitString(std::string str)
+{
+	std::vector<std::string> rvec;
+	std::string s = "";
+	std::regex delimiters("\\s+");
+	std::vector<std::string> temp(std::sregex_token_iterator(str.begin(), str.end(), delimiters, -1), std::sregex_token_iterator());
+	for (auto i=0;i<temp.size();i++)
+	{
+		rvec.push_back(temp[i]);
+	}
+	return rvec;
+}

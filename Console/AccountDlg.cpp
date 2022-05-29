@@ -10,6 +10,7 @@
 #include <windows.h>
 #include "exeLoad.h"
 #include "EipInject.h"
+#include "utils.h"
 // CAccountDlg 对话框
 
 
@@ -84,6 +85,7 @@ BOOL CAccountDlg::OnInitDialog()
 		return FALSE;
 	if (!initMem())
 		return FALSE;
+	initAccount();
 	auto tthread = std::thread(&CAccountDlg::threadCallBack, this);
 	tthread.detach();
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -146,13 +148,28 @@ void CAccountDlg::OnBnClickedButton1()
 	}
 	m_shareMemSer->m_pSMAllData->m_sm_data[index].userName = (std::string)m_userName.GetString();
 	m_shareMemSer->m_pSMAllData->m_sm_data[index].passWord =(std::string) m_password.GetString();
-
 }
 
 bool CAccountDlg::initMem()
 {
 	return  m_shareMemSer->createShareMemory();
 }
+
+bool CAccountDlg::initAccount()
+{
+	std::vector<std::string> vecA=tools::getInstance()->ReadTxt("..\\Account.txt");
+	for (auto i=0;i<vecA.size();i++)
+	{
+		if (i >= MORE_OPEN_NUMBER)return false; //账号超过最大躲开数量
+		std::vector<std::string> temp = tools::getInstance()->splitString(vecA[i]);
+		m_shareMemSer->m_pSMAllData->m_sm_data[i].userName = (std::string)temp[0];
+		m_shareMemSer->m_pSMAllData->m_sm_data[i].passWord = (std::string)temp[1];
+
+		temp.clear();
+	}
+	return true;
+}
+
 
 void CAccountDlg::threadCallBack()
 {
