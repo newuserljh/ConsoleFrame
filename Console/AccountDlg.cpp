@@ -107,8 +107,7 @@ bool CAccountDlg::updateDate()
 		{
 
 			if ((m_shareMemSer->m_pSMAllData->m_sm_data[i].send_rand != m_shareMemSer->m_pSMAllData->m_sm_data[i].rcv_rand)&&
-				(m_shareMemSer->m_pSMAllData->m_sm_data[i].send_rand != 0)&& 
-				(!m_shareMemSer->m_pSMAllData->m_sm_data[i].server_alive))
+				(m_shareMemSer->m_pSMAllData->m_sm_data[i].send_rand != 0))
 			{
 				::TerminateProcess(::OpenProcess(PROCESS_ALL_ACCESS, false, m_shareMemSer->m_pSMAllData->m_sm_data[i].ndPid),0);//强制关闭进程
 				m_shareMemSer->m_pSMAllData->m_sm_data[i].ndPid = 0;
@@ -119,6 +118,13 @@ bool CAccountDlg::updateDate()
 				srand((unsigned int)time(0));//先设置种子
 				m_shareMemSer->m_pSMAllData->m_sm_data[i].send_rand = rand() + 1;
 			}
+			if (m_shareMemSer->m_pSMAllData->m_sm_data[i].server_alive ==false)//验证外挂存活)
+			{
+				::TerminateProcess(::OpenProcess(PROCESS_ALL_ACCESS, false, m_shareMemSer->m_pSMAllData->m_sm_data[i].ndPid), 0);//强制关闭进程
+				m_shareMemSer->m_pSMAllData->m_sm_data[i].ndPid = 0;
+				log_inject(i);//重新登录
+			}
+
 		}
 	}
 	return true;

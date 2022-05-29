@@ -22,13 +22,14 @@ role r;//角色
 
 _declspec(naked) void CallTest()
 {
-
 	_asm pushad
 	if (hook.EAX != 0)
+	{
 		tools::getInstance()->message("错误!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+		shareCli.m_pSMAllData->m_sm_data[shareindex].server_alive = false;//验证外挂存活
+	}
 	_asm  popad
 	_asm ret
-
 }
 
 
@@ -65,9 +66,9 @@ void threadLogin()
 	do
 	{
 		shareCli.m_pSMAllData->m_sm_data[shareindex].cscript = "登录中...";
-		Sleep(5000);
+		Sleep(10000);
 		li.pressEnter(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
-		Sleep(1000);
+		Sleep(100);
 		li.game_login(shareCli.m_pSMAllData->m_sm_data[shareindex].userName.c_str(), shareCli.m_pSMAllData->m_sm_data[shareindex].passWord.c_str());
 		Sleep(1000);
 		li.pressEnter(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
@@ -98,7 +99,7 @@ void threadAlive()
 	while (true)
 	{
 		shareCli.m_pSMAllData->m_sm_data[shareindex].rcv_rand = shareCli.m_pSMAllData->m_sm_data[shareindex].send_rand;//验证外挂存活
-		shareCli.m_pSMAllData->m_sm_data[shareindex].server_alive = false;//验证外挂存活
+
 		Sleep(1000);
 	}
 }
@@ -141,17 +142,23 @@ BOOL CTestDlg::OnInitDialog()
 	CDialogEx::OnInitDialog();
 
 	// TODO:  在此添加额外的初始化
-		//初始化共享内存,取得共享内存索引
+
+  //初始化共享内存,取得共享内存索引
 	if (!shareCli.openShareMemory())
 	{
 		tools::getInstance()->message("打开共享内存失败\n");
 	}
 	shareindex = shareCli.getIndexByPID(GetCurrentProcessId());
+	shareCli.m_pSMAllData->m_sm_data[shareindex].server_alive = true;
+	shareCli.m_pSMAllData->m_sm_data[shareindex].send_rand=0;
+	shareCli.m_pSMAllData->m_sm_data[shareindex].rcv_rand=0;
+
+	//HOOK连接服务器失败代码
 	hook.hookReg(0x5F8B69, 5, CallTest);
 
 	CloseHandle(::CreateThread(NULL, NULL, LPTHREAD_START_ROUTINE(threadLogin), NULL, NULL, NULL));
 	//登录成功之后设置 启动通讯线程,定时验证存活消息
-
+	
 	CloseHandle(::CreateThread(NULL, NULL, LPTHREAD_START_ROUTINE(threadAlive), NULL, NULL, NULL));
 
 
