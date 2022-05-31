@@ -149,9 +149,6 @@ BOOL CTestDlg::OnInitDialog()
 		tools::getInstance()->message("打开共享内存失败\n");
 	}
 	shareindex = shareCli.getIndexByPID(GetCurrentProcessId());
-	shareCli.m_pSMAllData->m_sm_data[shareindex].server_alive = true;
-	shareCli.m_pSMAllData->m_sm_data[shareindex].send_rand=0;
-	shareCli.m_pSMAllData->m_sm_data[shareindex].rcv_rand=0;
 
 	//HOOK连接服务器失败代码
 	hook.hookReg(0x5F8B69, 5, CallTest);
