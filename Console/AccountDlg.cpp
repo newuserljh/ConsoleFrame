@@ -120,7 +120,7 @@ bool CAccountDlg::updateDate()
 				srand((unsigned int)time(0));//先设置种子
 				m_shareMemSer->m_pSMAllData->m_sm_data[i].send_rand = rand() + 1;
 			}
-			if (m_shareMemSer->m_pSMAllData->m_sm_data[i].server_alive ==false)//验证外挂存活)
+			if (m_shareMemSer->m_pSMAllData->m_sm_data[i].server_alive ==false)//验证游戏服务器状态
 			{
 				::TerminateProcess(::OpenProcess(PROCESS_ALL_ACCESS, false, m_shareMemSer->m_pSMAllData->m_sm_data[i].ndPid), 0);//强制关闭进程
 				m_shareMemSer->m_pSMAllData->m_sm_data[i].ndPid = 0;
@@ -155,7 +155,17 @@ void CAccountDlg::OnBnClickedButton1()
 
 bool CAccountDlg::initMem()
 {
-	return  m_shareMemSer->createShareMemory();
+	bool rt=  m_shareMemSer->createShareMemory();
+	if (rt)
+	{
+		for (auto i = 0; i < MORE_OPEN_NUMBER; i++)
+		{
+			m_shareMemSer->m_pSMAllData->m_sm_data[i].send_rand = 0;
+			m_shareMemSer->m_pSMAllData->m_sm_data[i].rcv_rand = 0;
+			m_shareMemSer->m_pSMAllData->m_sm_data[i].server_alive = true;
+		}
+	}
+	return rt;
 }
 
 bool CAccountDlg::initAccount()
@@ -186,10 +196,9 @@ void CAccountDlg::threadCallBack()
 	}
 }
 
-
+// TODO:  删除账号，是删除复选框选中的账号信息
 void CAccountDlg::OnBnClickedButton2()
 {
-	// TODO:  删除账号，是删除复选框选中的账号信息
 	std::vector<std::string> vecA = tools::getInstance()->ReadTxt("..\\Account.txt");
 	if (vecA.empty())return;
 	for (auto i = 0; i < MORE_OPEN_NUMBER; i++)
@@ -222,15 +231,15 @@ void CAccountDlg::OnBnClickedButton2()
 	}
 }
 
-
+// TODO:  开始脚本 判断当前复选框是否被选中，只登陆选中的
 void CAccountDlg::OnBnClickedButton3()
 {
-	// TODO:  开始脚本
-	//正常情况下，会判断当前复选框是否被选中，只登陆选中的
-
 		for (int i = 0; i < MORE_OPEN_NUMBER; i++)
 	{		
-			if(m_listCtl.GetCheck(i))
+			if (!m_listCtl.GetCheck(i))continue; //未选中
+			if ((m_shareMemSer->m_pSMAllData->m_sm_data[i].userName=="")|| //账号空
+				(m_shareMemSer->m_pSMAllData->m_sm_data[i].passWord == "")|| //密码空
+				(m_shareMemSer->m_pSMAllData->m_sm_data[i].ndPid!=0))continue;//已启动过
 			log_inject(i);
 	}
 	
@@ -239,8 +248,8 @@ void CAccountDlg::OnBnClickedButton3()
 /*登录游戏并注入获取PID*/
 void CAccountDlg::log_inject(int i)
 {
-	exeLoad e("D:\\传奇世界2.9\\传奇世界\\Data\\woool.dat.update", "D:\\传奇世界2.9\\传奇世界\\Data\\");
+	exeLoad e("G:\\传奇世界2.9\\传奇世界\\Data\\woool.dat.update", "G:\\传奇世界2.9\\传奇世界\\Data\\");
 	m_shareMemSer->m_pSMAllData->m_sm_data[i].ndPid = e.pi.dwProcessId;
 	EipInject in;
-	in.eipinjectDll(L"D:\\VS_PROJECT\\ConsoleFrame\\Debug\\TestDll.dll", e.pi);
+	in.eipinjectDll(L"G:\\VS_Projects\\ConsoleFrame-main\\Debug\\TestDll.dll", e.pi);
 }
