@@ -163,6 +163,27 @@ bool tools::log2file(std::string fileName, std::string data, std::ios_base::open
 	fout.close();
 	return true;
 }
+
+/*
+函数功能：string写入文件+换行
+参数1：文件名
+参数2：数据
+参数3：打开模式
+返回值：BOOL
+*/
+bool tools::write2file(std::string fileName, std::string data, std::ios_base::open_mode _model/*= std::ios::app*/)
+{
+	std::ofstream fout;
+	fout.open(fileName, _model);
+	if (!fout)
+	{
+		return false;
+	}
+	fout << data << std::endl;
+	fout.close();
+	return true;
+}
+
 /*
 函数功能：写内存字节集
 参数1: 内存地址
@@ -364,7 +385,7 @@ std::vector<std::string> tools::ReadTxt(std::string file_Path/*文件路径*/)
 	while (!f.eof())//会自动把换行符去掉
 	{
 		std::getline(f, line);
-		temp.push_back(line);
+		if(line.size())temp.push_back(line); //空行不push
 	}
 	f.close();
 	return temp;
@@ -378,13 +399,7 @@ std::vector<std::string> tools::ReadTxt(std::string file_Path/*文件路径*/)
 */
 std::vector<std::string> tools::splitString(std::string str)
 {
-	std::vector<std::string> rvec;
-	std::string s = "";
 	std::regex delimiters("\\s+");
 	std::vector<std::string> temp(std::sregex_token_iterator(str.begin(), str.end(), delimiters, -1), std::sregex_token_iterator());
-	for (auto i=0;i<temp.size();i++)
-	{
-		rvec.push_back(temp[i]);
-	}
-	return rvec;
+	return temp;
 }
