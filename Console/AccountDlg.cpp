@@ -146,8 +146,11 @@ void CAccountDlg::OnBnClickedButton1()
 		AfxMessageBox("超过最大的多开数量，如果想添加账号，请删除上面的任意账号！\n");
 		return;
 	}
+	std::stringstream ss;
 	m_shareMemSer->m_pSMAllData->m_sm_data[index].userName = (std::string)m_userName.GetString();
-	m_shareMemSer->m_pSMAllData->m_sm_data[index].passWord =(std::string) m_password.GetString();
+	m_shareMemSer->m_pSMAllData->m_sm_data[index].passWord = (std::string)m_password.GetString();
+	ss << m_shareMemSer->m_pSMAllData->m_sm_data[index].userName.c_str() << " " << m_shareMemSer->m_pSMAllData->m_sm_data[index].passWord.c_str();
+	tools::getInstance()->write2file("..\\Account.txt", ss.str());
 }
 
 bool CAccountDlg::initMem()
@@ -158,13 +161,14 @@ bool CAccountDlg::initMem()
 bool CAccountDlg::initAccount()
 {
 	std::vector<std::string> vecA=tools::getInstance()->ReadTxt("..\\Account.txt");
+	if (vecA.empty())return false;
 	for (auto i=0;i<vecA.size();i++)
 	{
 		if (i >= MORE_OPEN_NUMBER)return false; //账号超过最大躲开数量
 		std::vector<std::string> temp = tools::getInstance()->splitString(vecA[i]);
+		if (temp.size()<2)continue;
 		m_shareMemSer->m_pSMAllData->m_sm_data[i].userName = (std::string)temp[0];
 		m_shareMemSer->m_pSMAllData->m_sm_data[i].passWord = (std::string)temp[1];
-
 		temp.clear();
 	}
 	return true;
@@ -186,8 +190,36 @@ void CAccountDlg::threadCallBack()
 void CAccountDlg::OnBnClickedButton2()
 {
 	// TODO:  删除账号，是删除复选框选中的账号信息
-
-
+	std::vector<std::string> vecA = tools::getInstance()->ReadTxt("..\\Account.txt");
+	if (vecA.empty())return;
+	for (auto i = 0; i < MORE_OPEN_NUMBER; i++)
+	{
+		if (!m_listCtl.GetCheck(i))continue;
+		std::stringstream ss;
+		ss << m_shareMemSer->m_pSMAllData->m_sm_data[i].userName << " " << m_shareMemSer->m_pSMAllData->m_sm_data[i].passWord;
+		if (vecA.empty())break;
+		for (auto it=vecA.begin();it!=vecA.end(); it++)
+		{			
+			if (memcmp(ss.str().c_str(), (*it).c_str(),strlen(ss.str().c_str()))==0)
+			{
+				m_shareMemSer->m_pSMAllData->m_sm_data[i].userName = "";
+				m_shareMemSer->m_pSMAllData->m_sm_data[i].passWord = "";
+				it=vecA.erase(it);
+				break;
+			}			
+		}
+		ss.clear();
+	}
+	if (vecA.empty())
+	{
+		tools::getInstance()->write2file("..\\Account.txt", "", std::ios::out);
+			return;
+	}
+	tools::getInstance()->write2file("..\\Account.txt", "", std::ios::out);
+	for (auto i=0;i<vecA.size();i++)
+	{	
+		tools::getInstance()->write2file("..\\Account.txt", vecA[i]);
+	}
 }
 
 
