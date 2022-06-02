@@ -1,0 +1,43 @@
+0047A9DF   | CC                         | int3                                               |
+0047A9E0   | 56                         | push esi                                           |
+0047A9E1   | 57                         | push edi                                           |
+0047A9E2   | 8B7C24 0C                  | mov edi,dword ptr ss:[esp+0xC]                     |
+0047A9E6   | 85FF                       | test edi,edi                                       |
+0047A9E8   | 7C 53                      | jl woool.dat.47AA3D                                |
+0047A9EA   | 8B7424 10                  | mov esi,dword ptr ss:[esp+0x10]                    | [esp+10]:"MZ?"
+0047A9EE   | 85F6                       | test esi,esi                                       |
+0047A9F0   | 7C 4B                      | jl woool.dat.47AA3D                                |
+0047A9F2   | B8 67666666                | mov eax,0x66666667                                 |
+0047A9F7   | F7EF                       | imul edi                                           |
+0047A9F9   | C1FA 04                    | sar edx,0x4                                        |
+0047A9FC   | 8BC2                       | mov eax,edx                                        |
+0047A9FE   | C1E8 1F                    | shr eax,0x1F                                       |
+0047AA01   | 03C2                       | add eax,edx                                        |
+0047AA03   | 8D0480                     | lea eax,dword ptr ds:[eax+eax*4]                   |
+0047AA06   | 03C0                       | add eax,eax                                        |
+0047AA08   | 03C0                       | add eax,eax                                        |
+0047AA0A   | 03C0                       | add eax,eax                                        |
+0047AA0C   | 53                         | push ebx                                           |
+0047AA0D   | 8BD8                       | mov ebx,eax                                        |
+0047AA0F   | B8 99999999                | mov eax,0x99999999                                 |
+0047AA14   | F7EE                       | imul esi                                           |
+0047AA16   | C1FA 04                    | sar edx,0x4                                        |
+0047AA19   | 8BC2                       | mov eax,edx                                        |
+0047AA1B   | C1E8 1F                    | shr eax,0x1F                                       |
+0047AA1E   | 03C2                       | add eax,edx                                        |
+0047AA20   | 2BC3                       | sub eax,ebx                                        |
+0047AA22   | 03C7                       | add eax,edi                                        |
+0047AA24   | 8D1480                     | lea edx,dword ptr ds:[eax+eax*4]                   |
+0047AA27   | 8D04D6                     | lea eax,dword ptr ds:[esi+edx*8]                   |
+0047AA2A   | 69C0 700A0000              | imul eax,eax,0xA70                                 |
+0047AA30   | 8B8408 54234100            | mov eax,dword ptr ds:[eax+ecx+0x412354]  地面遍历：0x412354，周围对象： 0x412d68
+0047AA37   | 5B                         | pop ebx                                            |
+0047AA38   | 5F                         | pop edi                                            |
+0047AA39   | 5E                         | pop esi                                            |
+0047AA3A   | C2 0800                    | ret 0x8                                            |
+0047AA3D   | 5F                         | pop edi                                            |
+0047AA3E   | 33C0                       | xor eax,eax                                        |
+0047AA40   | 5E                         | pop esi                                            |
+0047AA41   | C2 0800                    | ret 0x8                                            |
+0047AA44   | CC                         | int3                                               |
+0047AA45   | CC                         | int3                                               |

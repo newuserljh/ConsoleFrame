@@ -16,7 +16,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
-    <Text Include="C:\Users\37399\Desktop\2.9 call1.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base.h">
@@ -43,6 +42,9 @@
     <ClInclude Include="login.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="bag.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="base.cpp">
@@ -64,6 +66,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="login.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="bag.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

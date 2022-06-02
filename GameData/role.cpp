@@ -1,5 +1,6 @@
 #include "role.h"
 #include "baseaddr.h"
+#include "../Common/utils.h"
 
 role::role()
 {
@@ -36,7 +37,8 @@ bool role::init()
 		m_roleproperty.MF_L= (DWORD*)(*(DWORD*)RoleBase + 0xA84);
 		m_roleproperty.MF_H= (DWORD*)(*(DWORD*)RoleBase +0xA88);
 		m_roleproperty.BAG_W= (WORD*)(*(DWORD*)RoleBase +0xAA8);
-		m_roleproperty.SW = (DWORD*)(*(DWORD*)RoleBase  +0xAA6);
+		m_roleproperty.BAG_W_MAX = (WORD*)(*(DWORD*)RoleBase + 0xAAA);
+		m_roleproperty.SW = (DWORD*)(*(DWORD*)RoleBase  +0xAD0);
 		m_roleproperty.p_Bag_Base = (DWORD*)(*(DWORD*)RoleBase+ 0xC54);
 		m_roleproperty.Bag_Size = (DWORD*)(*(DWORD*)RoleBase +0xc58);
 		m_roleproperty.p_LR_Bag_Base = (DWORD*)(*(DWORD*)RoleBase + 0xc60);
@@ -56,4 +58,67 @@ bool role::init()
 		return false;
 	}
 	return true;
+}
+
+/*遍历周围对象及地面物品*/
+bool role:: Get_Envionment(DWORD x, DWORD y, std::vector<DWORD> &vec,DWORD get_offset, DWORD g_range)
+{
+	DWORD p_temp=0;
+	for (int i = x - g_range; i < x + g_range; i++)
+	{
+		if (i <= 0)i = 1;
+		for (int j = y - g_range; j < y + g_range; j++)
+		{
+			if (j <= 0)j = 1;
+			try
+			{
+				_asm
+				{
+					pushad
+					mov ecx, RoleBase
+					mov ecx, [ecx]
+					add ecx, 0x1D38
+					mov edi, i
+					mov esi, j
+					mov eax, 0x66666667
+					imul edi
+					sar edx, 0x4
+					mov eax, edx
+					shr eax, 0x1F
+					add eax, edx
+					lea eax, dword ptr ds : [eax + eax * 4]
+					add eax, eax
+					add eax, eax
+					add eax, eax
+					mov ebx, eax
+					mov eax, 0x99999999
+					imul esi
+					sar edx, 0x4
+					mov eax, edx
+					shr eax, 0x1F
+					add eax, edx
+					sub eax, ebx
+					add eax, edi
+					lea edx, dword ptr ds : [eax + eax * 4]
+					lea eax, dword ptr ds : [esi + edx * 8]
+					imul eax, eax, 0xA70
+					add ecx, get_offset
+					mov eax, dword ptr ds : [eax + ecx]
+					mov p_temp, eax
+					popad
+				}
+				if (p_temp != 0)
+				{
+					if (get_offset == Ground_Offset)vec.push_back(p_temp);/*地面*/
+					if ((get_offset == Envi_Offset)&&(*(DWORD*)(p_temp + 0x80)!=0))vec.push_back(p_temp);/*周围其他对象*/
+				}
+			}
+			catch (...)
+			{
+				return false;
+			}
+		}
+	}
+	return true;
+
 }

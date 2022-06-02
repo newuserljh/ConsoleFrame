@@ -72,10 +72,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="C:\Users\37399\Desktop\2.9 call1.txt" />
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bag.h" />
     <ClInclude Include="base.h" />
     <ClInclude Include="baseaddr.h" />
     <ClInclude Include="datastruct.h" />
@@ -86,6 +86,7 @@
     <ClInclude Include="task.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="bag.cpp" />
     <ClCompile Include="base.cpp" />
     <ClCompile Include="datastruct.cpp" />
     <ClCompile Include="login.cpp" />

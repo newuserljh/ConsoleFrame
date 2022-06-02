@@ -36,8 +36,8 @@ struct ROLE_PROPERTY
 	DWORD* FY_H;//+0xA80
 	DWORD* MF_L;//防御/+0xA84 
 	DWORD* MF_H;//0xA88
-	WORD* BAG_W; // 背包重量 低16位//+0xAA8
-	WORD* BAG_W_MAX; // 背包重量 低16位//+0xAA6
+	WORD* BAG_W; // 背包重量 +0xAA8
+	WORD* BAG_W_MAX; // 背包重量 //+0xAAA
 	DWORD* SW; //声望//+0xAD0 
 	DWORD* p_Bag_Base; //背包基址，第一个格子指针0x135fb30]+0xC54]+ i * 0x688   (0-0x41)
 	DWORD* Bag_Size;//背包大小[0x135fb30  ]+0xc58 
@@ -59,8 +59,8 @@ struct SKILL_PROPERTY
 {
 	SKILL_PROPERTY();
 	~SKILL_PROPERTY();
-
-	WORD  ID;// + 0xe
+	BYTE* level;// +8
+	DWORD* ID;// + 0xe
 	char* pName;//+ 14
 };
 
@@ -84,8 +84,8 @@ struct GOODS_PROPERTY
 	BYTE  Need_what;// + 24  佩戴需求 0等级 1攻击 2魔法 3道术
 	BYTE  Need_Num;//+ 25  佩戴需求大小 等级 / 魔法。。
 	DWORD ID;//+ 2c
-	unsigned short Use_Num;//+ 30            耐久 / 使用次数
-	unsigned short Use_Num_Max;// + 32    最大耐久 / 使用次数
+	WORD Use_Num;//+ 30            耐久 / 使用次数
+	WORD Use_Num_Max;// + 32    最大耐久 / 使用次数
 };
 
 //任务对象

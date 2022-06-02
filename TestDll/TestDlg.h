@@ -21,4 +21,8 @@ protected:
 public:
 	afx_msg void OnBnClickedButton1();
 	virtual BOOL OnInitDialog();
+	CEdit m_edit2;
+	afx_msg void OnBnClickedButton2();
+	afx_msg void OnBnClickedButton3();
+	afx_msg void OnBnClickedButton8();
 };
