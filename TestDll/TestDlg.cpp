@@ -10,7 +10,7 @@
 #include "skill.h"
 #include "bag.h"
 #include "utils.h"
-#include "login.h"
+#include "gamecall.h"
 #include "shareMemoryCli.h"
 #pragma comment(lib , "Common.lib")
 #pragma comment(lib ,"GameData.lib")
@@ -72,26 +72,26 @@ END_MESSAGE_MAP()
 void threadLogin()
 {
 	int i = 0;//尝试登录次数
-	login li;
+	gamecall m_call;
 	do
 	{
 		shareCli.m_pSMAllData->m_sm_data[shareindex].cscript = "登录中...";
 		Sleep(10000);
-		li.pressEnter(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
+		m_call.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
 		Sleep(100);
-		li.game_login(shareCli.m_pSMAllData->m_sm_data[shareindex].userName.c_str(), shareCli.m_pSMAllData->m_sm_data[shareindex].passWord.c_str());
+		m_call.loginGame(shareCli.m_pSMAllData->m_sm_data[shareindex].userName.c_str(), shareCli.m_pSMAllData->m_sm_data[shareindex].passWord.c_str());
 		Sleep(1000);
-		li.pressEnter(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
+		m_call.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
 		Sleep(1000);
-		li.pressEnter(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
+		m_call.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
 		Sleep(1000);
-		li.pressEnter(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
+		m_call.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
 		Sleep(1000);
-		li.pressEnter(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
+		m_call.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
 		Sleep(1000);
-		li.pressEnter(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
+		m_call.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
 		Sleep(1000);
-		li.pressEnter(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
+		m_call.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
 		Sleep(1000);
 		i++;
 	} while ((!r.init()) && i < 10);
@@ -145,6 +145,12 @@ void CTestDlg::OnBnClickedButton1()
 	AppendText(m_edit2, s);
 	s.Format("ID:%x", *r.m_roleproperty.Object.ID);
 	AppendText(m_edit2, s);
+	for (auto i=0;i<21;i++)
+	{
+		if (!(*r.m_euip[i].ID))continue; 
+		s.Format("%d :%s 耐久:%d/%d",i, r.m_euip[i].pName, *(r.m_euip[i].Use_Num),*(r.m_euip[i].Use_Num_Max));
+		AppendText(m_edit2, s);
+	}
 }
 //int
 //WSAAPI
@@ -203,10 +209,10 @@ BOOL CTestDlg::OnInitDialog()
 
 void CTestDlg::OnBnClickedButton2()
 {
-	// TODO: 遍历周围对象 怪物NPC
+	// TODO: 遍历周围对象 地面 怪物NPC
 	if (!r.init())return;
 	m_mon.m_monsterList.clear();
-	m_mon.pOb_list.clear();
+	m_mon.m_groundList.clear();
 	CString s;
 	if (!r.Get_Envionment(*r.m_roleproperty.Object.X, *r.m_roleproperty.Object.Y, m_mon.pOb_list))
 	{
@@ -214,13 +220,26 @@ void CTestDlg::OnBnClickedButton2()
 		AppendText(m_edit2, s);
 		return;
 	}	
+	if (!r.Get_Envionment(*r.m_roleproperty.Object.X, *r.m_roleproperty.Object.Y, m_mon.pGr_list, Ground_Offset))
+	{
+		s.Format("遍历地面错误：\n");
+		AppendText(m_edit2, s);
+		return;
+	}
 	m_mon.init();
 	s.Format("周围对象列表（怪物、NPC、其他玩家、宠物）：\n");
 	AppendText(m_edit2, s);
-
 	for (auto i = 0; i < m_mon.m_monsterList.size(); i++)
 	{
-		s.Format("%s  ID: %d\n", m_mon.m_monsterList[i].pName, *(m_mon.m_monsterList[i].ID));
+		s.Format("%s ID: %x\n", m_mon.m_monsterList[i].pName, *(m_mon.m_monsterList[i].ID));
+		AppendText(m_edit2, s);
+	}
+
+	s.Format("地面：\n");
+	AppendText(m_edit2, s);
+	for (auto i = 0; i < m_mon.m_groundList.size(); i++)
+	{
+		s.Format(" %s : %d/%d\n", m_mon.m_groundList[i].pName, *m_mon.m_groundList[i].X, *m_mon.m_groundList[i].Y);
 		AppendText(m_edit2, s);
 	}
 
@@ -265,6 +284,13 @@ void CTestDlg::OnBnClickedButton8()
 		AppendText(m_edit2, s);
 		return;
 	}
-	s.Format("剩余背包格子数量: %d\n",r_bag.bSpace);
-	AppendText(m_edit2, s);
+	for (auto i=0;i<r_bag.maxSize;i++)
+	{
+		if (*(r_bag.m_bag[i].ID))
+		{
+			s.Format("第%d格:%s   ID: %x\n", i, r_bag.m_bag[i].pName, *r_bag.m_bag[i].ID);
+			AppendText(m_edit2, s);
+		}
+	}
+
 }

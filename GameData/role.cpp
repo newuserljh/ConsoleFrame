@@ -48,6 +48,7 @@ bool role::init()
 		m_roleproperty.p_ZB = (DWORD*)(*(DWORD*)RoleBase +0xc48);
 		m_roleproperty.LL = (DWORD*)(*(DWORD*)RoleBase + 0x139C);
 		m_roleproperty.p_Current_Map = (char*)(*(DWORD*)RoleBase + 0x8299C8);
+		m_roleproperty.PatCount = (DWORD*)(*(DWORD*)RoleBase + 0xA24);
 		if (!*m_roleproperty.Object.HP_MAX)
 		{
 			return false;
@@ -57,12 +58,55 @@ bool role::init()
 	{
 		return false;
 	}
+	if(!init_equip())return false;
 	return true;
 }
+
+//初始化身上装备
+bool role::init_equip()
+{
+	if (!m_roleproperty.p_ZB)return false;
+	DWORD bagBase = *m_roleproperty.p_ZB;
+	try
+	{
+		for (auto i=0;i<21;i++)
+		{
+			//if (!(*(DWORD*)(bagBase + i * 0x688 + 0x2c)))//判断无物品
+			//{
+			//	m_euip[i].ID = 0;
+			//	continue;
+			//}
+			m_euip[i].pName = (char*)(bagBase + i * 0x688 + 1);
+			m_euip[i].WD_low = (BYTE*)(bagBase + i * 0x688 + 0x1a);
+			m_euip[i].WD_high = (BYTE*)(bagBase + i * 0x688 + 0x1b);
+			m_euip[i].MD_low = (BYTE*)(bagBase + i * 0x688 + 0x1c);
+			m_euip[i].WD_high = (BYTE*)(bagBase + i * 0x688 + 0x1d);
+			m_euip[i].PA_low = (BYTE*)(bagBase + i * 0x688 + 0x1e);
+			m_euip[i].PA_high = (BYTE*)(bagBase + i * 0x688 + 0x1f);
+			m_euip[i].Magic_low = (BYTE*)(bagBase + i * 0x688 + 0x20);
+			m_euip[i].Magic_high = (BYTE*)(bagBase + i * 0x688 + 0x21);
+			m_euip[i].Tao_low = (BYTE*)(bagBase + i * 0x688 + 0x22);
+			m_euip[i].Tao_high = (BYTE*)(bagBase + i * 0x688 + 0x23);
+			m_euip[i].Need_what = (BYTE*)(bagBase + i * 0x688 + 0x24);
+			m_euip[i].Need_Num = (BYTE*)(bagBase + i * 0x688 + 0x25);
+			m_euip[i].ID = (DWORD*)(bagBase + i * 0x688 + 0x2c);
+			m_euip[i].Use_Num = (WORD*)(bagBase + i * 0x688 + 0x30);
+			m_euip[i].Use_Num_Max = (WORD*)(bagBase + i * 0x688 + 0x32);
+		}
+	}
+	catch (...)
+	{
+		return false;
+	}
+	return true;
+}
+
+
 
 /*遍历周围对象及地面物品*/
 bool role:: Get_Envionment(DWORD x, DWORD y, std::vector<DWORD> &vec,DWORD get_offset, DWORD g_range)
 {
+	vec.clear();
 	DWORD p_temp=0;
 	for (int i = x - g_range; i < x + g_range; i++)
 	{

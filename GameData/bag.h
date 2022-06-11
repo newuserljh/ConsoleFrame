@@ -12,7 +12,8 @@ public:
 	bag();
 	~bag();
 	bool init();
-
+	int caclGoodsNumber(std::string pName);
+	int getGoodsIndex(std::string pName);
 
 	DWORD maxSize; //背包总大小
 	DWORD bSpace;//空格子数量

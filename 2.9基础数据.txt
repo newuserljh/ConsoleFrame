@@ -45,6 +45,9 @@ p_Skill_Base( i )==0x135fb30]+0x1358]+ i * 0x88   //i为技能栏的顺序从0�
 DWORD Role_Job==0x135fb30]+0xe4] //职业 0/战士  1/法师 2/道士
 DWORD Role_Level==0x135fb30]+0xec] //等级
 DWORD Role_Sex ； //]+0xdc 性别 0男 1女
+
+DWORD PatCount;//宠物数量+0xA24
+
 Struct p_Bag
 {
     char  Goods_Name_Length  +0
@@ -72,11 +75,11 @@ p_Skill_Base( i )==0x135fb30]+0x1358]+ i * 0x88   //i为技能栏的顺序从0�
  p_Skill_Base( i )==0x135fb30]+0x1360]+ i * 0x88  
 Struct p_Skill
 {
-    Long  Skill_ID                  +0xe
+    DWORD Skill_ID                  +0xe
     String  Skill_Name      +14
     Char  Skill_Level    +8   
     Short  Skill_Level_exp    +c
-     Char  Skill_Need_MP   +e  
+    Char  Skill_Need_MP   +e  
     Short  Skill_Level_exp_max    +48 
 }
 

@@ -50,6 +50,7 @@ struct ROLE_PROPERTY
 					15 极品御兽天衣 ，16 紋佩 ，18 神龙背饰 ，19 面具 ，20 仙翼*/
 	DWORD* LL; //[0x135fb30] + 0x139C//灵力
 	char* p_Current_Map;// [135fb30] + 0x8299C8//所在地图 CHAR*
+    DWORD* PatCount; ///宠物数量+0xA24
 };
 
 
@@ -71,21 +72,31 @@ struct GOODS_PROPERTY
 	~GOODS_PROPERTY();
 	BYTE Name_Length;// + 0
 	char* pName;//+ 1
-	BYTE  WD_low;//+ 1a / /物理防御下  /幸运武器
-	BYTE  WD_high;// + 1b 物理防御上  /命中武器
-	BYTE  MD_low;//+ 1c / 魔防
-	BYTE  MD_high;//+ 1D
-	BYTE  PA_low;//+ 1e        //攻击力
-	BYTE  PA_high;// + 1f
-	BYTE  Magic_low;// + 20   //魔法攻击
-	BYTE  Magic_high;// + 21
-	BYTE  Tao_low;//+ 22   //道术攻击
-	BYTE  Tao_high;//+ 23
-	BYTE  Need_what;// + 24  佩戴需求 0等级 1攻击 2魔法 3道术
-	BYTE  Need_Num;//+ 25  佩戴需求大小 等级 / 魔法。。
-	DWORD ID;//+ 2c
-	WORD Use_Num;//+ 30            耐久 / 使用次数
-	WORD Use_Num_Max;// + 32    最大耐久 / 使用次数
+	BYTE*  WD_low;//+ 1a / /物理防御下  /幸运武器
+	BYTE* WD_high;// + 1b 物理防御上  /命中武器
+	BYTE* MD_low;//+ 1c / 魔防
+	BYTE* MD_high;//+ 1D
+	BYTE* PA_low;//+ 1e        //攻击力
+	BYTE* PA_high;// + 1f
+	BYTE* Magic_low;// + 20   //魔法攻击
+	BYTE* Magic_high;// + 21
+	BYTE* Tao_low;//+ 22   //道术攻击
+	BYTE* Tao_high;//+ 23
+	BYTE* Need_what;// + 24  佩戴需求 0等级 1攻击 2魔法 3道术
+	BYTE* Need_Num;//+ 25  佩戴需求大小 等级 / 魔法。。
+	DWORD* ID;//+ 2c
+	WORD* Use_Num;//+ 30            耐久 / 使用次数
+	WORD* Use_Num_Max;// + 32    最大耐久 / 使用次数
+};
+
+//物品对象
+struct GROUND_GOODS
+{
+	GROUND_GOODS();
+	~GROUND_GOODS();
+	char* pName;//+ 0x18
+	DWORD* X;//+c
+	DWORD* Y;//+0x10
 };
 
 //任务对象

@@ -7,12 +7,21 @@ base
 
 //游戏内部的基地址偏移
 baseaddr
+
 //游戏数据结构
 datastruct
 
 //人物属性类
 role
+
 //技能
 skill
+
 //任务
 task
+
+//周围对象 NPC 怪物 其他玩家 宠物
+monster
+
+//游戏功能call
+gamecall

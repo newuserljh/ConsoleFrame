@@ -1,0 +1,38 @@
+
+time is : 04/28/22 17:12:33
+version: 2.9.0.41
+dxver: c0000
+runtime: 26952 seconds
+CPU: 3300MHz,GenuineIntel,Intel(R) Xeon(R) CPU E3-1230 V2 @ 3.30GHz
+OS: 6,2,9200,2
+mem(F/T): 49%,2047M/2047M,PF:4095M/4095M,V:1781M/2047M
+Viedo: D3D设备未创建！
+//=====================================================
+Exception code: C0000005 ACCESS_VIOLATION
+Fault address:  00402D76 01:00001D76 G:\传奇世界2.9\传奇世界\Data\woool.dat.update
+
+Registers:
+EAX:FFFFFF00
+EBX:00000001
+ECX:00000001
+EDX:00000000
+ESI:00000002
+EDI:00000000
+CS:EIP:0023:00402D76
+SS:ESP:002B:0019FCB0  EBP:010BCEEC
+DS:002B  ES:002B  FS:0053  GS:002B
+Flags:00210286
+
+Call stack:
+Address   Frame     Function            SourceFile
+00402D76  010BCEEC  0001:00001D76 G:\传奇世界2.9\传奇世界\Data\woool.dat.update
+========================
+Local Variables And Parameters
+
+Call stack:
+Address   Frame     Function            SourceFile
+00402D76  010BCEEC  0001:00001D76 G:\传奇世界2.9\传奇世界\Data\woool.dat.update
+
+========================
+Global Variables
+

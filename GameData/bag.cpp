@@ -22,28 +22,28 @@ bool bag::init()
 	{
 		for (auto i=0;i<maxSize;i++)
 		{
-			if (!(*(DWORD*)(bagBase + i * 0x688 + 0x2c)))//判断无物品
-			{
-				m_bag[i].ID=0;
-				bSpace++;
-				continue;
-			}
+			//if (!(*(DWORD*)(bagBase + i * 0x688 + 0x2c)))//判断无物品
+			//{
+			//	m_bag[i].ID=0;
+			//	bSpace++;
+			//	continue;
+			//}
 			m_bag[i].pName = (char*)(bagBase + i * 0x688 + 1);
-			m_bag[i].WD_low = *(BYTE*)(bagBase + i * 0x688 + 0x1a);
-			m_bag[i].WD_high = *(BYTE*)(bagBase + i * 0x688 + 0x1b);
-			m_bag[i].MD_low = *(BYTE*)(bagBase + i * 0x688 + 0x1c);
-			m_bag[i].WD_high = *(BYTE*)(bagBase + i * 0x688 + 0x1d);
-			m_bag[i].PA_low = *(BYTE*)(bagBase + i * 0x688 + 0x1e); 
-			m_bag[i].PA_high = *(BYTE*)(bagBase + i * 0x688 + 0x1f);
-			m_bag[i].Magic_low = *(BYTE*)(bagBase + i * 0x688 + 0x20);
-			m_bag[i].Magic_high = *(BYTE*)(bagBase + i * 0x688 + 0x21);
-			m_bag[i].Tao_low = *(BYTE*)(bagBase + i * 0x688 + 0x22);
-			m_bag[i].Tao_high = *(BYTE*)(bagBase + i * 0x688 + 0x23);
-			m_bag[i].Need_what = *(BYTE*)(bagBase + i * 0x688 + 0x24);
-			m_bag[i].Need_Num = *(BYTE*)(bagBase + i * 0x688 + 0x25);
-			m_bag[i].ID = *(DWORD*)(bagBase + i * 0x688 + 0x2c);
-			m_bag[i].Use_Num = *(WORD*)(bagBase + i * 0x688 + 0x30);
-			m_bag[i].Use_Num_Max = *(WORD*)(bagBase + i * 0x688 + 0x32);
+			m_bag[i].WD_low = (BYTE*)(bagBase + i * 0x688 + 0x1a);
+			m_bag[i].WD_high = (BYTE*)(bagBase + i * 0x688 + 0x1b);
+			m_bag[i].MD_low = (BYTE*)(bagBase + i * 0x688 + 0x1c);
+			m_bag[i].WD_high = (BYTE*)(bagBase + i * 0x688 + 0x1d);
+			m_bag[i].PA_low = (BYTE*)(bagBase + i * 0x688 + 0x1e); 
+			m_bag[i].PA_high = (BYTE*)(bagBase + i * 0x688 + 0x1f);
+			m_bag[i].Magic_low = (BYTE*)(bagBase + i * 0x688 + 0x20);
+			m_bag[i].Magic_high = (BYTE*)(bagBase + i * 0x688 + 0x21);
+			m_bag[i].Tao_low = (BYTE*)(bagBase + i * 0x688 + 0x22);
+			m_bag[i].Tao_high = (BYTE*)(bagBase + i * 0x688 + 0x23);
+			m_bag[i].Need_what =(BYTE*)(bagBase + i * 0x688 + 0x24);
+			m_bag[i].Need_Num = (BYTE*)(bagBase + i * 0x688 + 0x25);
+			m_bag[i].ID = (DWORD*)(bagBase + i * 0x688 + 0x2c);
+			m_bag[i].Use_Num = (WORD*)(bagBase + i * 0x688 + 0x30);
+			m_bag[i].Use_Num_Max = (WORD*)(bagBase + i * 0x688 + 0x32);
 		}
 	}
 	catch (...)
@@ -51,4 +51,44 @@ bool bag::init()
 		return false;
 	}
 	return true;
+}
+
+/*
+函数功能:获取物品的数量
+参数一:物品名字
+返回值:该物品在背包内的总数量
+*/
+int bag::caclGoodsNumber(std::string pName)
+{
+	int goodsnum = 0;
+	for (auto i=0;i<maxSize;i++)
+	{
+		if (!(*m_bag[i].ID))continue;
+		if (strcmp(pName.c_str(),m_bag[i].pName)==0)
+		{
+			goodsnum++;
+		}
+	}
+	return goodsnum;
+}
+
+/*
+函数功能:获取物品的背包下标
+参数一:物品名字
+返回值:找到该物品的第一个下标
+*/
+int bag::getGoodsIndex(std::string pName)
+{
+	int firstIndex = -1;
+	for (auto i = 0; i < maxSize; i++)
+	{
+		if (!(*m_bag[i].ID))continue;
+		if (strcmp(pName.c_str(), m_bag[i].pName) == 0)
+		{
+			firstIndex = i;
+			break;
+		}
+	}
+	return firstIndex;
+
 }

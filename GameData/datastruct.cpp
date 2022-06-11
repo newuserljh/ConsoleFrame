@@ -49,3 +49,16 @@ GOODS_PROPERTY::~GOODS_PROPERTY()
 		delete pName;
 	}
 }
+
+GROUND_GOODS::GROUND_GOODS()
+{
+	pName = nullptr;
+}
+
+GROUND_GOODS::~GROUND_GOODS()
+{
+	if (!pName)
+	{
+		delete pName;
+	}
+}
