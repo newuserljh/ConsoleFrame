@@ -156,7 +156,7 @@ bool gamecall::ChooseCmd(char* command)
 			push command
 			mov ecx, dword ptr ds : [CALL_ECX]
 			mov edx, dword ptr ds : [CALL_EDX]
-			mov edi, CALL_USESKILL
+			mov edi, CALL_CHOOSE_CMD
 			call edi
 			popad
 		}
