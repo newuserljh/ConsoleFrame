@@ -1,6 +1,5 @@
 #pragma once
 
-
 // CTestDlg ¶Ô»°¿ò
 
 class CTestDlg : public CDialogEx
@@ -25,4 +24,6 @@ public:
 	afx_msg void OnBnClickedButton2();
 	afx_msg void OnBnClickedButton3();
 	afx_msg void OnBnClickedButton8();
+	afx_msg void OnBnClickedButton5();
+	afx_msg void OnBnClickedButton9();
 };

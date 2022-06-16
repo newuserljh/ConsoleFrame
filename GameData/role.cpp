@@ -103,15 +103,15 @@ bool role::init_equip()
 
 
 
-/*遍历周围对象及地面物品*/
-bool role:: Get_Envionment(DWORD x, DWORD y, std::vector<DWORD> &vec,DWORD get_offset, DWORD g_range)
+/*遍历周围对象*/
+bool role:: Get_Envionment(std::vector<DWORD> &vec, DWORD g_range)
 {
 	vec.clear();
 	DWORD p_temp=0;
-	for (int i = x - g_range; i < x + g_range; i++)
+	for (int i = *m_roleproperty.Object.X- g_range; i < *m_roleproperty.Object.X + g_range; i++)
 	{
 		if (i <= 0)i = 1;
-		for (int j = y - g_range; j < y + g_range; j++)
+		for (int j = *m_roleproperty.Object.Y - g_range; j < *m_roleproperty.Object.Y + g_range; j++)
 		{
 			if (j <= 0)j = 1;
 			try
@@ -146,15 +146,76 @@ bool role:: Get_Envionment(DWORD x, DWORD y, std::vector<DWORD> &vec,DWORD get_o
 					lea edx, dword ptr ds : [eax + eax * 4]
 					lea eax, dword ptr ds : [esi + edx * 8]
 					imul eax, eax, 0xA70
-					add ecx, get_offset
+					add ecx, Envi_Offset
 					mov eax, dword ptr ds : [eax + ecx]
 					mov p_temp, eax
 					popad
 				}
 				if (p_temp != 0)
 				{
-					if (get_offset == Ground_Offset)vec.push_back(p_temp);/*地面*/
-					if ((get_offset == Envi_Offset)&&(*(DWORD*)(p_temp + 0x80)!=0))vec.push_back(p_temp);/*周围其他对象*/
+					if ((*(DWORD*)(p_temp + 0x80)!=0))vec.push_back(p_temp);/*周围其他对象*/
+				}
+			}
+			catch (...)
+			{
+				return false;
+			}
+		}
+	}
+	return true;
+
+}
+
+bool role::Get_Ground(std::vector<DWORD>& vec, DWORD g_range)
+{
+	vec.clear();
+	DWORD p_temp = 0;
+	for (int i = *m_roleproperty.Object.X - g_range; i < *m_roleproperty.Object.X + g_range; i++)
+	{
+		if (i <= 0)i = 1;
+		for (int j = *m_roleproperty.Object.Y - g_range; j < *m_roleproperty.Object.Y + g_range; j++)
+		{
+			if (j <= 0)j = 1;
+			try
+			{
+				_asm
+				{
+					pushad
+					mov ecx, RoleBase
+					mov ecx, [ecx]
+					add ecx, 0x1D38
+					mov edi, i
+					mov esi, j
+					mov eax, 0x66666667
+					imul edi
+					sar edx, 0x4
+					mov eax, edx
+					shr eax, 0x1F
+					add eax, edx
+					lea eax, dword ptr ds : [eax + eax * 4]
+					add eax, eax
+					add eax, eax
+					add eax, eax
+					mov ebx, eax
+					mov eax, 0x99999999
+					imul esi
+					sar edx, 0x4
+					mov eax, edx
+					shr eax, 0x1F
+					add eax, edx
+					sub eax, ebx
+					add eax, edi
+					lea edx, dword ptr ds : [eax + eax * 4]
+					lea eax, dword ptr ds : [esi + edx * 8]
+					imul eax, eax, 0xA70
+					add ecx, Ground_Offset
+					mov eax, dword ptr ds : [eax + ecx]
+					mov p_temp, eax
+					popad
+				}
+				if (p_temp != 0)
+				{
+					vec.push_back(p_temp);/*地面*/		
 				}
 			}
 			catch (...)

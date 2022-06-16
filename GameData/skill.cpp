@@ -15,6 +15,7 @@ bool skill::init()
 {
 	skillBase = *(DWORD*)skillBase;
 	if (!skillBase)return false;
+	m_skillList.clear();
 	try
 	{
 		int i = 0;
@@ -33,4 +34,24 @@ bool skill::init()
 		return false;
 	}
 	return true;
+}
+
+
+/*
+函数功能:通过名字获取技能ID
+参数一:技能名字
+返回值：技能ID，如果为-1表示没有此技能
+*/
+DWORD skill::getSkillId(char* sName)
+{
+	DWORD ret = -1;
+	this->init();
+	for (auto i=0;i<m_skillList.size();i++)
+	{
+		if (strcmp(sName,m_skillList[i].pName)==0)
+		{
+			return *m_skillList[i].ID;
+		}
+	}
+	return ret;
 }

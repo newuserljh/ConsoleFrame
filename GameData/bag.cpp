@@ -1,4 +1,4 @@
-#include "bag.h"
+ï»¿#include "bag.h"
 
 bag::bag()
 {
@@ -22,7 +22,7 @@ bool bag::init()
 	{
 		for (auto i=0;i<maxSize;i++)
 		{
-			//if (!(*(DWORD*)(bagBase + i * 0x688 + 0x2c)))//ÅÐ¶ÏÎÞÎïÆ·
+			//if (!(*(DWORD*)(bagBase + i * 0x688 + 0x2c)))//åˆ¤æ–­æ— ç‰©å“
 			//{
 			//	m_bag[i].ID=0;
 			//	bSpace++;
@@ -54,9 +54,9 @@ bool bag::init()
 }
 
 /*
-º¯Êý¹¦ÄÜ:»ñÈ¡ÎïÆ·µÄÊýÁ¿
-²ÎÊýÒ»:ÎïÆ·Ãû×Ö
-·µ»ØÖµ:¸ÃÎïÆ·ÔÚ±³°üÄÚµÄ×ÜÊýÁ¿
+å‡½æ•°åŠŸèƒ½:èŽ·å–ç‰©å“çš„æ•°é‡
+å‚æ•°ä¸€:ç‰©å“åå­—
+è¿”å›žå€¼:è¯¥ç‰©å“åœ¨èƒŒåŒ…å†…çš„æ€»æ•°é‡
 */
 int bag::caclGoodsNumber(std::string pName)
 {
@@ -73,9 +73,9 @@ int bag::caclGoodsNumber(std::string pName)
 }
 
 /*
-º¯Êý¹¦ÄÜ:»ñÈ¡ÎïÆ·µÄ±³°üÏÂ±ê
-²ÎÊýÒ»:ÎïÆ·Ãû×Ö
-·µ»ØÖµ:ÕÒµ½¸ÃÎïÆ·µÄµÚÒ»¸öÏÂ±ê
+å‡½æ•°åŠŸèƒ½:èŽ·å–ç‰©å“çš„èƒŒåŒ…ä¸‹æ ‡
+å‚æ•°ä¸€:ç‰©å“åå­—
+è¿”å›žå€¼:æ‰¾åˆ°è¯¥ç‰©å“çš„ç¬¬ä¸€ä¸ªä¸‹æ ‡
 */
 int bag::getGoodsIndex(std::string pName)
 {
@@ -91,4 +91,17 @@ int bag::getGoodsIndex(std::string pName)
 	}
 	return firstIndex;
 
+}
+
+/*
+å‡½æ•°åŠŸèƒ½:èƒŒåŒ…æ˜¯å¦æœ‰æ¯’è¯
+è¿”å›žå€¼:0æ²¡æœ‰æ¯’è¯ï¼Œ1æœ‰çº¢æ¯’ï¼Œ2æœ‰ç»¿æ¯’ï¼Œ3æœ‰çº¢ç»¿æ¯’
+*/
+int bag::ifHasPoison()
+{
+	int a = caclGoodsNumber("ç»¿è‰²æ¯’è¯ï¼ˆå¤§é‡ï¼‰") + caclGoodsNumber("ç»¿è‰²æ¯’è¯ï¼ˆä¸­é‡ï¼‰") + caclGoodsNumber("ç»¿è‰²æ¯’è¯ï¼ˆå°é‡ï¼‰") + caclGoodsNumber("é“å°Šçµæ¯’(ç»¿)");
+	int b = caclGoodsNumber("çº¢è‰²æ¯’è¯ï¼ˆå¤§é‡ï¼‰") + caclGoodsNumber("çº¢è‰²æ¯’è¯ï¼ˆä¸­é‡ï¼‰") + caclGoodsNumber("çº¢è‰²æ¯’è¯ï¼ˆå°é‡ï¼‰") + caclGoodsNumber("é“å°Šçµæ¯’(çº¢)");
+	(a > 0)?(a = 2) : (a = 0);
+	(b > 0)?(b = 1) : (b = 0);
+	return a+b;
 }

@@ -18,16 +18,7 @@ bool monster::init()
 	{
 		DWORD pObjext = pOb_list[i];
 		try {
-			MONSTER_PROPERTY temp;
-			temp.ID = (DWORD*)(pObjext + 0x8);
-			temp.pName = (char*)(pObjext + 0x10);
-			temp.HP = (DWORD*)(pObjext + 0x80);
-			temp.HP_MAX = (DWORD*)(pObjext + 0x84);
-			temp.MP = (DWORD*)(pObjext + 0x88);
-			temp.MP_MAX = (DWORD*)(pObjext + 0x8C);
-			temp.X = (DWORD*)(pObjext + 0xac);
-			temp.Y = (DWORD*)(pObjext + 0xb0);
-			temp.IsPosion = (BYTE*)(pObjext + 0x34c);
+			MONSTER_PROPERTY temp((DWORD*)pOb_list[i]);
 			m_monsterList.push_back(temp);
 		}
 		catch (...)

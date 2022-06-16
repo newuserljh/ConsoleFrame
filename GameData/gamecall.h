@@ -1,6 +1,6 @@
 #pragma once
 #include "baseaddr.h"
-
+#include "role.h"
 /*
 游戏功能CALL类
 */
@@ -19,8 +19,8 @@ public:
 	bool presskey(int vkcode);
 	bool presskey(DWORD pid, int vkcode = VK_RETURN);
 	HWND GetHwndByPid(DWORD dwProcessID);
-	unsigned caclDistance(DWORD x1, DWORD x1, DWORD x2, DWORD y2);
-
+	unsigned caclDistance(DWORD x1, DWORD y1, DWORD x2, DWORD y2);
+	DWORD Find_T_Monster(role& r, std::vector<CHAR*>& vec);
 private:
 
 };
@@ -84,6 +84,7 @@ bool gamecall::useSkillTo(DWORD skillId,DWORD x,DWORD y,DWORD targetId)
 	}
 	return true;
 }
+
 
 /*
 函数功能:寻路到当前地图指定坐标
@@ -323,4 +324,41 @@ unsigned gamecall::caclDistance(DWORD x1,DWORD y1, DWORD x2, DWORD y2)
 	y = y1 - y2;
 	if (y < 0)y = 0 - y;
 	return (x > y) ? x : y;
+}
+
+
+/*
+函数功能:找到要攻击的怪物
+参数一:角色结构体
+参数二:攻击怪物列表
+返回值：返回找到的怪物对象指针
+*/
+DWORD gamecall::Find_T_Monster(role& r, std:: vector<CHAR*>& vec)
+{
+	std::vector<DWORD> near_Mon_3, near_Mon_7;
+	r.Get_Envionment(near_Mon_3, 3); /*找到3格已内的怪物*/
+	if (near_Mon_3.size())
+	{
+		for (unsigned i = 0; i < near_Mon_3.size(); i++)
+		{
+			for (unsigned j = 0; j < vec.size(); j++)
+			{
+				if (strcmp((CHAR*)(near_Mon_3[i] + 0x10), vec[j]) == 0) /*strcmp返回0代表不相等*/
+					return near_Mon_3[i];
+			}
+		}
+	}
+	r.Get_Envionment(near_Mon_7, 7); /*找到7格已内的怪物*/
+	if (near_Mon_7.size())
+	{
+		for (unsigned i = 0; i < near_Mon_7.size(); i++)
+		{
+			for (unsigned j = 0; j < vec.size(); j++)
+			{
+				if (strcmp((CHAR*)(near_Mon_7[i] + 0x10), vec[j]) == 0) /*strcmp返回0代表不相等*/
+					return near_Mon_7[i];
+			}
+		}
+	}
+	return 0;
 }

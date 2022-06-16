@@ -5,7 +5,7 @@
 #include "TestDll.h"
 #include "TestDlg.h"
 #include "afxdialogex.h"
-#include "role.h"
+
 #include "monster.h"
 #include "skill.h"
 #include "bag.h"
@@ -25,6 +25,10 @@ role r;//角色
 monster m_mon;
 skill m_skill;
 bag r_bag;
+gamecall mfun;
+
+/*打怪技能设置*/
+DWORD s_ID = -1;
 
 _declspec(naked) void CallTest()
 {
@@ -64,6 +68,8 @@ BEGIN_MESSAGE_MAP(CTestDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON2, &CTestDlg::OnBnClickedButton2)
 	ON_BN_CLICKED(IDC_BUTTON3, &CTestDlg::OnBnClickedButton3)
 	ON_BN_CLICKED(IDC_BUTTON8, &CTestDlg::OnBnClickedButton8)
+	ON_BN_CLICKED(IDC_BUTTON5, &CTestDlg::OnBnClickedButton5)
+	ON_BN_CLICKED(IDC_BUTTON9, &CTestDlg::OnBnClickedButton9)
 END_MESSAGE_MAP()
 
 
@@ -72,26 +78,25 @@ END_MESSAGE_MAP()
 void threadLogin()
 {
 	int i = 0;//尝试登录次数
-	gamecall m_call;
 	do
 	{
 		shareCli.m_pSMAllData->m_sm_data[shareindex].cscript = "登录中...";
 		Sleep(10000);
-		m_call.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
+		mfun.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
 		Sleep(100);
-		m_call.loginGame(shareCli.m_pSMAllData->m_sm_data[shareindex].userName.c_str(), shareCli.m_pSMAllData->m_sm_data[shareindex].passWord.c_str());
+		mfun.loginGame(shareCli.m_pSMAllData->m_sm_data[shareindex].userName.c_str(), shareCli.m_pSMAllData->m_sm_data[shareindex].passWord.c_str());
 		Sleep(1000);
-		m_call.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
+		mfun.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
 		Sleep(1000);
-		m_call.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
+		mfun.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
 		Sleep(1000);
-		m_call.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
+		mfun.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
 		Sleep(1000);
-		m_call.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
+		mfun.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
 		Sleep(1000);
-		m_call.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
+		mfun.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
 		Sleep(1000);
-		m_call.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
+		mfun.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
 		Sleep(1000);
 		i++;
 	} while ((!r.init()) && i < 10);
@@ -214,13 +219,13 @@ void CTestDlg::OnBnClickedButton2()
 	m_mon.m_monsterList.clear();
 	m_mon.m_groundList.clear();
 	CString s;
-	if (!r.Get_Envionment(*r.m_roleproperty.Object.X, *r.m_roleproperty.Object.Y, m_mon.pOb_list))
+	if (!r.Get_Envionment(m_mon.pOb_list))
 	{
 		s.Format("遍历周围错误：\n");
 		AppendText(m_edit2, s);
 		return;
 	}	
-	if (!r.Get_Envionment(*r.m_roleproperty.Object.X, *r.m_roleproperty.Object.Y, m_mon.pGr_list, Ground_Offset))
+	if (!r.Get_Ground(m_mon.pGr_list))
 	{
 		s.Format("遍历地面错误：\n");
 		AppendText(m_edit2, s);
@@ -293,4 +298,135 @@ void CTestDlg::OnBnClickedButton8()
 		}
 	}
 
+}
+
+
+void CTestDlg::OnBnClickedButton5()
+{
+	// TODO: 在此添加控件通知处理程序代码
+}
+
+
+void CTestDlg::OnBnClickedButton9()
+{
+	// TODO: 脚本测试
+
+	/*自动打怪 需要启动：①打怪线程优先级正常 ②遍历周围对象、地面并拾取线程 优先级中高 ③寻路线程、智能闪避 优先级最高
+	* 
+	*          ****选怪 
+	*自动打怪***   打怪：判断打死
+	*          ****继续打怪
+	* */
+	
+
+}
+
+
+
+/*
+函数功能:选择打怪目标
+参数一:角色结构体
+参数二:攻击怪物列表
+返回值：选中怪物对象指针
+*/
+DWORD Choose_Moster(role& r, std::vector<CHAR*>& vec)
+{
+	DWORD Object_ID = *r.m_roleproperty.p_Target_ID;
+	while (Object_ID == 0)
+	{
+		Object_ID = mfun.Find_T_Monster(r, vec);
+		if (Object_ID)
+		{
+			*r.m_roleproperty.p_Target_ID = *(DWORD*)(Object_ID + 0x8);
+		}
+		else
+		{
+			/*边寻路边找怪*/
+			//m_pThread_Goto->ResumeThread();
+			Sleep(500);
+		}
+	}
+	return Object_ID;
+}
+
+/*
+函数功能:自动打怪
+参数一:角色结构体
+参数二:攻击怪物列表
+参数三:使用技能ID
+返回值：true为已经打死怪物，fasle为位置错误（或者600次没打死怪物）
+*/
+bool Auto_Attack(role r, std::vector<CHAR*>& vec, DWORD s_ID)
+{
+	*r.m_roleproperty.p_Target_ID = 0;
+	DWORD p_Target = Choose_Moster(r, vec);
+	MONSTER_PROPERTY att_mon((DWORD*)p_Target);
+	unsigned i = 0;/*记录攻击次数*/
+	while( (*att_mon.HP> 0) && (*att_mon.ID == *r.m_roleproperty.p_Target_ID) && (i < 600))
+	{
+		if (mfun.caclDistance(*r.m_roleproperty.Object.X, *r.m_roleproperty.Object.Y, *att_mon.X, *att_mon.Y) > 9)return FALSE;
+		DWORD s_posion = m_skill.getSkillId("施毒术");
+		if( (s_posion!=-1))//道士
+		{
+			if ((r_bag.ifHasPoison()>0)&& (*att_mon.IsPosion < 0x40))//是否中毒 0没毒，0x40红毒，0x80绿毒，0xc0红绿毒,
+			{
+				mfun.useSkillTo(s_posion, *att_mon.X, *att_mon.Y, *att_mon.ID);
+				Sleep(ATTACK_SLEEP);
+				mfun.useSkillTo(s_posion, *att_mon.X, *att_mon.Y, *att_mon.ID);
+				Sleep(ATTACK_SLEEP);
+			}
+		}
+		mfun.useSkillTo(s_ID, *att_mon.X, *att_mon.Y, *att_mon.ID);
+		i++;
+		Sleep(ATTACK_SLEEP);
+	}
+	return true;
+}
+
+/*
+函数功能:载入设置
+参数一:角色结构体
+返回值：选中怪物对象指针
+*/
+bool Load_Settings(role r)
+{
+	/*技能设置*/
+	if (*r.m_roleproperty.Job == 0)/*战士*/
+	{
+	}
+	else if (*r.m_roleproperty.Job == 1)/*法师*/
+	{
+		DWORD  s_tmp = m_skill.getSkillId("狂龙紫电");
+		if (s_tmp != -1)
+		{
+			s_ID = s_tmp;
+			return true;
+		}
+		s_tmp = m_skill.getSkillId("雷电术");
+		if (s_tmp != -1)
+		{
+			s_ID = s_tmp;
+			return true;
+		}
+		s_tmp = m_skill.getSkillId("冰箭术");
+		if (s_tmp != -1)
+		{
+			s_ID = s_tmp;
+			return true;
+		}
+		s_tmp = m_skill.getSkillId("小火球");
+		if (s_tmp != -1)
+		{
+			s_ID = s_tmp;
+			return true;
+		}
+	}
+	else if (*r.m_roleproperty.Job == 2)/*道士*/
+	{
+
+	}
+	else return false;
+
+
+	return true;
 }
