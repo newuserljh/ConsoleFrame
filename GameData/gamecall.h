@@ -342,8 +342,8 @@ DWORD gamecall::Find_T_Monster(role& r, std:: vector<CHAR*>& vec)
 		for (unsigned i = 0; i < near_Mon_3.size(); i++)
 		{
 			for (unsigned j = 0; j < vec.size(); j++)
-			{
-				if (strcmp((CHAR*)(near_Mon_3[i] + 0x10), vec[j]) == 0) /*strcmp返回0代表不相等*/
+			
+				if (strcmp((CHAR*)(near_Mon_3[i] + 0x10), vec[j]) == 0) /*strcmp返回0代表相等*/
 					return near_Mon_3[i];
 			}
 		}
@@ -355,7 +355,7 @@ DWORD gamecall::Find_T_Monster(role& r, std:: vector<CHAR*>& vec)
 		{
 			for (unsigned j = 0; j < vec.size(); j++)
 			{
-				if (strcmp((CHAR*)(near_Mon_7[i] + 0x10), vec[j]) == 0) /*strcmp返回0代表不相等*/
+				if (strcmp((CHAR*)(near_Mon_7[i] + 0x10), vec[j]) == 0) /*strcmp返回0代表相等*/
 					return near_Mon_7[i];
 			}
 		}
