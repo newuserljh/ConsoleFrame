@@ -248,8 +248,8 @@ void CAccountDlg::OnBnClickedButton3()
 /*登录游戏并注入获取PID*/
 void CAccountDlg::log_inject(int i)
 {
-	exeLoad e("G:\\传奇世界2.9\\传奇世界\\Data\\woool.dat.update", "G:\\传奇世界2.9\\传奇世界\\Data\\");
+	exeLoad e("D:\\传奇世界2.9\\传奇世界\\Data\\woool.dat.update", "D:\\传奇世界2.9\\传奇世界\\Data\\");
 	m_shareMemSer->m_pSMAllData->m_sm_data[i].ndPid = e.pi.dwProcessId;
 	EipInject in;
-	in.eipinjectDll(L"G:\\VS_Projects\\ConsoleFrame\\Debug\\TestDll.dll", e.pi);
+	in.eipinjectDll(L"D:\\VS_PROJECT\\ConsoleFrame\\Debug\\TestDll.dll", e.pi);
 }
