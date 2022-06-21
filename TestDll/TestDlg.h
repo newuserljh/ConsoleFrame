@@ -1,5 +1,5 @@
 #pragma once
-
+#include "role.h"
 // CTestDlg ¶Ô»°¿ò
 
 class CTestDlg : public CDialogEx

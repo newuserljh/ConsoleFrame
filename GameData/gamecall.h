@@ -20,7 +20,7 @@ public:
 	bool presskey(DWORD pid, int vkcode = VK_RETURN);
 	HWND GetHwndByPid(DWORD dwProcessID);
 	unsigned caclDistance(DWORD x1, DWORD y1, DWORD x2, DWORD y2);
-	DWORD Find_T_Monster(role& r, std::vector<CHAR*>& vec);
+	DWORD Find_T_Monster(role& r, std::vector<std::string>& vec);
 private:
 
 };
@@ -333,7 +333,7 @@ unsigned gamecall::caclDistance(DWORD x1,DWORD y1, DWORD x2, DWORD y2)
 参数二:攻击怪物列表
 返回值：返回找到的怪物对象指针
 */
-DWORD gamecall::Find_T_Monster(role& r, std:: vector<CHAR*>& vec)
+DWORD gamecall::Find_T_Monster(role& r, std:: vector<std::string>& vec)
 {
 	std::vector<DWORD> near_Mon_3, near_Mon_7;
 	r.Get_Envionment(near_Mon_3, 3); /*找到3格已内的怪物*/
@@ -341,9 +341,9 @@ DWORD gamecall::Find_T_Monster(role& r, std:: vector<CHAR*>& vec)
 	{
 		for (unsigned i = 0; i < near_Mon_3.size(); i++)
 		{
-			for (unsigned j = 0; j < vec.size(); j++)
+			for (unsigned j = 0; j < vec.size(); j++){
 			
-				if (strcmp((CHAR*)(near_Mon_3[i] + 0x10), vec[j]) == 0) /*strcmp返回0代表相等*/
+				if (strcmp((CHAR*)(near_Mon_3[i] + 0x10), vec[j].c_str()) == 0) /*strcmp返回0代表相等*/
 					return near_Mon_3[i];
 			}
 		}
@@ -355,7 +355,7 @@ DWORD gamecall::Find_T_Monster(role& r, std:: vector<CHAR*>& vec)
 		{
 			for (unsigned j = 0; j < vec.size(); j++)
 			{
-				if (strcmp((CHAR*)(near_Mon_7[i] + 0x10), vec[j]) == 0) /*strcmp返回0代表相等*/
+				if (strcmp((CHAR*)(near_Mon_7[i] + 0x10), vec[j].c_str()) == 0) /*strcmp返回0代表相等*/
 					return near_Mon_7[i];
 			}
 		}

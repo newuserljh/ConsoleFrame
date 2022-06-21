@@ -329,7 +329,7 @@ void CTestDlg::OnBnClickedButton9()
 参数二:攻击怪物列表
 返回值：选中怪物对象指针
 */
-DWORD Choose_Moster(role& r, std::vector<CHAR*>& vec)
+DWORD Choose_Moster(role& r, std::vector<std::string>& vec)
 {
 	DWORD Object_ID = *r.m_roleproperty.p_Target_ID;
 	while (Object_ID == 0)
@@ -356,7 +356,7 @@ DWORD Choose_Moster(role& r, std::vector<CHAR*>& vec)
 参数三:使用技能ID
 返回值：true为已经打死怪物，fasle为位置错误（或者600次没打死怪物）
 */
-bool Auto_Attack(role r, std::vector<CHAR*>& vec, DWORD s_ID)
+bool Auto_Attack(role r, std::vector<std::string>& vec, DWORD s_ID)
 {
 	*r.m_roleproperty.p_Target_ID = 0;
 	DWORD p_Target = Choose_Moster(r, vec);
@@ -429,4 +429,47 @@ bool Load_Settings(role r)
 
 
 	return true;
+}
+
+void thredAttack()
+{
+	if(!Load_Settings(r))return;
+	std::vector<std::string> vec_mon = tools::getInstance()->ReadTxt("..\\逆魔大殿.txt");
+	while (true)
+	{
+		Auto_Attack(r, vec_mon, s_ID);
+		Sleep(ATTACK_SLEEP);
+	}
+}
+
+/*
+函数功能:寻路到当前地图(x,y)附近
+参数一:x
+参数二:y
+返回值:bool
+*/
+bool MapGoto_near(DWORD x,DWORD y)
+{
+	while (mfun.caclDistance(*r.m_roleproperty.Object.X, *r.m_roleproperty.Object.Y,x,y)>3)
+	{
+		mfun.CurrentMapMove(x, y);
+		Sleep(500);
+     }
+	return true;  
+}
+
+/*
+函数功能:寻路到当前地图(x,y)精确位置
+参数一:x
+参数二:y
+返回值:bool
+*/
+bool MapGoto_Point(DWORD x, DWORD y)
+{
+	while (mfun.caclDistance(*r.m_roleproperty.Object.X, *r.m_roleproperty.Object.Y, x, y) > 0)
+	{
+		mfun.CurrentMapMove(x, y);
+		Sleep(500);
+	}
+	return true;   
 }
