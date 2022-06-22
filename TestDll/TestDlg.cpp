@@ -29,6 +29,19 @@ gamecall mfun;
 
 /*打怪技能设置*/
 DWORD s_ID = -1;
+CWinThread* m_threadAttack;
+bool tflag_attack = true;
+
+/*寻路打怪坐标*/
+std::vector<MapXY> map_xy;
+CWinThread* m_threadGoto;
+bool tflag_goto = true;
+
+
+/*捡物设置*/
+std::vector<std::string> pick_goods_list;
+CWinThread* m_threadPickup;
+bool tflag_pickup = true;
 
 _declspec(naked) void CallTest()
 {
@@ -307,19 +320,7 @@ void CTestDlg::OnBnClickedButton5()
 }
 
 
-void CTestDlg::OnBnClickedButton9()
-{
-	// TODO: 脚本测试
 
-	/*自动打怪 需要启动：①打怪线程优先级正常 ②遍历周围对象、地面并拾取线程 优先级中高 ③寻路线程、智能闪避 优先级最高
-	* 
-	*          ****选怪 
-	*自动打怪***   打怪：判断打死
-	*          ****继续打怪
-	* */
-	
-
-}
 
 
 
@@ -342,8 +343,9 @@ DWORD Choose_Moster(role& r, std::vector<std::string>& vec)
 		else
 		{
 			/*边寻路边找怪*/
-			//m_pThread_Goto->ResumeThread();
-			Sleep(500);
+			//m_threadGoto->ResumeThread();
+			Sleep(2000);
+			//m_threadGoto->SuspendThread();
 		}
 	}
 	return Object_ID;
@@ -360,6 +362,7 @@ bool Auto_Attack(role r, std::vector<std::string>& vec, DWORD s_ID)
 {
 	*r.m_roleproperty.p_Target_ID = 0;
 	DWORD p_Target = Choose_Moster(r, vec);
+	
 	MONSTER_PROPERTY att_mon((DWORD*)p_Target);
 	unsigned i = 0;/*记录攻击次数*/
 	while( (*att_mon.HP> 0) && (*att_mon.ID == *r.m_roleproperty.p_Target_ID) && (i < 600))
@@ -388,13 +391,14 @@ bool Auto_Attack(role r, std::vector<std::string>& vec, DWORD s_ID)
 参数一:角色结构体
 返回值：选中怪物对象指针
 */
-bool Load_Settings(role r)
+bool Load_Settings()
 {
 	/*技能设置*/
 	if (*r.m_roleproperty.Job == 0)/*战士*/
 	{
+		return false;
 	}
-	else if (*r.m_roleproperty.Job == 1)/*法师*/
+    if (*r.m_roleproperty.Job == 1)/*法师*/
 	{
 		DWORD  s_tmp = m_skill.getSkillId("狂龙紫电");
 		if (s_tmp != -1)
@@ -420,40 +424,46 @@ bool Load_Settings(role r)
 			s_ID = s_tmp;
 			return true;
 		}
+		return false;
 	}
-	else if (*r.m_roleproperty.Job == 2)/*道士*/
+	if (*r.m_roleproperty.Job == 2)/*道士*/
 	{
-
+		return false;
 	}
-	else return false;
+	 return false;
 
-
-	return true;
 }
 
-void thredAttack()
+int CTestDlg::threadAttack(void* p)
 {
-	if(!Load_Settings(r))return;
+	CTestDlg* pDlg = (CTestDlg*)p;
+	if(!Load_Settings())return 0;
+	CString s;
+	s.Format("打怪技能ID:%d", s_ID);
+	AppendText(pDlg->m_edit2, s);
 	std::vector<std::string> vec_mon = tools::getInstance()->ReadTxt("..\\逆魔大殿.txt");
-	while (true)
+	while (tflag_attack)
 	{
 		Auto_Attack(r, vec_mon, s_ID);
 		Sleep(ATTACK_SLEEP);
 	}
+	return 0;
 }
 
 /*
 函数功能:寻路到当前地图(x,y)附近
 参数一:x
 参数二:y
-返回值:bool
+参数三:标识,只有为true的时候才走到目的地
+返回值:bool,走完真,未走完false
 */
-bool MapGoto_near(DWORD x,DWORD y)
+bool MapGoto_near(DWORD x,DWORD y, bool tflag)
 {
 	while (mfun.caclDistance(*r.m_roleproperty.Object.X, *r.m_roleproperty.Object.Y,x,y)>3)
 	{
 		mfun.CurrentMapMove(x, y);
 		Sleep(500);
+		if (!tflag)return false;
      }
 	return true;  
 }
@@ -462,14 +472,125 @@ bool MapGoto_near(DWORD x,DWORD y)
 函数功能:寻路到当前地图(x,y)精确位置
 参数一:x
 参数二:y
-返回值:bool
+参数三:标识,只有为true的时候才走到目的地
+返回值:bool,走完真,未走完false
 */
-bool MapGoto_Point(DWORD x, DWORD y)
+bool MapGoto_Point(DWORD x, DWORD y,bool tflag)
 {
 	while (mfun.caclDistance(*r.m_roleproperty.Object.X, *r.m_roleproperty.Object.Y, x, y) > 0)
 	{
 		mfun.CurrentMapMove(x, y);
 		Sleep(500);
+		if (!tflag)return false;
 	}
 	return true;   
+}
+
+
+/*
+函数功能:载入寻路打怪坐标
+参数一:角色结构体
+返回值：选中怪物对象指针
+*/
+bool Load_coordinate()
+{
+	map_xy.clear();
+	std::vector<std::string> map_coordinate= tools::getInstance()->ReadTxt("..\\逆魔大殿1.txt");
+	if (!map_coordinate.size())return false;
+	for (size_t i = 0; i < map_coordinate.size(); i++)
+	{
+		MapXY xy;
+		xy = mfun.splitXY(map_coordinate[i]);
+		if ((xy.x!=-1)&&(xy.y!=-1))map_xy.push_back(xy);
+	}
+	if (!map_xy.size())return false;
+	return true;
+}
+
+/*
+函数功能:载入拾取物品
+参数一:角色结构体
+返回值：选中怪物对象指针
+*/
+bool Load_pick_goods()
+{
+	pick_goods_list.clear();
+	std::vector<std::string> map_coordinate = tools::getInstance()->ReadTxt("..\\拾取物品.txt");
+	if (!map_coordinate.size())return false;
+	return true;
+}
+
+/*寻路线程*/
+void threadGoto()
+{
+	if (!Load_coordinate())return;
+	size_t i = 0;
+	while (tflag_goto)
+	{
+		MapXY xy = map_xy[i];
+		MapGoto_Point(map_xy[i].x, map_xy[i].y,tflag_goto);
+		i++;
+		if (i = map_xy.size())i = 0;
+	}
+}
+
+/*捡物线程*/
+void threadPickup()
+{
+	if (!Load_pick_goods())return;
+	size_t i = 0;
+	while (tflag_pickup)
+	{
+		r.Get_Ground(m_mon.pGr_list);
+		m_mon.init_ground();
+		for (size_t i=0;i<m_mon.m_groundList.size();i++)
+		{
+			for (size_t j = 0; j < pick_goods_list.size(); j++)
+			{
+				if (strcmp(m_mon.m_groundList[i].pName,pick_goods_list[j].c_str())==0)
+				{
+					MapGoto_Point(*m_mon.m_groundList[i].X, *m_mon.m_groundList[i].Y,true);
+					mfun.pickupGoods(*m_mon.m_groundList[i].X, *m_mon.m_groundList[i].Y);
+				}
+			}
+		}
+		Sleep(2000);
+	}
+}
+
+
+void CTestDlg::OnBnClickedButton9()
+{
+	// TODO: 脚本测试
+
+	/*自动打怪 需要启动：①打怪线程优先级正常 ②遍历周围对象、地面并拾取线程 优先级中高 ③寻路线程、智能闪避 优先级最高
+	*
+	*          ****选怪
+	*自动打怪***   打怪：判断打死
+	*          ****继续打怪
+	* */
+
+	CString s;
+	Load_Settings();
+	s.Format("打怪技能ID:%d", s_ID);
+	AppendText(m_edit2, s);
+	std::vector<std::string> vec_mon = tools::getInstance()->ReadTxt("D:\\VS_PROJECT\\ConsoleFrame\\逆魔大殿.txt");
+	for (size_t i = 0; i < vec_mon.size(); i++)
+	{
+		s.Format("%s\n", (char*)vec_mon[i].data());
+		AfxMessageBox( s);
+	}
+	//Auto_Attack(r, vec_mon, s_ID);
+
+
+	//m_threadGoto=AfxBeginThread((AFX_THREADPROC)threadGoto,NULL, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
+	//m_threadAttack= AfxBeginThread(thredAttack, NULL);
+	//m_threadPickup= AfxBeginThread((AFX_THREADPROC)threadPickup, NULL, THREAD_PRIORITY_ABOVE_NORMAL);
+
+	//tflag_attack = true;
+	//HANDLE thrHandle;
+	//thrHandle = (HANDLE)_beginthreadex(NULL, 0,
+	//	(unsigned int(__stdcall*)(void*))threadAttack, (LPVOID)this, 0, NULL);  //将this指针传给子线程
+
+	//CloseHandle(thrHandle);
 }

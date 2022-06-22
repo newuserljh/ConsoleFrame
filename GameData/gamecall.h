@@ -21,6 +21,7 @@ public:
 	HWND GetHwndByPid(DWORD dwProcessID);
 	unsigned caclDistance(DWORD x1, DWORD y1, DWORD x2, DWORD y2);
 	DWORD Find_T_Monster(role& r, std::vector<std::string>& vec);
+	MapXY splitXY(std::string str);
 private:
 
 };
@@ -361,4 +362,28 @@ DWORD gamecall::Find_T_Monster(role& r, std:: vector<std::string>& vec)
 		}
 	}
 	return 0;
+}
+
+/*
+函数功能:分割坐标字符串
+参数一:坐标字符串
+参数一:返回的数组指针
+返回值：坐标数组指针,如果x,y都为-1 则分割出错
+*/
+MapXY gamecall::splitXY(std::string str)
+{
+	MapXY XYtemp;
+	std::regex delimiters("\\s+");
+	std::vector<std::string> temp(std::sregex_token_iterator(str.begin(), str.end(), delimiters, -1), std::sregex_token_iterator());
+	if (temp.size()!=2) 
+	{
+		XYtemp.x = -1;
+		XYtemp.y = -1;
+	}
+	else
+	{
+		XYtemp.x = stoi(temp[0]); //x
+		XYtemp.y = stoi(temp[1]); //y
+	}
+	return XYtemp;
 }

@@ -26,4 +26,6 @@ public:
 	afx_msg void OnBnClickedButton8();
 	afx_msg void OnBnClickedButton5();
 	afx_msg void OnBnClickedButton9();
+
+	static int threadAttack(void* p);
 };

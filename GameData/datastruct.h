@@ -94,6 +94,7 @@ struct GOODS_PROPERTY
 struct GROUND_GOODS
 {
 	GROUND_GOODS();
+	GROUND_GOODS(DWORD* p);
 	~GROUND_GOODS();
 	char* pName;//+ 0x18
 	DWORD* X;//+c
@@ -106,4 +107,10 @@ struct TASK_PROPERTY
 	TASK_PROPERTY();
 	~TASK_PROPERTY();
 	char* pName;
+};
+
+struct MapXY
+{
+	DWORD x;
+	DWORD y;
 };

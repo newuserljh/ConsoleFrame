@@ -15,15 +15,15 @@ MONSTER_PROPERTY::MONSTER_PROPERTY(){}
 
 MONSTER_PROPERTY::MONSTER_PROPERTY(DWORD* p)
 {
-	this->ID = (DWORD*)(p + 0x8);
-	this->pName = (char*)(p + 0x10);
-	this->HP = (DWORD*)(p + 0x80);
-	this->HP_MAX = (DWORD*)(p + 0x84);
-	this->MP = (DWORD*)(p + 0x88);
-	this->MP_MAX = (DWORD*)(p + 0x8C);
-	this->X = (DWORD*)(p + 0xac);
-	this->Y = (DWORD*)(p + 0xb0);
-	this->IsPosion = (BYTE*)(p + 0x34c);
+	ID = (DWORD*)((DWORD)p + 0x8);
+	pName = (char*)((DWORD)p + 0x10);
+	HP = (DWORD*)((DWORD)p + 0x80);
+	HP_MAX = (DWORD*)((DWORD)p+ 0x84);
+	MP = (DWORD*)((DWORD)p + 0x88);
+	MP_MAX = (DWORD*)((DWORD)p + 0x8C);
+	X = (DWORD*)((DWORD)p + 0xac);
+	Y = (DWORD*)((DWORD)p + 0xb0);
+	IsPosion = (BYTE*)((DWORD)p + 0x34b);
 }
 
 MONSTER_PROPERTY::~MONSTER_PROPERTY()
@@ -64,7 +64,12 @@ GROUND_GOODS::GROUND_GOODS()
 {
 	pName = nullptr;
 }
-
+GROUND_GOODS::GROUND_GOODS(DWORD* p)
+{
+	X = (DWORD*)((DWORD)p + 0xc);
+	Y = (DWORD*)((DWORD)p + 0x10);
+	pName = (char*)((DWORD)p + 0x18);
+}
 GROUND_GOODS::~GROUND_GOODS()
 {
 	if (!pName)
