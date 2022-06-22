@@ -377,6 +377,8 @@ bool Auto_Attack(role r, std::vector<std::string>& vec, DWORD s_ID)
 				Sleep(ATTACK_SLEEP);
 				mfun.useSkillTo(s_posion, *att_mon.X, *att_mon.Y, *att_mon.ID);
 				Sleep(ATTACK_SLEEP);
+				/*	mfun.presskey(VK_F1);
+					Sleep(ATTACK_SLEEP);*/
 			}
 		}
 		mfun.useSkillTo(s_ID, *att_mon.X, *att_mon.Y, *att_mon.ID);
@@ -577,10 +579,10 @@ void CTestDlg::OnBnClickedButton9()
 	std::vector<std::string> vec_mon = tools::getInstance()->ReadTxt("D:\\VS_PROJECT\\ConsoleFrame\\ÄæÄ§´óµî.txt");
 	for (size_t i = 0; i < vec_mon.size(); i++)
 	{
-		s.Format("%s\n", (char*)vec_mon[i].data());
-		AfxMessageBox( s);
+		s.Format("%s\n", (char*)vec_mon[i].c_str());
+		AppendText(m_edit2, s);
 	}
-	//Auto_Attack(r, vec_mon, s_ID);
+	Auto_Attack(r, vec_mon, s_ID);
 
 
 	//m_threadGoto=AfxBeginThread((AFX_THREADPROC)threadGoto,NULL, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
