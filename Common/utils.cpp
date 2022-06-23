@@ -403,3 +403,35 @@ std::vector<std::string> tools::splitString(std::string str)
 	std::vector<std::string> temp(std::sregex_token_iterator(str.begin(), str.end(), delimiters, -1), std::sregex_token_iterator());
 	return temp;
 }
+
+/*
+函数功能：获取当前exe或者dll的路径
+参数1：字符串
+返回值：当前exe所在路径
+*/
+std::string tools::GetCurrDir()
+{	
+	TCHAR szFull[_MAX_PATH];
+	TCHAR szDrive[_MAX_DRIVE];
+	TCHAR szDir[_MAX_DIR];
+	::GetModuleFileName(NULL, szFull, sizeof(szFull) / sizeof(TCHAR));
+	_tsplitpath(szFull, szDrive, szDir, NULL, NULL);
+	_tcscpy(szFull, szDrive);
+	_tcscat(szFull, szDir);
+	std::string strPath(szFull);
+	return strPath;
+}
+
+/*
+函数功能：取文件夹名字,取上一路径
+参数1：路径字符串 " X:\\DIR1\\DIR2\\DIR3\\DIR4\\"
+返回值：上一级目录 " X:\\DIR1\\DIR2\\DIR3\\"
+*/
+ std::string tools::getParentPath(std::string str)
+{
+	std::string::size_type idx = str.rfind('\\', str.length());
+	std::string folder = str.substr(0, idx);
+	idx = folder.rfind('\\', folder.length());
+	std::string folder1 = folder.substr(0, idx + 1);
+	return folder1;
+}

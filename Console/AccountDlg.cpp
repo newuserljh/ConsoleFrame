@@ -12,7 +12,7 @@
 #include "EipInject.h"
 #include "utils.h"
 // CAccountDlg 对话框
-
+std::string GAME_DIR("G:\\传奇世界2.9\\传奇世界\\Data\\");
 
 IMPLEMENT_DYNAMIC(CAccountDlg, CDialogEx)
 
@@ -164,6 +164,7 @@ bool CAccountDlg::initMem()
 			m_shareMemSer->m_pSMAllData->m_sm_data[i].rcv_rand = 0;
 			m_shareMemSer->m_pSMAllData->m_sm_data[i].server_alive = true;
 		}
+		strcat_s(m_shareMemSer->m_pSMAllData->currDir, tools::getInstance()->GetCurrDir().c_str());
 	}
 	return rt;
 }
@@ -248,8 +249,15 @@ void CAccountDlg::OnBnClickedButton3()
 /*登录游戏并注入获取PID*/
 void CAccountDlg::log_inject(int i)
 {
-	exeLoad e("D:\\传奇世界2.9\\传奇世界\\Data\\woool.dat.update", "D:\\传奇世界2.9\\传奇世界\\Data\\");
+	std::string gamePath=GAME_DIR+"woool.dat.update";
+	exeLoad e(gamePath, GAME_DIR);
 	m_shareMemSer->m_pSMAllData->m_sm_data[i].ndPid = e.pi.dwProcessId;
 	EipInject in;
-	in.eipinjectDll(L"D:\\VS_PROJECT\\ConsoleFrame\\Debug\\TestDll.dll", e.pi);
+	//TCHAR dllPath[MAX_PATH];
+	//TCHAR* dp = "TestDll.dll";
+	//const TCHAR*  tempPath = m_shareMemSer->m_pSMAllData->currDir.c_str();
+	//strcat_s(dllPath, tempPath);
+	//strcat_s(dllPath, dp);
+	//AfxMessageBox(dllPath);
+	in.eipinjectDll(L"G:\\VS_Projects\\ConsoleFrame\\Debug\\TestDll.dll",e.pi);
 }

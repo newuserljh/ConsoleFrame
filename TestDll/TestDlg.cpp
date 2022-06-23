@@ -439,11 +439,20 @@ bool Load_Settings()
 int CTestDlg::threadAttack(void* p)
 {
 	CTestDlg* pDlg = (CTestDlg*)p;
-	if(!Load_Settings())return 0;
 	CString s;
+	Load_Settings();
 	s.Format("打怪技能ID:%d", s_ID);
 	AppendText(pDlg->m_edit2, s);
-	std::vector<std::string> vec_mon = tools::getInstance()->ReadTxt("..\\逆魔大殿.txt");
+	s.Format("当前目录:%s", shareCli.m_pSMAllData->currDir);
+	AppendText(pDlg->m_edit2, s);
+	std::string pathTemp = tools::getInstance()->getParentPath(shareCli.m_pSMAllData->currDir) + "逆魔大殿.txt";
+	std::vector<std::string>vec_mon = tools::getInstance()->ReadTxt(pathTemp);
+	for (size_t i = 0; i < vec_mon.size(); i++)
+	{
+		s.Format("%s\n", (char*)vec_mon[i].c_str());
+		AppendText(pDlg->m_edit2, s);
+	}
+	Auto_Attack(r, vec_mon, s_ID);
 	while (tflag_attack)
 	{
 		Auto_Attack(r, vec_mon, s_ID);
@@ -572,27 +581,13 @@ void CTestDlg::OnBnClickedButton9()
 	*          ****继续打怪
 	* */
 
-	CString s;
-	Load_Settings();
-	s.Format("打怪技能ID:%d", s_ID);
-	AppendText(m_edit2, s);
-	std::vector<std::string> vec_mon = tools::getInstance()->ReadTxt("D:\\VS_PROJECT\\ConsoleFrame\\逆魔大殿.txt");
-	for (size_t i = 0; i < vec_mon.size(); i++)
-	{
-		s.Format("%s\n", (char*)vec_mon[i].c_str());
-		AppendText(m_edit2, s);
-	}
-	Auto_Attack(r, vec_mon, s_ID);
-
-
 	//m_threadGoto=AfxBeginThread((AFX_THREADPROC)threadGoto,NULL, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
 	//m_threadAttack= AfxBeginThread(thredAttack, NULL);
 	//m_threadPickup= AfxBeginThread((AFX_THREADPROC)threadPickup, NULL, THREAD_PRIORITY_ABOVE_NORMAL);
 
-	//tflag_attack = true;
-	//HANDLE thrHandle;
-	//thrHandle = (HANDLE)_beginthreadex(NULL, 0,
-	//	(unsigned int(__stdcall*)(void*))threadAttack, (LPVOID)this, 0, NULL);  //将this指针传给子线程
-
-	//CloseHandle(thrHandle);
+	tflag_attack = true;
+	HANDLE thrHandle;
+	thrHandle = (HANDLE)_beginthreadex(NULL, 0,
+		(unsigned int(__stdcall*)(void*))threadAttack, (LPVOID)this, 0, NULL);  //将this指针传给子线程
+	CloseHandle(thrHandle);
 }

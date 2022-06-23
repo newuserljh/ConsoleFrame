@@ -19,6 +19,7 @@
 #include <map>
 #include <list>
 #include <regex>
+#include <tchar.h>
 #pragma comment(lib , "Psapi.lib")
 /*
 工具类
@@ -45,6 +46,8 @@ public:
 	bool fileIsexist(std::string fileName);
 	std::vector<std::string> ReadTxt(std::string file_Path/*文件路径*/);
 	std::vector<std::string> splitString(std::string str);
+	std::string GetCurrDir();
+	std::string getParentPath(std::string str);
 public:
 	tools();
 	tools(const tools&);

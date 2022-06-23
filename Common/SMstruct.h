@@ -21,6 +21,7 @@ typedef struct _SM_SHARE_DATA
 struct _SM_ALL_SHARE_DATA
 {
 	SM_SHARE_DATA m_sm_data[MORE_OPEN_NUMBER];
+	TCHAR currDir[MAX_PATH];
 };
 
 #pragma  pack()
