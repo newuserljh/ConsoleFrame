@@ -336,7 +336,7 @@ unsigned gamecall::caclDistance(DWORD x1,DWORD y1, DWORD x2, DWORD y2)
 */
 DWORD gamecall::Find_T_Monster(role& r, std:: vector<std::string>& vec)
 {
-	std::vector<DWORD> near_Mon_3, near_Mon_7;
+	std::vector<DWORD> near_Mon_3, near_Mon_9;
 	r.Get_Envionment(near_Mon_3, 3); /*找到3格已内的怪物*/
 	if (near_Mon_3.size())
 	{
@@ -349,15 +349,15 @@ DWORD gamecall::Find_T_Monster(role& r, std:: vector<std::string>& vec)
 			}
 		}
 	}
-	r.Get_Envionment(near_Mon_7, 7); /*找到7格已内的怪物*/
-	if (near_Mon_7.size())
+	r.Get_Envionment(near_Mon_9, 9); /*找到9格已内的怪物*/
+	if (near_Mon_9.size())
 	{
-		for (unsigned i = 0; i < near_Mon_7.size(); i++)
+		for (unsigned i = 0; i < near_Mon_9.size(); i++)
 		{
 			for (unsigned j = 0; j < vec.size(); j++)
 			{
-				if (strcmp((CHAR*)(near_Mon_7[i] + 0x10), vec[j].c_str()) == 0) /*strcmp返回0代表相等*/
-					return near_Mon_7[i];
+				if (strcmp((CHAR*)(near_Mon_9[i] + 0x10), vec[j].c_str()) == 0) /*strcmp返回0代表相等*/
+					return near_Mon_9[i];
 			}
 		}
 	}

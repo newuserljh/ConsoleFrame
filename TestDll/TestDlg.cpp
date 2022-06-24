@@ -27,22 +27,6 @@ skill m_skill;
 bag r_bag;
 gamecall mfun;
 
-/*打怪技能设置*/
-DWORD s_ID = -1;
-CWinThread* m_threadAttack;
-bool tflag_attack = true;
-
-/*寻路打怪坐标*/
-std::vector<MapXY> map_xy;
-CWinThread* m_threadGoto;
-bool tflag_goto = true;
-
-
-/*捡物设置*/
-std::vector<std::string> pick_goods_list;
-CWinThread* m_threadPickup;
-bool tflag_pickup = true;
-
 _declspec(naked) void CallTest()
 {
 	_asm pushad
@@ -223,6 +207,28 @@ BOOL CTestDlg::OnInitDialog()
 				  // 异常: OCX 属性页应返回 FALSE
 }
 
+/*初始化打怪相关设置*/
+bool CTestDlg:: initVariable()
+{
+	s_ID = -1;
+	tflag_attack = true;
+	tflag_goto = true;
+	tflag_pickup = true;
+	/*载入拾取物品*/
+	pick_goods_list.clear();
+	pick_goods_list = tools::getInstance()->ReadTxt(tools::getInstance()->getParentPath(shareCli.m_pSMAllData->currDir) + "拾取物品.txt");
+	if (!pick_goods_list.size())return false;
+	/*设置技能*/
+	if (!Set_Skill())return false;
+	/*载入打怪地图路线*/
+	if (!Load_coordinate())return false;
+	/*载入攻击怪物列表*/
+	pick_goods_list.clear();
+	attack_monlist = tools::getInstance()->ReadTxt(tools::getInstance()->getParentPath(shareCli.m_pSMAllData->currDir) + "逆魔大殿.txt");
+	if (!attack_monlist.size())return false;
+
+	return true;
+}
 
 
 void CTestDlg::OnBnClickedButton2()
@@ -316,7 +322,15 @@ void CTestDlg::OnBnClickedButton8()
 
 void CTestDlg::OnBnClickedButton5()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 停止脚本
+	tflag_pickup = false;
+	tflag_goto= false;
+	tflag_pickup= false;
+	//线程开关置为假
+	WaitForSingleObject(m_threadGoto, 100);
+	WaitForSingleObject(m_threadAttack, 100);
+	WaitForSingleObject(m_threadPickup, 100);
+	CDialogEx::OnOK();
 }
 
 
@@ -330,7 +344,7 @@ void CTestDlg::OnBnClickedButton5()
 参数二:攻击怪物列表
 返回值：选中怪物对象指针
 */
-DWORD Choose_Moster(role& r, std::vector<std::string>& vec)
+DWORD Choose_Moster(CTestDlg* pDlg, std::vector<std::string>& vec)
 {
 	DWORD Object_ID = *r.m_roleproperty.p_Target_ID;
 	while (Object_ID == 0)
@@ -343,9 +357,9 @@ DWORD Choose_Moster(role& r, std::vector<std::string>& vec)
 		else
 		{
 			/*边寻路边找怪*/
-			//m_threadGoto->ResumeThread();
-			Sleep(2000);
-			//m_threadGoto->SuspendThread();
+			pDlg->m_threadGoto->ResumeThread();
+			Sleep(500);
+			pDlg->m_threadGoto->SuspendThread();
 		}
 	}
 	return Object_ID;
@@ -358,10 +372,10 @@ DWORD Choose_Moster(role& r, std::vector<std::string>& vec)
 参数三:使用技能ID
 返回值：true为已经打死怪物，fasle为位置错误（或者600次没打死怪物）
 */
-bool Auto_Attack(role r, std::vector<std::string>& vec, DWORD s_ID)
+bool Auto_Attack(CTestDlg* pDlg, std::vector<std::string>& vec, DWORD s_ID)
 {
 	*r.m_roleproperty.p_Target_ID = 0;
-	DWORD p_Target = Choose_Moster(r, vec);
+	DWORD p_Target = Choose_Moster(pDlg, vec);
 	
 	MONSTER_PROPERTY att_mon((DWORD*)p_Target);
 	unsigned i = 0;/*记录攻击次数*/
@@ -389,11 +403,11 @@ bool Auto_Attack(role r, std::vector<std::string>& vec, DWORD s_ID)
 }
 
 /*
-函数功能:载入设置
+函数功能:设置打怪技能
 参数一:角色结构体
 返回值：选中怪物对象指针
 */
-bool Load_Settings()
+bool CTestDlg::Set_Skill()
 {
 	/*技能设置*/
 	if (*r.m_roleproperty.Job == 0)/*战士*/
@@ -436,30 +450,7 @@ bool Load_Settings()
 
 }
 
-int CTestDlg::threadAttack(void* p)
-{
-	CTestDlg* pDlg = (CTestDlg*)p;
-	CString s;
-	Load_Settings();
-	s.Format("打怪技能ID:%d", s_ID);
-	AppendText(pDlg->m_edit2, s);
-	s.Format("当前目录:%s", shareCli.m_pSMAllData->currDir);
-	AppendText(pDlg->m_edit2, s);
-	std::string pathTemp = tools::getInstance()->getParentPath(shareCli.m_pSMAllData->currDir) + "逆魔大殿.txt";
-	std::vector<std::string>vec_mon = tools::getInstance()->ReadTxt(pathTemp);
-	for (size_t i = 0; i < vec_mon.size(); i++)
-	{
-		s.Format("%s\n", (char*)vec_mon[i].c_str());
-		AppendText(pDlg->m_edit2, s);
-	}
-	Auto_Attack(r, vec_mon, s_ID);
-	while (tflag_attack)
-	{
-		Auto_Attack(r, vec_mon, s_ID);
-		Sleep(ATTACK_SLEEP);
-	}
-	return 0;
-}
+
 
 /*
 函数功能:寻路到当前地图(x,y)附近
@@ -503,10 +494,10 @@ bool MapGoto_Point(DWORD x, DWORD y,bool tflag)
 参数一:角色结构体
 返回值：选中怪物对象指针
 */
-bool Load_coordinate()
+bool CTestDlg::Load_coordinate()
 {
 	map_xy.clear();
-	std::vector<std::string> map_coordinate= tools::getInstance()->ReadTxt("..\\逆魔大殿1.txt");
+	std::vector<std::string> map_coordinate= tools::getInstance()->ReadTxt(tools::getInstance()->getParentPath(shareCli.m_pSMAllData->currDir) + "\\逆魔大殿1.txt");
 	if (!map_coordinate.size())return false;
 	for (size_t i = 0; i < map_coordinate.size(); i++)
 	{
@@ -518,55 +509,63 @@ bool Load_coordinate()
 	return true;
 }
 
-/*
-函数功能:载入拾取物品
-参数一:角色结构体
-返回值：选中怪物对象指针
-*/
-bool Load_pick_goods()
-{
-	pick_goods_list.clear();
-	std::vector<std::string> map_coordinate = tools::getInstance()->ReadTxt("..\\拾取物品.txt");
-	if (!map_coordinate.size())return false;
-	return true;
-}
+
 
 /*寻路线程*/
-void threadGoto()
+UINT __cdecl CTestDlg::threadGoto(LPVOID p)
 {
-	if (!Load_coordinate())return;
+	CTestDlg* pDlg = (CTestDlg*)p;
 	size_t i = 0;
-	while (tflag_goto)
+	while (pDlg->tflag_goto)
 	{
-		MapXY xy = map_xy[i];
-		MapGoto_Point(map_xy[i].x, map_xy[i].y,tflag_goto);
+		MapXY xy = pDlg->map_xy[i];
+		shareCli.m_pSMAllData->m_sm_data[shareindex].cscript = std::string( "正在寻路到");
+		MapGoto_Point(pDlg->map_xy[i].x, pDlg->map_xy[i].y, pDlg->tflag_goto);
 		i++;
-		if (i = map_xy.size())i = 0;
+		if (i = pDlg->map_xy.size())i = 0;
 	}
+	return 0;
+}
+
+/*打怪线程*/
+UINT __cdecl CTestDlg::threadAttack(LPVOID p)
+{
+	CTestDlg* pDlg = (CTestDlg*)p;
+	while (pDlg->tflag_attack)
+	{
+		shareCli.m_pSMAllData->m_sm_data[shareindex].cscript = std::string("打怪");
+		Auto_Attack(pDlg, pDlg->attack_monlist, pDlg->s_ID);
+		Sleep(ATTACK_SLEEP);
+	}
+	return 0;
 }
 
 /*捡物线程*/
-void threadPickup()
+UINT __cdecl CTestDlg::threadPickup(LPVOID p)
 {
-	if (!Load_pick_goods())return;
+	CTestDlg* pDlg = (CTestDlg*)p;
 	size_t i = 0;
-	while (tflag_pickup)
+	while (pDlg->tflag_pickup)
 	{
 		r.Get_Ground(m_mon.pGr_list);
 		m_mon.init_ground();
 		for (size_t i=0;i<m_mon.m_groundList.size();i++)
 		{
-			for (size_t j = 0; j < pick_goods_list.size(); j++)
+			for (size_t j = 0; j < pDlg->pick_goods_list.size(); j++)
 			{
-				if (strcmp(m_mon.m_groundList[i].pName,pick_goods_list[j].c_str())==0)
+				if (strcmp(m_mon.m_groundList[i].pName, pDlg->pick_goods_list[j].c_str())==0)
 				{
+					pDlg->m_threadGoto->SuspendThread();
+					shareCli.m_pSMAllData->m_sm_data[shareindex].cscript = pDlg->pick_goods_list[j] + "正在拾取物品";
 					MapGoto_Point(*m_mon.m_groundList[i].X, *m_mon.m_groundList[i].Y,true);
 					mfun.pickupGoods(*m_mon.m_groundList[i].X, *m_mon.m_groundList[i].Y);
+					pDlg->m_threadGoto->ResumeThread();
 				}
 			}
 		}
 		Sleep(2000);
 	}
+	return 0;
 }
 
 
@@ -580,14 +579,27 @@ void CTestDlg::OnBnClickedButton9()
 	*自动打怪***   打怪：判断打死
 	*          ****继续打怪
 	* */
+	r.init();
+	r.Get_Envionment(m_mon.pOb_list);
+	r.Get_Ground(m_mon.pGr_list);
+	m_mon.init();
+	r_bag.maxSize = *r.m_roleproperty.Bag_Size;
+	r_bag.bagBase = (DWORD)r.m_roleproperty.p_Bag_Base;
+	m_skill.skillBase = (DWORD)r.m_roleproperty.p_Skill_Base;
+	r_bag.init();
+	m_skill.init();
 
-	//m_threadGoto=AfxBeginThread((AFX_THREADPROC)threadGoto,NULL, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
-	//m_threadAttack= AfxBeginThread(thredAttack, NULL);
-	//m_threadPickup= AfxBeginThread((AFX_THREADPROC)threadPickup, NULL, THREAD_PRIORITY_ABOVE_NORMAL);
+	initVariable();
 
-	tflag_attack = true;
-	HANDLE thrHandle;
-	thrHandle = (HANDLE)_beginthreadex(NULL, 0,
-		(unsigned int(__stdcall*)(void*))threadAttack, (LPVOID)this, 0, NULL);  //将this指针传给子线程
-	CloseHandle(thrHandle);
+
+	m_threadGoto=AfxBeginThread(threadGoto, (LPVOID)this, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
+	m_threadAttack= AfxBeginThread(threadAttack, (LPVOID)this);
+	m_threadPickup= AfxBeginThread(threadPickup, (LPVOID)this, THREAD_PRIORITY_ABOVE_NORMAL);
+	
+	
+}
+
+void CTestDlg::OnBnClickedButton4()
+{
+	// TODO: 在此添加控件通知处理程序代码
 }
