@@ -17,6 +17,7 @@ struct MONSTER_PROPERTY
 	DWORD*  X;// X;// +0xac 
 	DWORD*  Y;// Y;// +0xb0
 	BYTE*  IsPosion;// +0x34b  //是否中毒 0没毒，0x40红毒，0x80绿毒，0xc0红绿毒,
+	DWORD Distance; //对象和角色的距离
 };
 //人物属性
 struct ROLE_PROPERTY
@@ -99,6 +100,7 @@ struct GROUND_GOODS
 	char* pName;//+ 0x18
 	DWORD* X;//+c
 	DWORD* Y;//+0x10
+	DWORD Distance;//距离角色距离
 };
 
 //任务对象

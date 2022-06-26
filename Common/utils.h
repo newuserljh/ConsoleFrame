@@ -48,6 +48,8 @@ public:
 	std::vector<std::string> splitString(std::string str);
 	std::string GetCurrDir();
 	std::string getParentPath(std::string str);
+	wchar_t* char2wchar(const char* cchar);
+	char* wchar2char(const wchar_t* cchar);
 public:
 	tools();
 	tools(const tools&);

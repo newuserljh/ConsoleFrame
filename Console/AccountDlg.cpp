@@ -12,7 +12,7 @@
 #include "EipInject.h"
 #include "utils.h"
 // CAccountDlg 对话框
-std::string GAME_DIR("G:\\传奇世界2.9\\传奇世界\\Data\\");
+std::string GAME_DIR("D:\\传奇世界2.9\\传奇世界\\Data\\");
 
 IMPLEMENT_DYNAMIC(CAccountDlg, CDialogEx)
 
@@ -253,11 +253,8 @@ void CAccountDlg::log_inject(int i)
 	exeLoad e(gamePath, GAME_DIR);
 	m_shareMemSer->m_pSMAllData->m_sm_data[i].ndPid = e.pi.dwProcessId;
 	EipInject in;
-	//TCHAR dllPath[MAX_PATH];
-	//TCHAR* dp = "TestDll.dll";
-	//const TCHAR*  tempPath = m_shareMemSer->m_pSMAllData->currDir.c_str();
-	//strcat_s(dllPath, tempPath);
-	//strcat_s(dllPath, dp);
-	//AfxMessageBox(dllPath);
-	in.eipinjectDll(L"G:\\VS_Projects\\ConsoleFrame\\Debug\\TestDll.dll",e.pi);
+	std::string dllPath  =std::string( m_shareMemSer->m_pSMAllData->currDir)+"TestDll.dll";
+	//wchar_t* t = tools::getInstance()->char2wchar(dllPath.c_str());
+	//MessageBoxW(0,t,L" ",MB_OK);
+	in.eipinjectDll(tools::getInstance()->char2wchar(dllPath.c_str()),e.pi);
 }

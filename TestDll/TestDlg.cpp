@@ -111,6 +111,7 @@ void threadAlive()
 	while (true)
 	{
 		shareCli.m_pSMAllData->m_sm_data[shareindex].rcv_rand = shareCli.m_pSMAllData->m_sm_data[shareindex].send_rand;//验证外挂存活
+		shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid=GetCurrentProcessId();//验证外挂存活
 		Sleep(1000);
 	}
 }
@@ -210,6 +211,7 @@ BOOL CTestDlg::OnInitDialog()
 /*初始化打怪相关设置*/
 bool CTestDlg:: initVariable()
 {
+	i_map = 0;
 	s_ID = -1;
 	tflag_attack = true;
 	tflag_goto = true;
@@ -223,7 +225,7 @@ bool CTestDlg:: initVariable()
 	/*载入打怪地图路线*/
 	if (!Load_coordinate())return false;
 	/*载入攻击怪物列表*/
-	pick_goods_list.clear();
+	attack_monlist.clear();
 	attack_monlist = tools::getInstance()->ReadTxt(tools::getInstance()->getParentPath(shareCli.m_pSMAllData->currDir) + "逆魔大殿.txt");
 	if (!attack_monlist.size())return false;
 
@@ -324,12 +326,12 @@ void CTestDlg::OnBnClickedButton5()
 {
 	// TODO: 停止脚本
 	tflag_pickup = false;
-	tflag_goto= false;
+	//tflag_goto= false;
 	tflag_pickup= false;
 	//线程开关置为假
-	WaitForSingleObject(m_threadGoto, 100);
-	WaitForSingleObject(m_threadAttack, 100);
-	WaitForSingleObject(m_threadPickup, 100);
+	//WaitForSingleObject(m_threadGoto, 100);
+	WaitForSingleObject(m_threadAttack, 60000);
+	WaitForSingleObject(m_threadPickup, 60000);
 	CDialogEx::OnOK();
 }
 
@@ -344,25 +346,31 @@ void CTestDlg::OnBnClickedButton5()
 参数二:攻击怪物列表
 返回值：选中怪物对象指针
 */
-DWORD Choose_Moster(CTestDlg* pDlg, std::vector<std::string>& vec)
+MONSTER_PROPERTY Choose_Moster(CTestDlg* pDlg, std::vector<std::string>& vec)
 {
 	DWORD Object_ID = *r.m_roleproperty.p_Target_ID;
+	MONSTER_PROPERTY ret;
 	while (Object_ID == 0)
 	{
-		Object_ID = mfun.Find_T_Monster(r, vec);
-		if (Object_ID)
+		std::vector<MONSTER_PROPERTY> near_atak_mon_list = mfun.sort_aroud_monster(r, vec);
+		if (near_atak_mon_list.size() > 0)
 		{
-			*r.m_roleproperty.p_Target_ID = *(DWORD*)(Object_ID + 0x8);
+			ret = near_atak_mon_list[0];
+			*r.m_roleproperty.p_Target_ID = *near_atak_mon_list[0].ID;
 		}
 		else
 		{
 			/*边寻路边找怪*/
-			pDlg->m_threadGoto->ResumeThread();
+			if (pDlg->i_map == pDlg->map_xy.size())pDlg->i_map = 0;
+			MapXY xy = pDlg->map_xy[pDlg->i_map];
+			mfun.CurrentMapMove(xy.x, xy.y);//寻路0.5s
 			Sleep(500);
-			pDlg->m_threadGoto->SuspendThread();
+			mfun.CurrentMapMove(*r.m_roleproperty.Object.X, *r.m_roleproperty.Object.Y);//停止
+			if (mfun.caclDistance(*r.m_roleproperty.Object.X, *r.m_roleproperty.Object.Y,xy.x,xy.y)<4)pDlg->i_map++;			
 		}
+		Object_ID = *r.m_roleproperty.p_Target_ID;
 	}
-	return Object_ID;
+	return ret;
 }
 
 /*
@@ -375,13 +383,11 @@ DWORD Choose_Moster(CTestDlg* pDlg, std::vector<std::string>& vec)
 bool Auto_Attack(CTestDlg* pDlg, std::vector<std::string>& vec, DWORD s_ID)
 {
 	*r.m_roleproperty.p_Target_ID = 0;
-	DWORD p_Target = Choose_Moster(pDlg, vec);
-	
-	MONSTER_PROPERTY att_mon((DWORD*)p_Target);
+	MONSTER_PROPERTY att_mon = Choose_Moster(pDlg, vec);
 	unsigned i = 0;/*记录攻击次数*/
 	while( (*att_mon.HP> 0) && (*att_mon.ID == *r.m_roleproperty.p_Target_ID) && (i < 600))
 	{
-		if (mfun.caclDistance(*r.m_roleproperty.Object.X, *r.m_roleproperty.Object.Y, *att_mon.X, *att_mon.Y) > 9)return FALSE;
+		if (mfun.caclDistance(*r.m_roleproperty.Object.X, *r.m_roleproperty.Object.Y, *att_mon.X, *att_mon.Y) > 9)return false;
 		DWORD s_posion = m_skill.getSkillId("施毒术");
 		if( (s_posion!=-1))//道士
 		{
@@ -544,23 +550,25 @@ UINT __cdecl CTestDlg::threadAttack(LPVOID p)
 UINT __cdecl CTestDlg::threadPickup(LPVOID p)
 {
 	CTestDlg* pDlg = (CTestDlg*)p;
-	size_t i = 0;
 	while (pDlg->tflag_pickup)
 	{
-		r.Get_Ground(m_mon.pGr_list);
-		m_mon.init_ground();
-		for (size_t i=0;i<m_mon.m_groundList.size();i++)
+		std::vector<GROUND_GOODS>need2pick_list=mfun.sort_groud_goods(r, pDlg->pick_goods_list);
+		if (need2pick_list.size())
 		{
-			for (size_t j = 0; j < pDlg->pick_goods_list.size(); j++)
+			std::vector<MONSTER_PROPERTY> near_mon = mfun.sort_aroud_monster(r, pDlg->attack_monlist);
+			if (near_mon.size() < 3)
 			{
-				if (strcmp(m_mon.m_groundList[i].pName, pDlg->pick_goods_list[j].c_str())==0)
+				pDlg->m_threadAttack->SuspendThread();
+				shareCli.m_pSMAllData->m_sm_data[shareindex].cscript = std::string("正在拾取物品")+need2pick_list[0].pName;
+				int pick_try_accounts = 0;
+				while ((*r.m_roleproperty.Object.X != *need2pick_list[0].X) || (*r.m_roleproperty.Object.Y != *need2pick_list[0].Y) || pick_try_accounts > 9)
 				{
-					pDlg->m_threadGoto->SuspendThread();
-					shareCli.m_pSMAllData->m_sm_data[shareindex].cscript = pDlg->pick_goods_list[j] + "正在拾取物品";
-					MapGoto_Point(*m_mon.m_groundList[i].X, *m_mon.m_groundList[i].Y,true);
-					mfun.pickupGoods(*m_mon.m_groundList[i].X, *m_mon.m_groundList[i].Y);
-					pDlg->m_threadGoto->ResumeThread();
+					mfun.CurrentMapMove(*need2pick_list[0].X, *need2pick_list[0].Y);
+					Sleep(500);
+					mfun.pickupGoods(*need2pick_list[0].X, *need2pick_list[0].Y);
+					pick_try_accounts++;
 				}
+				pDlg->m_threadAttack->ResumeThread();
 			}
 		}
 		Sleep(2000);
@@ -592,7 +600,8 @@ void CTestDlg::OnBnClickedButton9()
 	initVariable();
 
 
-	m_threadGoto=AfxBeginThread(threadGoto, (LPVOID)this, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
+
+	//m_threadGoto=AfxBeginThread(threadGoto, (LPVOID)this, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
 	m_threadAttack= AfxBeginThread(threadAttack, (LPVOID)this);
 	m_threadPickup= AfxBeginThread(threadPickup, (LPVOID)this, THREAD_PRIORITY_ABOVE_NORMAL);
 	

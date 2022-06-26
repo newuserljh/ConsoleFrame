@@ -39,6 +39,7 @@ public:
 
 	/*寻路打怪坐标*/
 	std::vector<MapXY> map_xy;
+	size_t i_map;//寻路点下标
 	CWinThread* m_threadGoto;
 	bool tflag_goto;
 	static UINT __cdecl threadGoto(LPVOID lparam);

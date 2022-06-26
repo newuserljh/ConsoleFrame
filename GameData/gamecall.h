@@ -1,6 +1,8 @@
 #pragma once
 #include "baseaddr.h"
 #include "role.h"
+
+#include<algorithm>
 /*
 游戏功能CALL类
 */
@@ -20,10 +22,13 @@ public:
 	bool presskey(DWORD pid, int vkcode = VK_RETURN);
 	HWND GetHwndByPid(DWORD dwProcessID);
 	unsigned caclDistance(DWORD x1, DWORD y1, DWORD x2, DWORD y2);
-	DWORD Find_T_Monster(role& r, std::vector<std::string>& vec);
+	//DWORD Find_T_Monster(role& r, std::vector<std::string>& vec);
+	std::vector<MONSTER_PROPERTY> sort_aroud_monster(role& r, std::vector<std::string>& vec);
+	std::vector<GROUND_GOODS> sort_groud_goods(role& r, std::vector<std::string>& vec);
 	MapXY splitXY(std::string str);
 private:
-
+	static bool comp(const MONSTER_PROPERTY& a, const MONSTER_PROPERTY& b);
+	static bool comp_groud(const GROUND_GOODS& a, const GROUND_GOODS& b);
 };
 
 
@@ -317,51 +322,133 @@ bool gamecall::presskey(DWORD pid,int vkcode)
 参数四：y2
 返回值：距离
 */
-unsigned gamecall::caclDistance(DWORD x1,DWORD y1, DWORD x2, DWORD y2)
+unsigned gamecall::caclDistance(DWORD x1, DWORD y1, DWORD x2, DWORD y2)
 {
+	unsigned ret;
 	int x, y;
 	x = x1 - x2;
-	if (x < 0)x = 0 - x;
 	y = y1 - y2;
-	if (y < 0)y = 0 - y;
-	return (x > y) ? x : y;
+	ret = (unsigned)sqrt(abs(x * x) + abs(y * y));
+	return ret;
+}
+
+///*
+//函数功能:找到要攻击的怪物
+//参数一:角色结构体
+//参数二:攻击怪物列表
+//返回值：返回找到的怪物对象指针
+//*/
+//DWORD gamecall::Find_T_Monster(role& r, std:: vector<std::string>& vec)
+//{
+//	std::vector<DWORD>  near_Mon_7;
+//	r.Get_Envionment(near_Mon_7, 7); /*找到9格已内的怪物*/
+//	if (near_Mon_7.size())
+//	{
+//		for (unsigned i = 0; i < near_Mon_7.size(); i++)
+//		{
+//			for (unsigned j = 0; j < vec.size(); j++)
+//			{
+//				if (strcmp((CHAR*)(near_Mon_7[i] + 0x10), vec[j].c_str()) == 0) /*strcmp返回0代表相等*/
+//					return near_Mon_7[i];
+//			}
+//		}
+//	}
+//	return 0;
+//}
+
+
+/*
+函数功能:怪物距离sort排序函数
+参数一:怪物对象
+参数二:怪物对象
+返回值：bool
+*/
+bool gamecall:: comp(const MONSTER_PROPERTY& a, const MONSTER_PROPERTY& b)
+{
+	if (a.Distance < b.Distance) {
+		return true;
+	}
+	else if (a.Distance == b.Distance && a.ID < b.ID) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+/*
+函数功能:刷新周围怪物按距离排序
+参数一:角色结构体
+参数二:攻击怪物列表
+返回值：返回按距离排序的7格以内的攻击怪物怪物列表
+*/
+std::vector<MONSTER_PROPERTY> gamecall::sort_aroud_monster(role& r, std::vector<std::string>& vec)
+{
+	std::vector<MONSTER_PROPERTY> ret;
+	std::vector<DWORD>  near_Mon_7;
+	r.Get_Envionment(near_Mon_7, 7); /*找到7格已内的怪物*/
+	if (near_Mon_7.size())
+	{
+		for (unsigned i = 0; i < near_Mon_7.size(); i++)
+		{
+			for (unsigned j = 0; j < vec.size(); j++)
+			{
+				if (strcmp((CHAR*)(near_Mon_7[i] + 0x10), vec[j].c_str()) == 0) /*strcmp返回0代表相等*/
+				{
+					MONSTER_PROPERTY temp((DWORD*)near_Mon_7[i]);
+					temp.Distance = caclDistance(*r.m_roleproperty.Object.X, *r.m_roleproperty.Object.Y, *temp.X, *temp.Y);
+					ret.push_back(temp);
+				}
+			}
+		}
+	}
+	std::sort(ret.begin(), ret.end(), &comp);
+	return ret;
 }
 
 
 /*
-函数功能:找到要攻击的怪物
-参数一:角色结构体
-参数二:攻击怪物列表
-返回值：返回找到的怪物对象指针
+函数功能:地面物品距离sort排序函数
+参数一:地面对象
+参数二:地面对象
+返回值：bool
 */
-DWORD gamecall::Find_T_Monster(role& r, std:: vector<std::string>& vec)
+bool gamecall::comp_groud(const GROUND_GOODS& a, const GROUND_GOODS& b)
 {
-	std::vector<DWORD> near_Mon_3, near_Mon_9;
-	r.Get_Envionment(near_Mon_3, 3); /*找到3格已内的怪物*/
-	if (near_Mon_3.size())
-	{
-		for (unsigned i = 0; i < near_Mon_3.size(); i++)
-		{
-			for (unsigned j = 0; j < vec.size(); j++){
-			
-				if (strcmp((CHAR*)(near_Mon_3[i] + 0x10), vec[j].c_str()) == 0) /*strcmp返回0代表相等*/
-					return near_Mon_3[i];
-			}
-		}
+	if (a.Distance <=b.Distance) {
+		return true;
 	}
-	r.Get_Envionment(near_Mon_9, 9); /*找到9格已内的怪物*/
-	if (near_Mon_9.size())
+	else {
+		return false;
+	}
+}
+/*
+函数功能:刷新地面物品按距离排序
+参数一:角色结构体
+参数二:拾取物品列表
+返回值：返回按距离排序的15格以内的需要拾取的地面物品列表
+*/
+std::vector<GROUND_GOODS> gamecall::sort_groud_goods(role& r, std::vector<std::string>& vec)
+{
+	std::vector<GROUND_GOODS> ret;
+	std::vector<DWORD>  near_groud;
+	r.Get_Ground(near_groud, 15);
+	if (near_groud.size())
 	{
-		for (unsigned i = 0; i < near_Mon_9.size(); i++)
+		for (unsigned i = 0; i < near_groud.size(); i++)
 		{
 			for (unsigned j = 0; j < vec.size(); j++)
 			{
-				if (strcmp((CHAR*)(near_Mon_9[i] + 0x10), vec[j].c_str()) == 0) /*strcmp返回0代表相等*/
-					return near_Mon_9[i];
+				if (strcmp((CHAR*)(near_groud[i] + 0x18), vec[j].c_str()) == 0) /*strcmp返回0代表相等*/
+				{
+					GROUND_GOODS temp((DWORD*)near_groud[i]);
+					temp.Distance = caclDistance(*r.m_roleproperty.Object.X, *r.m_roleproperty.Object.Y, *temp.X, *temp.Y);
+					ret.push_back(temp);
+				}
 			}
 		}
 	}
-	return 0;
+	std::sort(ret.begin(), ret.end(), &comp_groud);
+	return ret;
 }
 
 /*
