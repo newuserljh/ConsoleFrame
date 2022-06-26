@@ -555,19 +555,23 @@ UINT __cdecl CTestDlg::threadPickup(LPVOID p)
 		std::vector<GROUND_GOODS>need2pick_list=mfun.sort_groud_goods(r, pDlg->pick_goods_list);
 		if (need2pick_list.size())
 		{
-			std::vector<MONSTER_PROPERTY> near_mon = mfun.sort_aroud_monster(r, pDlg->attack_monlist);
+			GROUND_GOODS pick_temp = need2pick_list[0];
+			std::vector<MONSTER_PROPERTY> near_mon = mfun.sort_aroud_monster(r, pDlg->attack_monlist);		
 			if (near_mon.size() < 3)
 			{
 				pDlg->m_threadAttack->SuspendThread();
-				shareCli.m_pSMAllData->m_sm_data[shareindex].cscript = std::string("正在拾取物品")+need2pick_list[0].pName;
+				shareCli.m_pSMAllData->m_sm_data[shareindex].cscript = std::string("正在拾取物品")+ pick_temp.pName;
 				int pick_try_accounts = 0;
-				while ((*r.m_roleproperty.Object.X != *need2pick_list[0].X) || (*r.m_roleproperty.Object.Y != *need2pick_list[0].Y) || pick_try_accounts > 9)
+				do
 				{
-					mfun.CurrentMapMove(*need2pick_list[0].X, *need2pick_list[0].Y);
+					mfun.CurrentMapMove(*pick_temp.X, *pick_temp.Y);
 					Sleep(500);
-					mfun.pickupGoods(*need2pick_list[0].X, *need2pick_list[0].Y);
+					mfun.pickupGoods(*pick_temp.X, *pick_temp.Y);
 					pick_try_accounts++;
-				}
+					need2pick_list.clear();
+					need2pick_list = mfun.sort_groud_goods(r, pDlg->pick_goods_list);
+					if (!need2pick_list.size())break;
+				} while ((need2pick_list[0].X == pick_temp.X) || pick_try_accounts< 9);
 				pDlg->m_threadAttack->ResumeThread();
 			}
 		}
@@ -598,8 +602,13 @@ void CTestDlg::OnBnClickedButton9()
 	m_skill.init();
 
 	initVariable();
-
-
+	std::vector<GROUND_GOODS>need2pick_list = mfun.sort_groud_goods(r, pick_goods_list);
+	CString s;
+	for (auto i=0;i<need2pick_list.size();i++)
+	{
+		s.Format("%s", need2pick_list[i].pName);
+		AppendText(m_edit2, s);
+	}
 
 	//m_threadGoto=AfxBeginThread(threadGoto, (LPVOID)this, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
 	m_threadAttack= AfxBeginThread(threadAttack, (LPVOID)this);

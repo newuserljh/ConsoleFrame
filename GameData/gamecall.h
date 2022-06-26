@@ -447,7 +447,11 @@ std::vector<GROUND_GOODS> gamecall::sort_groud_goods(role& r, std::vector<std::s
 			}
 		}
 	}
-	std::sort(ret.begin(), ret.end(), &comp_groud);
+	if (ret.size())
+	{
+		std::sort(ret.begin(), ret.end(), &comp_groud);
+	}
+
 	return ret;
 }
 
