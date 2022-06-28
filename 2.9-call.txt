@@ -25,3 +25,109 @@ call 0x00718A10
 00C92D25   | 53                         | push ebx                                                        | 目标Y
 00C92D26   | 57                         | push edi                                                        | 目标X
 00C92D27   | E8 34CBB1FF                | call <woool.dat.sub_7AF860>                                     | 寻路call
+
+=======走路/跑步call================
+007AD6D9     | 8BC6                       | mov eax,esi                                        |
+007AD6DB     | 2BC1                       | sub eax,ecx                                        |
+007AD6DD     | 8BCF                       | mov ecx,edi                                        |
+007AD6DF     | 2BCD                       | sub ecx,ebp                                        |
+007AD6E1     | C1E0 06                    | shl eax,0x6                                        |
+007AD6E4     | C1E1 05                    | shl ecx,0x5                                        |
+007AD6E7     | 85C0                       | test eax,eax                                       |
+007AD6E9     | 896A 0C                    | mov dword ptr ds:[edx+0xC],ebp                     |
+007AD6EC     | 8942 10                    | mov dword ptr ds:[edx+0x10],eax                    |
+007AD6EF     | 894A 14                    | mov dword ptr ds:[edx+0x14],ecx                    |
+007AD6F2     | 75 04                      | jne woool.dat.7AD6F8                               |
+007AD6F4     | 85C9                       | test ecx,ecx                                       |
+007AD6F6     | 74 25                      | je woool.dat.7AD71D                                |
+007AD6F8     | 837C24 10 00               | cmp dword ptr ss:[esp+0x10],0x0                    |
+007AD6FD     | 8B0D 10FB3501              | mov ecx,dword ptr ds:[0x135FB10]                   | ecx
+007AD703     | 57                         | push edi                                           | 坐标Y
+007AD704     | 56                         | push esi                                           | 坐标X
+007AD705     | 74 11                      | je woool.dat.7AD718                                |跑步call 每次跑2格 需要连续调用，跑到2格以内
+007AD707     | E8 645BF8FF                | call woool.dat.733270                              |
+007AD70C     | 5F                         | pop edi                                            |
+007AD70D     | 5D                         | pop ebp                                            |
+007AD70E     | 5B                         | pop ebx                                            |
+007AD70F     | B0 01                      | mov al,0x1                                         |
+007AD711     | 5E                         | pop esi                                            |
+007AD712     | 83C4 0C                    | add esp,0xC                                        |
+007AD715     | C2 0C00                    | ret 0xC                                            |
+007AD718     | E8 B35AF8FF                | call woool.dat.7331D0                              | 走步call 每次走一格 需要连续调用
+007AD71D     | 5F                         | pop edi                                            |
+007AD71E     | 5D                         | pop ebp                                            |
+007AD71F     | 5B                         | pop ebx                                            |
+007AD720     | B0 01                      | mov al,0x1                                         |
+007AD722     | 5E                         | pop esi                                            |
+
+=======走路跑步一体call================
+007BACDC     | 83C0 01                    | add eax,0x1                                        |
+007BACDF     | 8881 74060000              | mov byte ptr ds:[ecx+0x674],al                     |
+007BACE5     | 8B0D 30FB3501              | mov ecx,dword ptr ds:[0x135FB30]                   |
+007BACEB     | 8A81 74060000              | mov al,byte ptr ds:[ecx+0x674]                     |
+007BACF1     | 3C 04                      | cmp al,0x4                                         |
+007BACF3     | 75 0D                      | jne woool.dat.7BAD02                               |
+007BACF5     | 6A 00                      | push 0x0                                           |
+007BACF7     | E8 F4E5F0FF                | call woool.dat.6C92F0                              |
+007BACFC     | 8B0D 30FB3501              | mov ecx,dword ptr ds:[0x135FB30]                   |
+007BAD02     | F645 28 02                 | test byte ptr ss:[ebp+0x28],0x2                    |
+007BAD06     | 0F85 A4000000              | jne woool.dat.7BADB0                               |
+007BAD0C     | 66:837D 14 1E              | cmp word ptr ss:[ebp+0x14],0x1E                    |
+007BAD11     | 75 0F                      | jne woool.dat.7BAD22                               |
+007BAD13     | 8B81 E4000000              | mov eax,dword ptr ds:[ecx+0xE4]                    |
+007BAD19     | 83F8 04                    | cmp eax,0x4                                        |
+007BAD1C     | 0F84 8E000000              | je woool.dat.7BADB0                                |
+007BAD22     | 57                         | push edi                                           | Y
+007BAD23     | 8B45 10                    | mov eax,dword ptr ss:[ebp+0x10]                    |
+007BAD26     | 50                         | push eax                                           | x
+007BAD27     | 8D4D 14                    | lea ecx,dword ptr ss:[ebp+0x14]                    |
+007BAD2A     | 51                         | push ecx                                           | 封包
+007BAD2B     | 8BCE                       | mov ecx,esi                                        |
+007BAD2D     | E8 AE28FFFF                | call woool.dat.7AD5E0                              | 走跑一体call
+007BAD32     | 84C0                       | test al,al                                         |
+007BAD34     | 0F85 E8030000              | jne woool.dat.7BB122                               |
+007BAD3A     | 8BCB                       | mov ecx,ebx                                        |
+
+0019F17C      1（16位：1走，2跑）   158 （16位）    7（32位）     0（32位） 475（32位X坐标） 219（32位Y坐标）
+
+=======跑步封包call================
+007332C6   | 8B0D 30FB3501              | mov ecx,dword ptr ds:[0x135FB30]                   |
+007332CC   | 6A 00                      | push 0x0                                           |
+007332CE   | 81C1 70140000              | add ecx,0x1470                                     |
+007332D4   | E8 C7A0E8FF                | call woool.dat.5BD3A0                              |
+007332D9   | 8B0D 04FB3501              | mov ecx,dword ptr ds:[0x135FB04]                   |
+007332DF   | 6A 00                      | push 0x0                                           |
+007332E1   | 6A 01                      | push 0x1                                           |
+007332E3   | 6A 01                      | push 0x1                                           |
+007332E5   | 6A 0C                      | push 0xC                                           |
+007332E7   | 56                         | push esi                 | 封包 16位数 x,y,3013,0,方向（0=y-  2=x+  4=y+  6=x-）
+007332E8   | 6A 00                      | push 0x0                                           |
+007332EA   | E8 C160ECFF                | call woool.dat.5F93B0                              | 跑步封包
+007332EF   | 55                         | push ebp                                           |
+007332F0   | 53                         | push ebx                                           |
+007332F1   | B9 B0F8D603                | mov ecx,woool.dat.3D6F8B0                          |
+007332F6   | E8 B5FDEAFF                | call woool.dat.5E30B0                              |
+007332FB   | 5F                         | pop edi                                            |
+007332FC   | 5E                         | pop esi                                            |
+007332FD   | 5D                         | pop ebp                                            |
+007332FE   | B0 01                      | mov al,0x1                                         |
+
+=======走路封包call================
+00733220     | 8987 E80B0000              | mov dword ptr ds:[edi+0xBE8],eax                   |
+00733226     | 8B0D 30FB3501              | mov ecx,dword ptr ds:[0x135FB30]                   |
+0073322C     | 6A 00                      | push 0x0                                           |
+0073322E     | 81C1 70140000              | add ecx,0x1470                                     |
+00733234     | E8 67A1E8FF                | call woool.dat.5BD3A0                              |
+00733239     | 8B0D 04FB3501              | mov ecx,dword ptr ds:[0x135FB04]                   |
+0073323F     | 6A 00                      | push 0x0                                           |
+00733241     | 6A 01                      | push 0x1                                           |
+00733243     | 6A 01                      | push 0x1                                           |
+00733245     | 6A 0C                      | push 0xC                                           |
+00733247     | 56                         | push esi                                           | 封包 16位 x,y,3013,0,方向 0=y-  2=x+  4=y+  6=x-
+00733248     | 6A 00                      | push 0x0                                           |
+0073324A     | E8 6161ECFF                | call woool.dat.5F93B0                              | 走路封包call
+0073324F     | 55                         | push ebp                                           |
+00733250     | 53                         | push ebx                                           |
+00733251     | B9 B0F8D603                | mov ecx,woool.dat.3D6F8B0                          |
+00733256     | E8 55FEEAFF                | call woool.dat.5E30B0                              |
+

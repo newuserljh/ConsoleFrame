@@ -15,6 +15,7 @@ MONSTER_PROPERTY::MONSTER_PROPERTY()
 {
 	ID = nullptr;
 	pName = nullptr;
+	HP = nullptr;
 }
 
 MONSTER_PROPERTY::MONSTER_PROPERTY(DWORD* p)
@@ -71,8 +72,8 @@ GROUND_GOODS::GROUND_GOODS()
 }
 GROUND_GOODS::GROUND_GOODS(DWORD* p)
 {
-	X = (DWORD*)((DWORD)p + 0xc);
-	Y = (DWORD*)((DWORD)p + 0x10);
+	X = (DWORD*)((DWORD)p + 8);
+	Y = (DWORD*)((DWORD)p + 0xc);
 	pName = (char*)((DWORD)p + 0x18);
 }
 GROUND_GOODS::~GROUND_GOODS()

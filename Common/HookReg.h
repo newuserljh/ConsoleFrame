@@ -36,6 +36,14 @@ private:
 */
 HookReg::HookReg()
 {
+	DWORD EAX = 0;
+	DWORD ECX = 0;
+	DWORD EDX = 0;
+	DWORD EBX = 0;
+	DWORD ESP = 0;
+	DWORD EBP = 0;
+	DWORD ESI = 0;
+	DWORD EDI = 0;
 }
 
 /*

@@ -29,5 +29,5 @@
 #define CALL_OPENNPC 0x7BC280   //打开NPC
 #define CALL_CHOOSE_CMD 0x6AC2D0//选择对话命令
 #define CALL_PICKUP_GOODS 0x6C9A30  //拾取地面物品
-
-
+#define CALL_STEP_TO_MAP 0x7331D0  //走路到指定坐标，每次走一格，需要连续调用
+#define CALL_RUN_TO_MAP 0x733270    //跑步到指定坐标，每次走2格，需要连续调用，只能走到2格以内

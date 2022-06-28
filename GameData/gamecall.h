@@ -20,10 +20,11 @@ public:
 	bool pickupGoods(DWORD x,DWORD y);
 	bool presskey(int vkcode);
 	bool presskey(DWORD pid, int vkcode = VK_RETURN);
+	bool Run_or_Step_To(DWORD x, DWORD y, DWORD run_step_flag);
 	HWND GetHwndByPid(DWORD dwProcessID);
-	unsigned caclDistance(DWORD x1, DWORD y1, DWORD x2, DWORD y2);
+	float caclDistance(DWORD x1, DWORD y1, DWORD x2, DWORD y2);
 	//DWORD Find_T_Monster(role& r, std::vector<std::string>& vec);
-	std::vector<MONSTER_PROPERTY> sort_aroud_monster(role& r, std::vector<std::string>& vec);
+	std::vector<MONSTER_PROPERTY> sort_aroud_monster(role& r, std::vector<std::string>& vec, DWORD e_range=15);
 	std::vector<GROUND_GOODS> sort_groud_goods(role& r, std::vector<std::string>& vec);
 	MapXY splitXY(std::string str);
 private:
@@ -93,7 +94,7 @@ bool gamecall::useSkillTo(DWORD skillId,DWORD x,DWORD y,DWORD targetId)
 
 
 /*
-函数功能:寻路到当前地图指定坐标
+函数功能:寻路到当前地图指定坐标4格以内
 参数一:坐标x
 参数二:坐标y
 */
@@ -109,6 +110,38 @@ bool gamecall::CurrentMapMove(DWORD x, DWORD y)
 			push x
 			mov ecx, dword ptr ds : [CALL_ECX_1]
 			mov edx, CALL_CURRENT_MAPMOVE
+			call edx
+			popad
+		}
+	}
+	catch (...)
+	{
+		return false;
+	}
+	return true;
+}
+
+/*
+函数功能:走到指定坐标，每次走一格需要连续调用
+参数一:坐标x
+参数二:坐标y
+参数三：走跑标记，1为走，2为跑
+*/
+bool gamecall::Run_or_Step_To(DWORD x, DWORD y,DWORD run_step_flag)
+{
+	DWORD call_addr;
+	if (run_step_flag == 1)call_addr = CALL_STEP_TO_MAP;
+	else if (run_step_flag == 2)call_addr = CALL_RUN_TO_MAP;
+	else return false;
+	try
+	{
+		_asm
+		{
+			pushad
+			push y
+			push x
+			mov ecx, dword ptr ds : [CALL_ECX]
+			mov edx, call_addr
 			call edx
 			popad
 		}
@@ -322,14 +355,12 @@ bool gamecall::presskey(DWORD pid,int vkcode)
 参数四：y2
 返回值：距离
 */
-unsigned gamecall::caclDistance(DWORD x1, DWORD y1, DWORD x2, DWORD y2)
+float gamecall::caclDistance(DWORD x1, DWORD y1, DWORD x2, DWORD y2)
 {
-	unsigned ret;
 	int x, y;
 	x = x1 - x2;
-	y = y1 - y2;
-	ret = (unsigned)sqrt(abs(x * x) + abs(y * y));
-	return ret;
+	y = y1 - y2; 
+	return sqrt(abs(x * x) + abs(y * y));
 }
 
 ///*
@@ -379,22 +410,23 @@ bool gamecall:: comp(const MONSTER_PROPERTY& a, const MONSTER_PROPERTY& b)
 函数功能:刷新周围怪物按距离排序
 参数一:角色结构体
 参数二:攻击怪物列表
-返回值：返回按距离排序的7格以内的攻击怪物怪物列表
+参数三:遍历范围默认15
+返回值：返回按距离排序的15格以内的攻击怪物怪物列表
 */
-std::vector<MONSTER_PROPERTY> gamecall::sort_aroud_monster(role& r, std::vector<std::string>& vec)
+std::vector<MONSTER_PROPERTY> gamecall::sort_aroud_monster(role& r, std::vector<std::string>& vec,DWORD e_range)
 {
 	std::vector<MONSTER_PROPERTY> ret;
-	std::vector<DWORD>  near_Mon_7;
-	r.Get_Envionment(near_Mon_7, 7); /*找到7格已内的怪物*/
-	if (near_Mon_7.size())
+	std::vector<DWORD>  near_Mon;
+	r.Get_Envionment(near_Mon, e_range); /*找到7格已内的怪物*/
+	if (near_Mon.size())
 	{
-		for (unsigned i = 0; i < near_Mon_7.size(); i++)
+		for (unsigned i = 0; i < near_Mon.size(); i++)
 		{
 			for (unsigned j = 0; j < vec.size(); j++)
 			{
-				if (strcmp((CHAR*)(near_Mon_7[i] + 0x10), vec[j].c_str()) == 0) /*strcmp返回0代表相等*/
+				if (strcmp((CHAR*)(near_Mon[i] + 0x10), vec[j].c_str()) == 0) /*strcmp返回0代表相等*/
 				{
-					MONSTER_PROPERTY temp((DWORD*)near_Mon_7[i]);
+					MONSTER_PROPERTY temp((DWORD*)near_Mon[i]);
 					temp.Distance = caclDistance(*r.m_roleproperty.Object.X, *r.m_roleproperty.Object.Y, *temp.X, *temp.Y);
 					ret.push_back(temp);
 				}
@@ -414,7 +446,7 @@ std::vector<MONSTER_PROPERTY> gamecall::sort_aroud_monster(role& r, std::vector<
 */
 bool gamecall::comp_groud(const GROUND_GOODS& a, const GROUND_GOODS& b)
 {
-	if (a.Distance <=b.Distance) {
+	if (a.Distance <b.Distance) {
 		return true;
 	}
 	else {
@@ -438,16 +470,17 @@ std::vector<GROUND_GOODS> gamecall::sort_groud_goods(role& r, std::vector<std::s
 		{
 			for (unsigned j = 0; j < vec.size(); j++)
 			{
-				if (strcmp((CHAR*)(near_groud[i] + 0x18), vec[j].c_str()) == 0) /*strcmp返回0代表相等*/
+				if (strcmp((char*)(near_groud[i] + 0x18), vec[j].c_str()) == 0) /*strcmp返回0代表相等*/
 				{
 					GROUND_GOODS temp((DWORD*)near_groud[i]);
 					temp.Distance = caclDistance(*r.m_roleproperty.Object.X, *r.m_roleproperty.Object.Y, *temp.X, *temp.Y);
 					ret.push_back(temp);
+					break;
 				}
 			}
 		}
 	}
-	if (ret.size())
+	if (ret.size()>1)
 	{
 		std::sort(ret.begin(), ret.end(), &comp_groud);
 	}
