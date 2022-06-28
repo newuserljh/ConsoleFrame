@@ -80,8 +80,8 @@ LRESULT CALLBACK KeyBoardProc(int nCode, WPARAM wParam, LPARAM lParam)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	if ((wParam == VK_HOME) && ((lParam & 0x40000000) != 0))
 	{
-	
-		 pDlg->ShowWindow(SW_SHOW); //SW_SHOW
+		if(pDlg->IsWindowVisible())pDlg->ShowWindow(SW_HIDE);
+		else pDlg->ShowWindow(SW_SHOW); //SW_SHOW
 
 	}
 	return CallNextHookEx(0, nCode, wParam, lParam);
