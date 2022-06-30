@@ -48,6 +48,19 @@ DWORD Role_Sex ； //]+0xdc 性别 0男 1女
 
 DWORD PatCount;//宠物数量+0xA24
 
+队伍信息:
+DWORD Team_is_allow;//+0x1054550 是否允许组队0不允许,1允许,可直接修改
+DWORD Team_pointer;//+0x1054550+8 队伍对象指针
+DWORD Team_number;//+0x1054550+0xC 队伍人数
+
+Struct TEAM //队伍
+{
+    P_Team_Leader; //队长 *Team_pointer
+    P_Team_Member;//+i*4;//第i个队员        
+}
+
+
+
 Struct p_Bag
 {
     char  Goods_Name_Length  +0

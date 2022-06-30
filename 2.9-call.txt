@@ -131,3 +131,53 @@ call 0x00718A10
 00733251     | B9 B0F8D603                | mov ecx,woool.dat.3D6F8B0                          |
 00733256     | E8 55FEEAFF                | call woool.dat.5E30B0                              |
 
+=======组队call================
+00BBB7E9 | E9 89000000              | jmp woool.dat.BBB877                               |
+00BBB7EE | 8B87 94020000            | mov eax,dword ptr ds:[edi+294]                     |
+00BBB7F4 | 3B87 A0020000            | cmp eax,dword ptr ds:[edi+2A0]                     |
+00BBB7FA | 0F8D C3020000            | jge woool.dat.BBBAC3                               |
+00BBB800 | 85C0                     | test eax,eax                                       |
+00BBB802 | 0F8C BB020000            | jl woool.dat.BBBAC3                                |
+00BBB808 | 50                       | push eax                                           |
+00BBB809 | 8D8F A4020000            | lea ecx,dword ptr ds:[edi+2A4]                     |
+00BBB80F | E8 DC8B85FF              | call woool.dat.4143F0                              |
+00BBB814 | 8378 18 10               | cmp dword ptr ds:[eax+18],10                       |
+00BBB818 | 72 05                    | jb woool.dat.BBB81F                                |
+00BBB81A | 8B40 04                  | mov eax,dword ptr ds:[eax+4]                       |
+00BBB81D | EB 03                    | jmp woool.dat.BBB822                               |
+00BBB81F | 83C0 04                  | add eax,4                                          |
+00BBB822 | 8B0D 10FB3501            | mov ecx,dword ptr ds:[135FB10]                     | ecx
+00BBB828 | 50                       | push eax                                           | 队员名字
+00BBB829 | E8 823FBBFF              | call woool.dat.76F7B0                              | 组队call
+00BBB82E | C787 94020000 FFFFFFFF   | mov dword ptr ds:[edi+294],FFFFFFFF                |
+00BBB838 | E9 86020000              | jmp woool.dat.BBBAC3                               |
+00BBB83D | 8B8F 74020000            | mov ecx,dword ptr ds:[edi+274]                     | [edi+274]:&"`IY"
+00BBB843 | 85C9                     | test ecx,ecx                                       |
+00BBB845 | 74 45                    | je woool.dat.BBB88C                                |
+00BBB847 | 8B11                     | mov edx,dword ptr ds:[ecx]                         |
+00BBB849 | 8B42 50                  | mov eax,dword ptr ds:[edx+50]                      | edx+50:" "
+00BBB84C | FFD0                     | call eax                                           |
+00BBB84E | 8D50 01                  | lea edx,dword ptr ds:[eax+1]                       |
+00BBB851 | 8A08                     | mov cl,byte ptr ds:[eax]                           |
+00BBB853 | 83C0 01                  | add eax,1                                          |
+
+
+=======同意组队call================
+00C67083 | E8 38E8ACFF             | call woool.dat.7358C0                                         |
+00C67088 | 5F                      | pop edi                                                       | edi:L"c"
+00C67089 | 5E                      | pop esi                                                       |
+00C6708A | 59                      | pop ecx                                                       |
+00C6708B | C3                      | ret                                                           |
+00C6708C | 8B0D 10FB3501           | mov ecx,dword ptr ds:[135FB10]                                | ecx
+00C67092 | 83C6 2C                 | add esi,2C                                                    |
+00C67095 | 6A 01                   | push 1                                                        |
+00C67097 | 56                      | push esi                                                      | 队长名字,组队发起人
+00C67098 | E8 23E8ACFF             | call woool.dat.7358C0                                         | 同意组队call
+00C6709D | 5F                      | pop edi                                                       | edi:L"c"
+00C6709E | 5E                      | pop esi                                                       |
+00C6709F | 59                      | pop ecx                                                       |
+00C670A0 | C3                      | ret                                                           |
+00C670A1 | 8B46 08                 | mov eax,dword ptr ds:[esi+8]                                  |
+00C670A4 | 8B0D 0CFB3501           | mov ecx,dword ptr ds:[135FB0C]                                |
+00C670AA | 50                      | push eax                                                      |
+00C670AB | E8 A06D7BFF             | call woool.dat.41DE50                                         |
