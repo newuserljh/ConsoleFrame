@@ -27,6 +27,9 @@ public:
 	std::vector<MONSTER_PROPERTY> sort_aroud_monster(role& r, std::vector<std::string>& vec, DWORD e_range=15);
 	std::vector<GROUND_GOODS> sort_groud_goods(role& r, std::vector<std::string>& vec);
 	MapXY splitXY(std::string str);
+	bool maketeam(std::string pName);
+	bool allowteam(std::string pName);
+
 private:
 	static bool comp(const MONSTER_PROPERTY& a, const MONSTER_PROPERTY& b);
 	static bool comp_groud(const GROUND_GOODS& a, const GROUND_GOODS& b);
@@ -510,4 +513,59 @@ MapXY gamecall::splitXY(std::string str)
 		XYtemp.y = stoi(temp[1]); //y
 	}
 	return XYtemp;
+}
+
+/*
+函数功能:发起组队请求
+参数一:队员名字
+返回值：bool
+*/
+bool gamecall::maketeam(std::string pName)
+{
+	const char* cname = pName.c_str();
+	try
+	{
+		_asm
+		{
+			pushad
+			push cname
+			mov ecx, dword ptr ds : [CALL_ECX]
+			mov edx, CALL_MAKE_TEAM
+			call edx
+			popad
+		}
+	}
+	catch (...)
+	{
+		return false;
+	}
+	return true;
+}
+
+/*
+函数功能:同意组队请求
+参数一:队长名字
+返回值：bool
+*/
+bool gamecall::allowteam(std::string pName)
+{
+	const char* cname = pName.c_str();
+	try
+	{
+		_asm
+		{
+			pushad
+			push 1
+			push cname
+			mov ecx, dword ptr ds : [CALL_ECX]
+			mov edx, CALL_ALLOW_TEAM
+			call edx
+			popad
+		}
+	}
+	catch (...)
+	{
+		return false;
+	}
+	return true;
 }

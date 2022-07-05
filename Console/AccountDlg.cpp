@@ -12,7 +12,7 @@
 #include "EipInject.h"
 #include "utils.h"
 // CAccountDlg 对话框
-std::string GAME_DIR("D:\\传奇世界2.9\\传奇世界\\Data\\");
+std::string GAME_DIR("G:\\传奇世界2.9\\传奇世界\\Data\\");
 
 IMPLEMENT_DYNAMIC(CAccountDlg, CDialogEx)
 

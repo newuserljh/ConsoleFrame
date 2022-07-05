@@ -6,9 +6,11 @@
 #include "TestDlg.h"
 #include "afxdialogex.h"
 #include <thread>
+#include <mutex>
 #include "monster.h"
 #include "skill.h"
 #include "bag.h"
+#include "team.h"
 #include "utils.h"
 #include "gamecall.h"
 #include "shareMemoryCli.h"
@@ -26,6 +28,10 @@ monster m_mon;
 skill m_skill;
 bag r_bag;
 gamecall mfun;
+team m_team;
+
+std::mutex team_mutex;  // 队伍文件变量互斥 
+
 
 _declspec(naked) void CallTest()
 {
@@ -39,7 +45,7 @@ _declspec(naked) void CallTest()
 	_asm ret
 }
 
-
+extern CTestDlg* pDlg;
 
 IMPLEMENT_DYNAMIC(CTestDlg, CDialogEx)
 
@@ -67,6 +73,8 @@ BEGIN_MESSAGE_MAP(CTestDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON8, &CTestDlg::OnBnClickedButton8)
 	ON_BN_CLICKED(IDC_BUTTON5, &CTestDlg::OnBnClickedButton5)
 	ON_BN_CLICKED(IDC_BUTTON9, &CTestDlg::OnBnClickedButton9)
+	ON_BN_CLICKED(IDC_BUTTON4, &CTestDlg::OnBnClickedButton4)
+	ON_BN_CLICKED(IDC_CHK_TEAM, &CTestDlg::OnBnClickedChkTeam)
 END_MESSAGE_MAP()
 
 
@@ -102,7 +110,12 @@ void threadLogin()
 		shareCli.m_pSMAllData->m_sm_data[shareindex].cscript = "登陆失败,正在结束程序";
 		shareCli.m_pSMAllData->m_sm_data[shareindex].server_alive = false;
 	}
-	shareCli.m_pSMAllData->m_sm_data[shareindex].cscript = "登陆完成";
+	else 
+	{
+		shareCli.m_pSMAllData->m_sm_data[shareindex].cscript = "登陆完成";
+		shareCli.m_pSMAllData->m_sm_data[shareindex].roleName = std::string(r.m_roleproperty.Object.pName);
+		pDlg->init_team();
+	}
 	return;
 }
 
@@ -183,8 +196,9 @@ void CTestDlg::OnBnClickedButton1()
 BOOL CTestDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-
+ 
 	// TODO:  在此添加额外的初始化
+
 
   //初始化共享内存,取得共享内存索引
 	if (!shareCli.openShareMemory())
@@ -255,7 +269,7 @@ void CTestDlg::OnBnClickedButton2()
 	m_mon.init();
 	s.Format("周围对象列表（怪物、NPC、其他玩家、宠物）：\n");
 	AppendText(m_edit2, s);
-	for (auto i = 0; i < m_mon.m_monsterList.size(); i++)
+	for (size_t i = 0; i < m_mon.m_monsterList.size(); i++)
 	{
 		s.Format("%s ID: %x\n", m_mon.m_monsterList[i].pName, *(m_mon.m_monsterList[i].ID));
 		AppendText(m_edit2, s);
@@ -263,7 +277,7 @@ void CTestDlg::OnBnClickedButton2()
 
 	s.Format("地面：\n");
 	AppendText(m_edit2, s);
-	for (auto i = 0; i < m_mon.m_groundList.size(); i++)
+	for (size_t i = 0; i < m_mon.m_groundList.size(); i++)
 	{
 		s.Format(" %s : %d/%d\n", m_mon.m_groundList[i].pName, *m_mon.m_groundList[i].X, *m_mon.m_groundList[i].Y);
 		AppendText(m_edit2, s);
@@ -288,7 +302,7 @@ void CTestDlg::OnBnClickedButton3()
 	s.Format("技能：\n");
 	AppendText(m_edit2, s);
 
-	for (auto i = 0; i < m_skill.m_skillList.size(); i++)
+	for (size_t i = 0; i < m_skill.m_skillList.size(); i++)
 	{
 		s.Format("%s  等级:%d  ID: %d\n", m_skill.m_skillList[i].pName, *(m_skill.m_skillList[i].level), *(m_skill.m_skillList[i].ID));
 		AppendText(m_edit2, s);
@@ -310,7 +324,7 @@ void CTestDlg::OnBnClickedButton8()
 		AppendText(m_edit2, s);
 		return;
 	}
-	for (auto i=0;i<r_bag.maxSize;i++)
+	for (size_t i=0;i<r_bag.maxSize;i++)
 	{
 		if (*(r_bag.m_bag[i].ID))
 		{
@@ -459,44 +473,6 @@ bool CTestDlg::Set_Skill()
 }
 
 
-
-/*
-函数功能:寻路到当前地图(x,y)附近
-参数一:x
-参数二:y
-参数三:标识,只有为true的时候才走到目的地
-返回值:bool,走完真,未走完false
-*/
-bool MapGoto_near(DWORD x,DWORD y, bool tflag)
-{
-	while (mfun.caclDistance(*r.m_roleproperty.Object.X, *r.m_roleproperty.Object.Y,x,y)>3)
-	{
-		mfun.CurrentMapMove(x, y);
-		Sleep(500);
-		if (!tflag)return false;
-     }
-	return true;  
-}
-
-/*
-函数功能:寻路到当前地图(x,y)精确位置
-参数一:x
-参数二:y
-参数三:标识,只有为true的时候才走到目的地
-返回值:bool,走完真,未走完false
-*/
-bool MapGoto_Point(DWORD x, DWORD y,bool tflag)
-{
-	while (mfun.caclDistance(*r.m_roleproperty.Object.X, *r.m_roleproperty.Object.Y, x, y) > 0)
-	{
-		mfun.CurrentMapMove(x, y);
-		Sleep(500);
-		if (!tflag)return false;
-	}
-	return true;   
-}
-
-
 /*
 函数功能:载入寻路打怪坐标
 参数一:角色结构体
@@ -517,6 +493,72 @@ bool CTestDlg::Load_coordinate()
 	return true;
 }
 
+/*
+函数功能:初始化组队Timer
+参数一:角色结构体
+返回值：选中怪物对象指针
+*/
+bool CTestDlg::init_team()
+{
+	m_team.init();
+	m_team_check_id = 0;
+	pBtn = (CButton*)GetDlgItem(IDC_CHK_TEAM);  //获得组队复选框控件的句柄
+	team_list.clear();
+	team_list = tools::getInstance()->ReadTxt(tools::getInstance()->getParentPath(shareCli.m_pSMAllData->currDir) + "\\队伍人员.txt");
+	if (pBtn->GetCheck())
+	{
+		*r.m_roleproperty.Team_is_allow = 1;//允许组队
+		shareCli.m_pSMAllData->m_sm_data[shareindex].team_info = 2;//允许组队
+		m_team_check_id = SetTimer(1, 30000, &CTestDlg::MakeTeam);
+	}
+	return true;
+}
+
+/*
+函数功能:读取组队文件并组队
+参数一:角色结构体
+返回值：选中怪物对象指针
+*/
+//void  TimerProc(HWND hWnd, UINT uMsg, UINT uID, DWORD dwTimew)
+void CALLBACK CTestDlg::MakeTeam(HWND hWnd, UINT uMsg, UINT uID, DWORD dwTimew)
+{	
+	
+	//if (pDlg->team_list.size()<2)return;
+	//if (pDlg->team_list.size() == m_team.m_team_list.size())return;//组队完毕
+	//CString s;
+	//for (size_t i=0;i<pDlg->team_list.size();i++)
+	//{
+	//	s.Format("队伍成员:%s", pDlg->team_list[i].c_str());
+	//	AppendText(pDlg->m_edit2, s);
+	//}
+	//if (strcmp(pDlg->team_list[0].c_str(),r.m_roleproperty.Object.pName)==0)//我是队长
+	//{
+	//	for (size_t i=1;i< pDlg->team_list.size();i++)
+	//	{
+	//		for (size_t j=0;j<MORE_OPEN_NUMBER;j++)
+	//		{
+
+	//			if (strcmp(pDlg->team_list[i].c_str(), shareCli.m_pSMAllData->m_sm_data[j].roleName.c_str()) == 0) //找到队员的信息
+	//			{
+	//				if (shareCli.m_pSMAllData->m_sm_data[j].team_info == 2) //队员已经开启组队
+	//				{
+	//					mfun.maketeam(pDlg->team_list[i]);
+	//					shareCli.m_pSMAllData->m_sm_data[j].team_info = 1;//队长已经发起组队
+	//					break;
+	//				}
+	//			}
+	//		}			
+	//	}
+	//}
+	//else //我是队员
+	//{
+	//	if (shareCli.m_pSMAllData->m_sm_data[shareindex].team_info == 1)//队长已经发起组队
+	//	{
+	//		mfun.allowteam(pDlg->team_list[0]);//允许组队
+	//		shareCli.m_pSMAllData->m_sm_data[shareindex].team_info = 3;//组队成功
+	//	}
+	//}
+}
 
 
 /*寻路线程*/
@@ -528,7 +570,7 @@ UINT __cdecl CTestDlg::threadGoto(LPVOID p)
 	{
 		MapXY xy = pDlg->map_xy[i];
 		shareCli.m_pSMAllData->m_sm_data[shareindex].cscript = std::string( "正在寻路到");
-		MapGoto_Point(pDlg->map_xy[i].x, pDlg->map_xy[i].y, pDlg->tflag_goto);
+		//MapGoto_Point(pDlg->map_xy[i].x, pDlg->map_xy[i].y, pDlg->tflag_goto);
 		i++;
 		if (i = pDlg->map_xy.size())i = 0;
 	}
@@ -651,5 +693,46 @@ void CTestDlg::OnBnClickedButton9()
 
 void CTestDlg::OnBnClickedButton4()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// 队伍遍历+任务遍历
+	r.init();
+	m_team.team_Base = r.m_roleproperty.Team_pointer;
+	m_team.m_team_list.clear();
+	m_team.init();
+	CString s;
+	s.Format("%p \n", m_team.team_Base);
+	AppendText(m_edit2, s);
+	if (m_team.m_team_list.size())
+	{
+		for (size_t i = 0; i < m_team.m_team_list.size(); i++)
+		{
+			s.Format("名字:%s NEXT:%p Pre:%p \n", m_team.m_team_list[i].pName, m_team.m_team_list[i].Next, m_team.m_team_list[i].Previous);
+			AppendText(m_edit2, s);
+		}
+	}
+}
+
+
+void CTestDlg::OnBnClickedChkTeam()
+{
+	// TODO: 组队CHECK单机事件
+	//pBtn = (CButton*)GetDlgItem(IDC_CHK_TEAM);  //获得组队复选框控件的句柄
+	CString s;
+
+
+	if (pBtn->GetCheck()&&(m_team_check_id==0))
+	{
+		*r.m_roleproperty.Team_is_allow = 1;//允许组队
+		//shareCli.m_pSMAllData->m_sm_data[shareindex].team_info = 2;//允许组队
+		m_team_check_id = SetTimer(1, 30000, MakeTeam);
+		//s.Format("SetTimer返回值:%x", m_team_check_id);
+		//AppendText(m_edit2, s);
+	}
+	else
+	{
+		if (m_team_check_id != 0)
+		{
+			KillTimer(1);
+			m_team_check_id = 0;
+		}
+	}
 }

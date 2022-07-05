@@ -49,6 +49,8 @@ bool role::init()
 		m_roleproperty.LL = (DWORD*)(*(DWORD*)RoleBase + 0x139C);
 		m_roleproperty.p_Current_Map = (char*)(*(DWORD*)RoleBase + 0x8299C8);
 		m_roleproperty.PatCount = (DWORD*)(*(DWORD*)RoleBase + 0xA24);
+		m_roleproperty.Team_is_allow = (DWORD*)(*(DWORD*)RoleBase + 0x1054550);
+		m_roleproperty.Team_pointer = (DWORD*)(*(DWORD*)RoleBase + 0x1054550+8);
 		if (!*m_roleproperty.Object.HP_MAX)
 		{
 			return false;

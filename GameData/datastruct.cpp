@@ -83,3 +83,18 @@ GROUND_GOODS::~GROUND_GOODS()
 		delete pName;
 	}
 }
+
+TEAM_PROPERTY::TEAM_PROPERTY()
+{
+}
+TEAM_PROPERTY::TEAM_PROPERTY(DWORD* p /*当前链条指针*/)
+{
+	Next = (TEAM_PROPERTY*)((*p));
+	DWORD pt = (DWORD)p;
+	Previous = (TEAM_PROPERTY*)((*(DWORD*)(pt + 4))); //指针加1，结果是对该指针增加1个储存单位，DWORD就+4
+	pName=(char*)((pt + 0xc));
+}
+TEAM_PROPERTY::~TEAM_PROPERTY()
+{
+
+}

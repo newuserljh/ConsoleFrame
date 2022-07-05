@@ -45,6 +45,9 @@
     <ClInclude Include="gamecall.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="team.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="base.cpp">
@@ -66,6 +69,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="bag.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="team.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

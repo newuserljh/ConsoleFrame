@@ -31,3 +31,5 @@
 #define CALL_PICKUP_GOODS 0x6C9A30  //拾取地面物品
 #define CALL_STEP_TO_MAP 0x7331D0  //走路到指定坐标，每次走一格，需要连续调用
 #define CALL_RUN_TO_MAP 0x733270    //跑步到指定坐标，每次走2格，需要连续调用，只能走到2格以内
+#define CALL_MAKE_TEAM 0x76F7B0    //发起组队请求
+#define CALL_ALLOW_TEAM 0x7358C0    //同意组队请求

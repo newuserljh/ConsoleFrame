@@ -19,17 +19,19 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedButton1();
-	virtual BOOL OnInitDialog();
-	CEdit m_edit2;
 	afx_msg void OnBnClickedButton2();
 	afx_msg void OnBnClickedButton3();
 	afx_msg void OnBnClickedButton8();
 	afx_msg void OnBnClickedButton5();
 	afx_msg void OnBnClickedButton9();
+	afx_msg void OnBnClickedButton4();
+	virtual BOOL OnInitDialog();
+	afx_msg void OnBnClickedChkTeam();
+	CEdit m_edit2;
 	bool Set_Skill();
 	bool Load_coordinate();
 	bool initVariable();
-
+	bool init_team();
 	/*打怪技能设置*/
 	DWORD s_ID ;
 	CWinThread* m_threadAttack;
@@ -49,8 +51,14 @@ public:
 	bool tflag_pickup;
 	static UINT __cdecl threadPickup(LPVOID lparam);
 
+	/*组队设置*/
+	CButton* pBtn;//队伍复选框
+	std::vector<std::string> team_list;
+	static void CALLBACK MakeTeam(HWND hWnd, UINT uMsg, UINT uID, DWORD dwTimew);
+	UINT_PTR m_team_check_id;
 
 	CCriticalSection g_criticalsection; //边界锁，线程间同步用的。
 
-	afx_msg void OnBnClickedButton4();
+	
+	
 };

@@ -170,7 +170,7 @@ call 0x00718A10
 00C6708B | C3                      | ret                                                           |
 00C6708C | 8B0D 10FB3501           | mov ecx,dword ptr ds:[135FB10]                                | ecx
 00C67092 | 83C6 2C                 | add esi,2C                                                    |
-00C67095 | 6A 01                   | push 1                                                        |
+00C67095 | 6A 01                   | push 1                                                        |参数
 00C67097 | 56                      | push esi                                                      | 队长名字,组队发起人
 00C67098 | E8 23E8ACFF             | call woool.dat.7358C0                                         | 同意组队call
 00C6709D | 5F                      | pop edi                                                       | edi:L"c"

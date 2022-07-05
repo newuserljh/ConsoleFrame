@@ -49,14 +49,16 @@ DWORD Role_Sex ； //]+0xdc 性别 0男 1女
 DWORD PatCount;//宠物数量+0xA24
 
 队伍信息:
-DWORD Team_is_allow;//+0x1054550 是否允许组队0不允许,1允许,可直接修改
-DWORD Team_pointer;//+0x1054550+8 队伍对象指针
+DWORD Team_is_allow;//[0x135fb30  ]+0x1054550 是否允许组队0不允许,1允许,可直接修改
+DWORD Team_pointer;//+0x1054550+8 队伍链表对象指针 指向表头的指针 
 DWORD Team_number;//+0x1054550+0xC 队伍人数
 
-Struct TEAM //队伍
+Struct TeamStruct //队伍 链表 （ 第一个链条数据为空 ）链条总数为n+1 n为队伍总人数
 {
-    P_Team_Leader; //队长 *Team_pointer
-    P_Team_Member;//+i*4;//第i个队员        
+    TeamStruct *  Next =NULL; //下一个链条指针
+    TeamStruct *  Previous=NULL;//上一个链条指针  
+    DWROD  unkown;//未知数 数据对齐
+    char* pName;//队员名字
 }
 
 

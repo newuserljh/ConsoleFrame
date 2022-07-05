@@ -53,6 +53,8 @@ struct ROLE_PROPERTY
 	DWORD* LL; //[0x135fb30] + 0x139C//灵力
 	char* p_Current_Map;// [135fb30] + 0x8299C8//所在地图 CHAR*
     DWORD* PatCount; ///宠物数量+0xA24
+	DWORD* Team_is_allow;//[0x135fb30  ]+0x1054550 是否允许组队0不允许,1允许,可直接修改
+	DWORD* Team_pointer;//+0x1054550+8 队伍链表对象指针 指向表头的指针 
 };
 
 
@@ -111,8 +113,20 @@ struct TASK_PROPERTY
 	char* pName;
 };
 
+//坐标
 struct MapXY
 {
 	DWORD x;
 	DWORD y;
+};
+
+//队伍成员对象
+struct TEAM_PROPERTY //队伍 链表 （ 第一个链条数据为空 ）链条总数为n+1 n为队伍总人数
+{
+	TEAM_PROPERTY();
+	TEAM_PROPERTY(DWORD* p);
+	~TEAM_PROPERTY();
+	TEAM_PROPERTY* Next; //下一个链条指针
+	TEAM_PROPERTY* Previous;//上一个链条指针  
+	char* pName;//队员名字
 };
