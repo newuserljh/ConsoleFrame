@@ -27,6 +27,7 @@ public:
 	std::vector<MONSTER_PROPERTY> sort_aroud_monster(role& r, std::vector<std::string>& vec, DWORD e_range=15);
 	std::vector<GROUND_GOODS> sort_groud_goods(role& r, std::vector<std::string>& vec);
 	MapXY splitXY(std::string str);
+	bool team_open_close(DWORD tflag);
 	bool maketeam(std::string pName);
 	bool allowteam(std::string pName);
 
@@ -363,7 +364,7 @@ float gamecall::caclDistance(DWORD x1, DWORD y1, DWORD x2, DWORD y2)
 	int x, y;
 	x = x1 - x2;
 	y = y1 - y2; 
-	return sqrt(abs(x * x) + abs(y * y));
+	return (float)sqrt(abs(x * x) + abs(y * y));
 }
 
 ///*
@@ -514,6 +515,32 @@ MapXY gamecall::splitXY(std::string str)
 	}
 	return XYtemp;
 }
+/*
+函数功能:发起组队请求
+参数一:开关标志 1开 0关
+返回值：bool
+*/
+bool gamecall::team_open_close(DWORD tflag)
+{
+	try
+	{
+		_asm
+		{
+			pushad
+			push tflag
+			mov ecx, dword ptr ds : [CALL_ECX]
+			mov edx, CALL_TEAM_OPEN_CLOSE
+			call edx
+			popad
+		}
+	}
+	catch (...)
+	{
+		return false;
+	}
+	return true;
+}
+
 
 /*
 函数功能:发起组队请求

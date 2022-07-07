@@ -131,6 +131,32 @@ call 0x00718A10
 00733251     | B9 B0F8D603                | mov ecx,woool.dat.3D6F8B0                          |
 00733256     | E8 55FEEAFF                | call woool.dat.5E30B0                              |
 
+======= 组队开关call================
+00BBBA8B | 6A 06                   | push 6                                                        |
+00BBBA8D | 6A 01                   | push 1                                                        |
+00BBBA8F | 6A 00                   | push 0                                                        |
+00BBBA91 | 8BC8                    | mov ecx,eax                                                   |
+00BBBA93 | 83C0 01                 | add eax,1                                                     |
+00BBBA96 | 80BA 50450501 00        | cmp byte ptr ds:[edx+1054550],0                               |
+00BBBA9D | 6A 01                   | push 1                                                        |
+00BBBA9F | 51                      | push ecx                                                      |
+00BBBAA0 | 8B0D FCFA3501           | mov ecx,dword ptr ds:[135FAFC]                                |
+00BBBAA6 | A3 6C9D0901             | mov dword ptr ds:[1099D6C],eax                                | 01099D6C:L"p"
+00BBBAAB | 74 57                   | je woool.dat.BBBB04                                           |
+00BBBAAD | 6A 12                   | push 12                                                       |
+00BBBAAF | 6A 0A                   | push A                                                        |
+00BBBAB1 | E8 CAD7A2FF             | call woool.dat.5E9280                                         |
+00BBBAB6 | 6A 00                   | push 0                                                        | 0关闭队伍 1开启队伍
+00BBBAB8 | 8B0D 10FB3501           | mov ecx,dword ptr ds:[135FB10]                                |
+00BBBABE | E8 ED37BBFF             | call woool.dat.76F2B0                                         | 组队开关call
+00BBBAC3 | 8B8424 2C010000         | mov eax,dword ptr ss:[esp+12C]                                |
+00BBBACA | 8B8C24 28010000         | mov ecx,dword ptr ss:[esp+128]                                |
+00BBBAD1 | 55                      | push ebp                                                      |
+00BBBAD2 | 50                      | push eax                                                      |
+00BBBAD3 | 51                      | push ecx                                                      |
+00BBBAD4 | 8BCF                    | mov ecx,edi                                                   |
+00BBBAD6 | E8 35599DFF             | call woool.dat.591410                                         |
+
 =======组队call================
 00BBB7E9 | E9 89000000              | jmp woool.dat.BBB877                               |
 00BBB7EE | 8B87 94020000            | mov eax,dword ptr ds:[edi+294]                     |

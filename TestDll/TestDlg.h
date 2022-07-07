@@ -54,11 +54,12 @@ public:
 	/*组队设置*/
 	CButton* pBtn;//队伍复选框
 	std::vector<std::string> team_list;
-	static void CALLBACK MakeTeam(HWND hWnd, UINT uMsg, UINT uID, DWORD dwTimew);
-	UINT_PTR m_team_check_id;
+	void  MakeTeam(CTestDlg* p);
+	int m_team_check_id;
 
 	CCriticalSection g_criticalsection; //边界锁，线程间同步用的。
 
 	
 	
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };

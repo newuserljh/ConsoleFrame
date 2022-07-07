@@ -110,10 +110,10 @@ bool role:: Get_Envionment(std::vector<DWORD> &vec, DWORD g_range)
 {
 	vec.clear();
 	DWORD p_temp=0;
-	for (int i = *m_roleproperty.Object.X- g_range; i < *m_roleproperty.Object.X + g_range; i++)
+	for (int i = (int)*m_roleproperty.Object.X- (int)g_range; i < (int)*m_roleproperty.Object.X + (int)g_range; i++)
 	{
 		if (i <= 0)i = 1;
-		for (int j = *m_roleproperty.Object.Y - g_range; j < *m_roleproperty.Object.Y + g_range; j++)
+		for (int j = (int)*m_roleproperty.Object.Y - (int)g_range; j < (int)*m_roleproperty.Object.Y + (int)g_range; j++)
 		{
 			if (j <= 0)j = 1;
 			try
@@ -172,10 +172,10 @@ bool role::Get_Ground(std::vector<DWORD>& vec, DWORD g_range)
 {
 	vec.clear();
 	DWORD p_temp = 0;
-	for (int i = *m_roleproperty.Object.X - g_range; i < *m_roleproperty.Object.X + g_range; i++)
+	for (int i = (int)*m_roleproperty.Object.X - (int)g_range; i < (int)*m_roleproperty.Object.X + (int)g_range; i++)
 	{
 		if (i <= 0)i = 1;
-		for (int j = *m_roleproperty.Object.Y - g_range; j < *m_roleproperty.Object.Y + g_range; j++)
+		for (int j = (int)*m_roleproperty.Object.Y - (int)g_range; j < (int)*m_roleproperty.Object.Y + (int)g_range; j++)
 		{
 			if (j <= 0)j = 1;
 			try

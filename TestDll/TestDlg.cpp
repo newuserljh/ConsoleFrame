@@ -75,6 +75,7 @@ BEGIN_MESSAGE_MAP(CTestDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON9, &CTestDlg::OnBnClickedButton9)
 	ON_BN_CLICKED(IDC_BUTTON4, &CTestDlg::OnBnClickedButton4)
 	ON_BN_CLICKED(IDC_CHK_TEAM, &CTestDlg::OnBnClickedChkTeam)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -507,9 +508,8 @@ bool CTestDlg::init_team()
 	team_list = tools::getInstance()->ReadTxt(tools::getInstance()->getParentPath(shareCli.m_pSMAllData->currDir) + "\\队伍人员.txt");
 	if (pBtn->GetCheck())
 	{
-		*r.m_roleproperty.Team_is_allow = 1;//允许组队
-		shareCli.m_pSMAllData->m_sm_data[shareindex].team_info = 2;//允许组队
-		m_team_check_id = SetTimer(1, 30000, &CTestDlg::MakeTeam);
+		if (*r.m_roleproperty.Team_is_allow != 1)mfun.team_open_close(1);//允许组队
+		m_team_check_id = SetTimer(11111, 30000, NULL);
 	}
 	return true;
 }
@@ -520,44 +520,44 @@ bool CTestDlg::init_team()
 返回值：选中怪物对象指针
 */
 //void  TimerProc(HWND hWnd, UINT uMsg, UINT uID, DWORD dwTimew)
-void CALLBACK CTestDlg::MakeTeam(HWND hWnd, UINT uMsg, UINT uID, DWORD dwTimew)
-{	
-	
-	//if (pDlg->team_list.size()<2)return;
-	//if (pDlg->team_list.size() == m_team.m_team_list.size())return;//组队完毕
-	//CString s;
-	//for (size_t i=0;i<pDlg->team_list.size();i++)
-	//{
-	//	s.Format("队伍成员:%s", pDlg->team_list[i].c_str());
-	//	AppendText(pDlg->m_edit2, s);
-	//}
-	//if (strcmp(pDlg->team_list[0].c_str(),r.m_roleproperty.Object.pName)==0)//我是队长
-	//{
-	//	for (size_t i=1;i< pDlg->team_list.size();i++)
-	//	{
-	//		for (size_t j=0;j<MORE_OPEN_NUMBER;j++)
-	//		{
-
-	//			if (strcmp(pDlg->team_list[i].c_str(), shareCli.m_pSMAllData->m_sm_data[j].roleName.c_str()) == 0) //找到队员的信息
-	//			{
-	//				if (shareCli.m_pSMAllData->m_sm_data[j].team_info == 2) //队员已经开启组队
-	//				{
-	//					mfun.maketeam(pDlg->team_list[i]);
-	//					shareCli.m_pSMAllData->m_sm_data[j].team_info = 1;//队长已经发起组队
-	//					break;
-	//				}
-	//			}
-	//		}			
-	//	}
-	//}
-	//else //我是队员
-	//{
-	//	if (shareCli.m_pSMAllData->m_sm_data[shareindex].team_info == 1)//队长已经发起组队
-	//	{
-	//		mfun.allowteam(pDlg->team_list[0]);//允许组队
-	//		shareCli.m_pSMAllData->m_sm_data[shareindex].team_info = 3;//组队成功
-	//	}
-	//}
+void  CTestDlg::MakeTeam(CTestDlg* pDlg)
+{		
+	m_team.init();
+	if (pDlg->team_list.size()<2)return;
+	if (pDlg->team_list.size() == m_team.m_team_list.size())return;//组队完毕
+	if (strcmp(pDlg->team_list[0].c_str(),r.m_roleproperty.Object.pName)==0)//我是队长
+	{
+		for (size_t i = 1; i < pDlg->team_list.size(); i++)
+		{
+			size_t temp = i;
+			for (size_t j = 0; j < m_team.m_team_list.size(); j++)
+			{
+				if (strcmp(pDlg->team_list[i].c_str(), m_team.m_team_list[j].pName) == 0)
+				{
+					temp = i + 1;
+					break;
+				}			
+			}
+			if (temp==i) mfun.maketeam(pDlg->team_list[i]);
+		}
+	}
+	else //我是队员
+	{
+		if (shareCli.m_pSMAllData->team_info == 0)
+		{
+			pBtn->SetCheck(0);
+			pDlg->OnBnClickedChkTeam();
+			return;
+		}
+		for (size_t j = 0; j < m_team.m_team_list.size(); j++)
+		{
+			if (strcmp(r.m_roleproperty.Object.pName, m_team.m_team_list[j].pName) == 0)
+			{
+				return;
+			}
+		}
+	  mfun.allowteam(pDlg->team_list[0]);//同意组队
+	}
 }
 
 
@@ -715,24 +715,43 @@ void CTestDlg::OnBnClickedButton4()
 void CTestDlg::OnBnClickedChkTeam()
 {
 	// TODO: 组队CHECK单机事件
-	//pBtn = (CButton*)GetDlgItem(IDC_CHK_TEAM);  //获得组队复选框控件的句柄
+	pBtn = (CButton*)GetDlgItem(IDC_CHK_TEAM);  //获得组队复选框控件的句柄
 	CString s;
-
 
 	if (pBtn->GetCheck()&&(m_team_check_id==0))
 	{
-		*r.m_roleproperty.Team_is_allow = 1;//允许组队
-		//shareCli.m_pSMAllData->m_sm_data[shareindex].team_info = 2;//允许组队
-		m_team_check_id = SetTimer(1, 30000, MakeTeam);
-		//s.Format("SetTimer返回值:%x", m_team_check_id);
-		//AppendText(m_edit2, s);
+		if (*r.m_roleproperty.Team_is_allow != 1)mfun.team_open_close(1);//允许组队
+		m_team_check_id = SetTimer(11111, 30000, NULL);
 	}
 	else
 	{
 		if (m_team_check_id != 0)
-		{
-			KillTimer(1);
+		{			
+			KillTimer(11111);
 			m_team_check_id = 0;
+			if (strcmp(team_list[0].c_str(),r.m_roleproperty.Object.pName)!=0)mfun.team_open_close(0);//队员直接关闭队伍开关
+			else//队长 逐个删除队员之后再关闭队伍开关
+			{
+				shareCli.m_pSMAllData->team_info = 0;
+				s.Format("你是队长,正在逐个关闭队员队伍开关,稍等10s");
+				AppendText(m_edit2, s);
+			}
 		}
 	}
+}
+
+
+void CTestDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	switch (nIDEvent)
+	{
+	case 11111:
+		MakeTeam(this);
+		break;
+	default:
+		break;
+	}
+	CDialogEx::OnTimer(nIDEvent);
+
 }

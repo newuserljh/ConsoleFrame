@@ -12,7 +12,7 @@
 #include "EipInject.h"
 #include "utils.h"
 // CAccountDlg 对话框
-std::string GAME_DIR("G:\\传奇世界2.9\\传奇世界\\Data\\");
+std::string GAME_DIR("D:\\传奇世界2.9\\传奇世界\\Data\\");
 
 IMPLEMENT_DYNAMIC(CAccountDlg, CDialogEx)
 
@@ -165,6 +165,7 @@ bool CAccountDlg::initMem()
 			m_shareMemSer->m_pSMAllData->m_sm_data[i].server_alive = true;
 		}
 		strcat_s(m_shareMemSer->m_pSMAllData->currDir, tools::getInstance()->GetCurrDir().c_str());
+		m_shareMemSer->m_pSMAllData->team_info = 1;
 	}
 	return rt;
 }
@@ -173,7 +174,7 @@ bool CAccountDlg::initAccount()
 {
 	std::vector<std::string> vecA=tools::getInstance()->ReadTxt("..\\Account.txt");
 	if (vecA.empty())return false;
-	for (auto i=0;i<vecA.size();i++)
+	for (size_t i=0;i<vecA.size();i++)
 	{
 		if (i >= MORE_OPEN_NUMBER)return false; //账号超过最大躲开数量
 		std::vector<std::string> temp = tools::getInstance()->splitString(vecA[i]);
@@ -226,7 +227,7 @@ void CAccountDlg::OnBnClickedButton2()
 			return;
 	}
 	tools::getInstance()->write2file("..\\Account.txt", "", std::ios::out);
-	for (auto i=0;i<vecA.size();i++)
+	for (size_t i=0;i<vecA.size();i++)
 	{	
 		tools::getInstance()->write2file("..\\Account.txt", vecA[i]);
 	}

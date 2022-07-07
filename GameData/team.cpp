@@ -15,6 +15,7 @@ team::~team()
 bool team::init()
 {
 	if (team_Base == nullptr)return false;
+	m_team_list.clear();
 	member_num = (DWORD*)((DWORD)team_Base + 4);
 	if (*member_num < 2)return true; 
 	base_temp = (DWORD*)(*team_Base);
