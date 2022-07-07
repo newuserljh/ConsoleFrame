@@ -20,7 +20,7 @@ bool team::init()
 	base_temp = (DWORD*)(*team_Base);
 	try
 	{
-		for (auto i = 0; i <=*member_num; i++)
+		for (size_t i = 0; i <=*member_num; i++)
 		{
 			TEAM_PROPERTY temp(base_temp);
 			base_temp = (DWORD*)(temp.Next);

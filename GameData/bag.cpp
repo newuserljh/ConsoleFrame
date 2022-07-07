@@ -20,7 +20,7 @@ bool bag::init()
 	GOODS_PROPERTY temp;
 	try
 	{
-		for (auto i=0;i<maxSize;i++)
+		for (size_t i=0;i<maxSize;i++)
 		{
 			//if (!(*(DWORD*)(bagBase + i * 0x688 + 0x2c)))//判断无物品
 			//{
@@ -61,7 +61,7 @@ bool bag::init()
 int bag::caclGoodsNumber(std::string pName)
 {
 	int goodsnum = 0;
-	for (auto i=0;i<maxSize;i++)
+	for (size_t i=0;i<maxSize;i++)
 	{
 		if (!(*m_bag[i].ID))continue;
 		if (strcmp(pName.c_str(),m_bag[i].pName)==0)
@@ -80,7 +80,7 @@ int bag::caclGoodsNumber(std::string pName)
 int bag::getGoodsIndex(std::string pName)
 {
 	int firstIndex = -1;
-	for (auto i = 0; i < maxSize; i++)
+	for (size_t i = 0; i < maxSize; i++)
 	{
 		if (!(*m_bag[i].ID))continue;
 		if (strcmp(pName.c_str(), m_bag[i].pName) == 0)

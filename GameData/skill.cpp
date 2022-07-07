@@ -45,7 +45,7 @@ bool skill::init()
 DWORD skill::getSkillId(char* sName)
 {
 	DWORD ret = -1;
-	for (auto i=0;i<m_skillList.size();i++)
+	for (size_t i=0;i<m_skillList.size();i++)
 	{
 		if (strcmp(sName,m_skillList[i].pName)==0)
 		{

@@ -14,7 +14,7 @@ bool monster::init()
 {
 	init_ground();
 	if (pOb_list.empty())return false;
-	for (auto i = 0; i < pOb_list.size(); i++)
+	for (size_t i = 0; i < pOb_list.size(); i++)
 	{
 		try
 		{
@@ -33,7 +33,7 @@ bool monster::init_ground()
 {
 	if (pGr_list.empty())return false;
 	m_groundList.clear();
-	for (auto i = 0; i < pGr_list.size(); i++)
+	for (size_t i = 0; i < pGr_list.size(); i++)
 	{
 		try 
 		{
