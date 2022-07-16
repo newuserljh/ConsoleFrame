@@ -207,3 +207,19 @@ call 0x00718A10
 00C670A4 | 8B0D 0CFB3501           | mov ecx,dword ptr ds:[135FB0C]                                |
 00C670AA | 50                      | push eax                                                      |
 00C670AB | E8 A06D7BFF             | call woool.dat.41DE50                                         |
+
+
+=======释放收回元神call================
+00CF1777 | 2B83 C4020000           | sub eax,dword ptr ds:[ebx+2C4]                                |
+00CF177D | 3D 88130000             | cmp eax,1388                                                  |
+00CF1782 | 76 16                   | jbe woool.dat.CF179A                                          |
+00CF1784 | E8 071983FF             | call woool.dat.523090                                         |
+00CF1789 | 8983 C4020000           | mov dword ptr ds:[ebx+2C4],eax                                |
+00CF178F | 8B0D 10FB3501           | mov ecx,dword ptr ds:[135FB10]                                | ecx 无参数
+00CF1795 | E8 E637A6FF             | call woool.dat.754F80                                         | 释放/收回元神
+00CF179A | 6A 00                   | push 0                                                        |
+00CF179C | 6A 06                   | push 6                                                        |
+00CF179E | 6A 01                   | push 1                                                        |
+00CF17A0 | C783 BC020000 02000000  | mov dword ptr ds:[ebx+2BC],2                                  |
+00CF17AA | C783 C0020000 00000000  | mov dword ptr ds:[ebx+2C0],0                                  |
+00CF17B4 | A1 6C9D0901             | mov eax,dword ptr ds:[1099D6C]                                | 01099D6C:L","

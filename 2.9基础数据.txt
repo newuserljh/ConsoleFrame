@@ -2,7 +2,8 @@
 元神人物基址 0x135fb34
  
 元神信息：
-DWORD  p_Mode ; // +0xA08        元神模式 0战斗 1跟随 2停止 可直接修改值改变模式
+DWORD  p_Is_Release ; // [0x135fb34]+0x3D8        元神是否释放 1是 0否  +0xAA4也是
+DWORD  p_Mode ; // [0x135fb34]+0xA08        元神模式 0战斗 1跟随 2停止 可直接修改值改变模式
             
 
 人物信息:
@@ -50,6 +51,8 @@ DWORD Role_Level==0x135fb30]+0xec] //等级
 DWORD Role_Sex ； //]+0xdc 性别 0男 1女
 
 DWORD PatCount;//宠物数量+0xA24
+DWORD p_Is_has_Promenade; +0xAE4 /AE8  0无元神 1有元神; +0x13A0 4有 0 无
+
 
 队伍信息:
 DWORD Team_is_allow;//[0x135fb30  ]+0x1054550 是否允许组队0不允许,1允许,可直接修改
