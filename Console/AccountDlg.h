@@ -1,8 +1,8 @@
 #pragma once
 #include "afxcmn.h"
 #include <string>
-#include "SMstruct.h"
-#include "shareMemorySer.h"
+#include "../Common/SMstruct.h"
+#include "../Common/shareMemorySer.h"
 // CAccountDlg ¶Ô»°¿ò
 
 class CAccountDlg : public CDialogEx

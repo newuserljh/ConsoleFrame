@@ -6,7 +6,7 @@
 #include "Console.h"
 #include "ConsoleDlg.h"
 #include "afxdialogex.h"
-#include "utils.h"
+#include "../Common/utils.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

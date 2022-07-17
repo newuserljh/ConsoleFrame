@@ -24,6 +24,7 @@ int shareindex = -1;
 //初始化HOOk
 HookReg hook;
 role r;//角色
+role Promenade; //元神
 monster m_mon;
 skill m_skill;
 bag r_bag;
@@ -76,6 +77,7 @@ BEGIN_MESSAGE_MAP(CTestDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON4, &CTestDlg::OnBnClickedButton4)
 	ON_BN_CLICKED(IDC_CHK_TEAM, &CTestDlg::OnBnClickedChkTeam)
 	ON_WM_TIMER()
+	ON_BN_CLICKED(IDC_BUTTON10, &CTestDlg::OnBnClickedButton10)
 END_MESSAGE_MAP()
 
 
@@ -168,6 +170,41 @@ void CTestDlg::OnBnClickedButton1()
 		s.Format("%d :%s 耐久:%d/%d",i, r.m_euip[i].pName, *(r.m_euip[i].Use_Num),*(r.m_euip[i].Use_Num_Max));
 		AppendText(m_edit2, s);
 	}
+
+	// 元神属性
+	if (*r.m_roleproperty.Is_has_Promenade==0)return;
+	Promenade.init_promenade();
+	if (*Promenade.m_roleproperty.Is_Promenade_Release==0) mfun.release_Promenade();
+	if (!Promenade.init_promenade())return;
+	s.Format("%s\n", Promenade.m_roleproperty.Object.pName);
+	AppendText(m_edit2, s);
+	if (*Promenade.m_roleproperty.Sex == 0)sex = "男";
+	else sex = "女";
+	if (*Promenade.m_roleproperty.Job == 0)job = "战士";
+	else if (*Promenade.m_roleproperty.Job == 1)job = "法师";
+	else job = "道士";
+	s.Format("职业:%s      等级:%d    性别:%s", job, *Promenade.m_roleproperty.Level, sex);
+	AppendText(m_edit2, s);;
+	s.Format("HP:%d / %d", *Promenade.m_roleproperty.Object.HP, *Promenade.m_roleproperty.Object.HP_MAX);
+	AppendText(m_edit2, s);
+	s.Format("MP:%d / %d", *Promenade.m_roleproperty.Object.MP, *Promenade.m_roleproperty.Object.MP_MAX);
+	AppendText(m_edit2, s);
+	s.Format("当前地图:%s  坐标%d,%d", Promenade.m_roleproperty.p_Current_Map, *Promenade.m_roleproperty.Object.X, *Promenade.m_roleproperty.Object.Y);
+	AppendText(m_edit2, s);
+	s.Format("背包大小:%d  背包负重%d / %d", *Promenade.m_roleproperty.Bag_Size, *Promenade.m_roleproperty.BAG_W, *Promenade.m_roleproperty.BAG_W_MAX);
+	AppendText(m_edit2, s);
+	s.Format("ID:%x", *Promenade.m_roleproperty.Object.ID);
+	AppendText(m_edit2, s);
+	for (auto i = 0; i < 21; i++)
+	{
+		if (!(*Promenade.m_euip[i].ID))continue;
+		s.Format("%d :%s 耐久:%d/%d", i, Promenade.m_euip[i].pName, *(Promenade.m_euip[i].Use_Num), *(Promenade.m_euip[i].Use_Num_Max));
+		AppendText(m_edit2, s);
+	}
+	Promenade.m_roleproperty.Object.Distance = mfun.caclDistance(*r.m_roleproperty.Object.X, *r.m_roleproperty.Object.Y, *Promenade.m_roleproperty.Object.X, *Promenade.m_roleproperty.Object.Y);
+	s.Format("距主体距离:%f", Promenade.m_roleproperty.Object.Distance);
+	AppendText(m_edit2, s);
+
 }
 //int
 //WSAAPI
@@ -753,5 +790,17 @@ void CTestDlg::OnTimer(UINT_PTR nIDEvent)
 		break;
 	}
 	CDialogEx::OnTimer(nIDEvent);
+
+}
+
+
+void CTestDlg::OnBnClickedButton10()
+{
+	// TODO: 道士挂机测试
+
+
+
+
+
 
 }

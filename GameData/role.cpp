@@ -51,6 +51,10 @@ bool role::init()
 		m_roleproperty.PatCount = (DWORD*)(*(DWORD*)RoleBase + 0xA24);
 		m_roleproperty.Team_is_allow = (DWORD*)(*(DWORD*)RoleBase + 0x1054550);
 		m_roleproperty.Team_pointer = (DWORD*)(*(DWORD*)RoleBase + 0x1054550+8);
+		m_roleproperty.Is_has_Promenade = (DWORD*)(*(DWORD*)RoleBase +0x13A0); //+0xAE4 / AE8  0无元神 1有元神; +0x13A0 4有 0 无
+//元神独有属性
+		m_roleproperty.Is_Promenade_Release = (DWORD*)(*(DWORD*)RoleBase  +0x3D8);
+		m_roleproperty.Promenade_Mode = (DWORD*)(*(DWORD*)RoleBase + 0xA08);
 		if (!*m_roleproperty.Object.HP_MAX)
 		{
 			return false;
@@ -61,6 +65,65 @@ bool role::init()
 		return false;
 	}
 	if(!init_equip())return false;
+	return true;
+}
+
+//元神初始化
+bool role::init_promenade()
+{
+	try
+	{
+		m_roleproperty.Object.ID = (DWORD*)(*(DWORD*)PROMENADE_Base + 8);
+		m_roleproperty.Object.pName = (char*)(*(DWORD*)PROMENADE_Base + 0x10);
+		m_roleproperty.Object.HP = (DWORD*)(*(DWORD*)PROMENADE_Base + 0x80);
+		m_roleproperty.Object.HP_MAX = (DWORD*)(*(DWORD*)PROMENADE_Base + 0x84);
+		m_roleproperty.Object.MP = (DWORD*)(*(DWORD*)PROMENADE_Base + 0x88);
+		m_roleproperty.Object.MP_MAX = (DWORD*)(*(DWORD*)PROMENADE_Base + 0x8c);
+		m_roleproperty.Object.X = (DWORD*)(*(DWORD*)PROMENADE_Base + 0xac);
+		m_roleproperty.Object.Y = (DWORD*)(*(DWORD*)PROMENADE_Base + 0xb0);
+		m_roleproperty.Object.IsPosion = (BYTE*)(*(DWORD*)PROMENADE_Base + 0x34b);
+		m_roleproperty.Job = (DWORD*)(*(DWORD*)PROMENADE_Base + 0xe4);
+		m_roleproperty.Level = (DWORD*)(*(DWORD*)PROMENADE_Base + 0xec);
+		m_roleproperty.Sex = (DWORD*)(*(DWORD*)PROMENADE_Base + 0xdc);
+		m_roleproperty.GJL_L = (DWORD*)(*(DWORD*)PROMENADE_Base + 0xA5C);
+		m_roleproperty.GJL_H = (DWORD*)(*(DWORD*)PROMENADE_Base + 0xA60);
+		m_roleproperty.MFL_L = (DWORD*)(*(DWORD*)PROMENADE_Base + 0xA64);
+		m_roleproperty.MFL_H = (DWORD*)(*(DWORD*)PROMENADE_Base + 0xA68);
+		m_roleproperty.DSL_L = (DWORD*)(*(DWORD*)PROMENADE_Base + 0xA6c);
+		m_roleproperty.DSL_H = (DWORD*)(*(DWORD*)PROMENADE_Base + 0xA70);
+		m_roleproperty.FY_L = (DWORD*)(*(DWORD*)PROMENADE_Base + 0xA7C);
+		m_roleproperty.FY_H = (DWORD*)(*(DWORD*)PROMENADE_Base + 0xA80);
+		m_roleproperty.MF_L = (DWORD*)(*(DWORD*)PROMENADE_Base + 0xA84);
+		m_roleproperty.MF_H = (DWORD*)(*(DWORD*)PROMENADE_Base + 0xA88);
+		m_roleproperty.BAG_W = (WORD*)(*(DWORD*)PROMENADE_Base + 0xAA8);
+		m_roleproperty.BAG_W_MAX = (WORD*)(*(DWORD*)PROMENADE_Base + 0xAAA);
+		m_roleproperty.SW = (DWORD*)(*(DWORD*)PROMENADE_Base + 0xAD0);
+		m_roleproperty.p_Bag_Base = (DWORD*)(*(DWORD*)PROMENADE_Base + 0xC54);
+		m_roleproperty.Bag_Size = (DWORD*)(*(DWORD*)PROMENADE_Base + 0xc58);
+		m_roleproperty.p_LR_Bag_Base = (DWORD*)(*(DWORD*)PROMENADE_Base + 0xc60);
+		m_roleproperty.LR_Bag_Size = (DWORD*)(*(DWORD*)PROMENADE_Base + 0xc64);
+		m_roleproperty.p_Target_ID = (DWORD*)(*(DWORD*)PROMENADE_Base + 0x458);
+		m_roleproperty.p_Skill_Base = (DWORD*)(*(DWORD*)PROMENADE_Base + 0x1358);
+		m_roleproperty.p_ZB = (DWORD*)(*(DWORD*)PROMENADE_Base + 0xc48);
+		m_roleproperty.LL = (DWORD*)(*(DWORD*)PROMENADE_Base + 0x139C);
+		m_roleproperty.p_Current_Map = (char*)(*(DWORD*)PROMENADE_Base + 0x8299C8);
+		m_roleproperty.PatCount = (DWORD*)(*(DWORD*)PROMENADE_Base + 0xA24);
+		m_roleproperty.Team_is_allow = (DWORD*)(*(DWORD*)PROMENADE_Base + 0x1054550);
+		m_roleproperty.Team_pointer = (DWORD*)(*(DWORD*)PROMENADE_Base + 0x1054550 + 8);
+		m_roleproperty.Is_has_Promenade = (DWORD*)(*(DWORD*)PROMENADE_Base + 0x13A0); //+0xAE4 / AE8  0无元神 1有元神; +0x13A0 4有 0 无
+//元神独有属性
+		m_roleproperty.Is_Promenade_Release = (DWORD*)(*(DWORD*)PROMENADE_Base + 0x3D8);
+		m_roleproperty.Promenade_Mode = (DWORD*)(*(DWORD*)PROMENADE_Base + 0xA08);
+		if (!*m_roleproperty.Object.HP_MAX)
+		{
+			return false;
+		}
+	}
+	catch (...)
+	{
+		return false;
+	}
+	if (!init_equip())return false;
 	return true;
 }
 

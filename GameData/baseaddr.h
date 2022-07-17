@@ -5,7 +5,7 @@
 */
 
 #define RoleBase 0x135fb30 //人物主体基址
-#define YS_Base 0x135fb34 //元神基址
+#define PROMENADE_Base 0x135fb34 //元神基址
 #define Envi_Offset 0x412D68 //NPC,怪物遍历偏移
 #define Ground_Offset 0x412354 //地面物品遍历偏移
 
@@ -34,3 +34,5 @@
 #define CALL_TEAM_OPEN_CLOSE 0x76F2B0  //队伍开关
 #define CALL_MAKE_TEAM 0x76F7B0    //发起组队请求
 #define CALL_ALLOW_TEAM 0x7358C0    //同意组队请求
+#define CALL_RELEASE_PROMENADE 0x754F80 //释放元神
+#define CALL_START_END_ATTACK 0x5D2E60 //开关自动挂机

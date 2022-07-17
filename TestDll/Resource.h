@@ -13,8 +13,9 @@
 #define IDC_EDIT2                       2008
 #define IDC_BUTTON8                     2009
 #define IDC_BUTTON9                     2010
-#define IDC_CHK_TEAM                    5000
+#define IDC_BUTTON10                    2016
 #define IDD_DLGTEST                     4000
+#define IDC_CHK_TEAM                    5000
 
 // Next default values for new objects
 // 
@@ -22,7 +23,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        2004
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         2016
+#define _APS_NEXT_CONTROL_VALUE         2017
 #define _APS_NEXT_SYMED_VALUE           2000
 #endif
 #endif

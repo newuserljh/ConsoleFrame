@@ -14,6 +14,7 @@ public:
 	virtual ~role();
 	virtual bool init();
 	bool init_equip();
+	bool init_promenade();
 	bool Get_Envionment(std::vector<DWORD>& vec, DWORD g_range = 15);
 	bool Get_Ground(std::vector<DWORD>& vec, DWORD g_range = 15);
 	ROLE_PROPERTY m_roleproperty;

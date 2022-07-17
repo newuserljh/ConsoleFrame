@@ -1,5 +1,5 @@
 #pragma once
-#include "role.h"
+#include "../GameData/role.h"
 // CTestDlg ¶Ô»°¿ò
 
 class CTestDlg : public CDialogEx
@@ -62,4 +62,5 @@ public:
 	
 	
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnBnClickedButton10();
 };

@@ -55,6 +55,12 @@ struct ROLE_PROPERTY
     DWORD* PatCount; ///宠物数量+0xA24
 	DWORD* Team_is_allow;//[0x135fb30  ]+0x1054550 是否允许组队0不允许,1允许,可直接修改
 	DWORD* Team_pointer;//+0x1054550+8 队伍链表对象指针 指向表头的指针 
+
+	DWORD* Is_has_Promenade; //+0xAE4 / AE8  0无元神 1有元神; +0x13A0 4有 0 无
+
+	//元神独有属性
+	DWORD*  Is_Promenade_Release; // [0x135fb34]+0x3D8        元神是否释放 1是 0否  +0xAA4也是
+	DWORD*  Promenade_Mode; // [0x135fb34]+0xA08        元神模式 0战斗 1跟随 2停止 可直接修改值改变模式
 };
 
 

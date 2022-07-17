@@ -6,7 +6,7 @@
 #include "afxcmn.h"
 #include "AccountDlg.h"
 #include "ConfigDlg.h"
-#include "shareMemorySer.h"
+#include "../Common/shareMemorySer.h"
 #include <memory>
 #include <thread>
 // CConsoleDlg ¶Ô»°¿ò

@@ -30,7 +30,8 @@ public:
 	bool team_open_close(DWORD tflag);
 	bool maketeam(std::string pName);
 	bool allowteam(std::string pName);
-
+	bool release_Promenade(void);
+	bool start_end_AutoAttack(int turn_flag);
 private:
 	static bool comp(const MONSTER_PROPERTY& a, const MONSTER_PROPERTY& b);
 	static bool comp_groud(const GROUND_GOODS& a, const GROUND_GOODS& b);
@@ -596,3 +597,57 @@ bool gamecall::allowteam(std::string pName)
 	}
 	return true;
 }
+
+/*
+函数功能:释放元神
+参数一:0
+返回值：bool
+*/
+bool  gamecall::release_Promenade(void)
+{
+	try
+	{
+		_asm
+		{
+			pushad
+			mov ecx, dword ptr ds : [CALL_ECX]
+			mov edx, CALL_RELEASE_PROMENADE
+			call edx
+			popad
+		}
+	}
+	catch (...)
+	{
+		return false;
+	}
+	return true;
+}
+
+
+
+/*
+函数功能:开关自动挂机
+参数一:挂机标志，1为开，0为关
+返回值：bool
+*/
+bool  gamecall::start_end_AutoAttack(int turn_flag)
+{
+	try
+	{
+		_asm
+		{
+			pushad
+			push turn_flag
+			mov ecx, 0x3D6B4F0
+			mov edx, CALL_START_END_ATTACK
+			call edx
+			popad
+		}
+	}
+	catch (...)
+	{
+		return false;
+	}
+	return true;
+}
+
