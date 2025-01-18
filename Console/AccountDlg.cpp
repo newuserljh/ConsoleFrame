@@ -12,7 +12,7 @@
 #include "EipInject.h"
 #include "utils.h"
 // CAccountDlg 对话框
-std::string GAME_DIR("D:\\Games\\传奇世界2.9.0.41\\传奇世界\\Data\\");
+std::string GAME_DIR;
 
 IMPLEMENT_DYNAMIC(CAccountDlg, CDialogEx)
 
@@ -41,6 +41,7 @@ BEGIN_MESSAGE_MAP(CAccountDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON1, &CAccountDlg::OnBnClickedButton1)
 	ON_BN_CLICKED(IDC_BUTTON2, &CAccountDlg::OnBnClickedButton2)
 	ON_BN_CLICKED(IDC_BUTTON3, &CAccountDlg::OnBnClickedButton3)
+	ON_BN_CLICKED(IDC_BTN_CS_DIR, &CAccountDlg::OnBnClickedBtnCsDir)
 END_MESSAGE_MAP()
 
 
@@ -86,6 +87,7 @@ BOOL CAccountDlg::OnInitDialog()
 	if (!initMem())
 		return FALSE;
 	initAccount();
+	initGameDir();
 	auto tthread = std::thread(&CAccountDlg::threadCallBack, this);
 	tthread.detach();
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -136,7 +138,7 @@ bool CAccountDlg::updateDate()
 
 
 
-void CAccountDlg::OnBnClickedButton1()
+void CAccountDlg::OnBnClickedButton1() //添加账号
 {
 	// TODO:  添加账号
 	UpdateData(TRUE);
@@ -153,7 +155,7 @@ void CAccountDlg::OnBnClickedButton1()
 	tools::getInstance()->write2file("..\\Account.txt", ss.str());
 }
 
-bool CAccountDlg::initMem()
+bool CAccountDlg::initMem() //初始化共享内存
 {
 	bool rt=  m_shareMemSer->createShareMemory();
 	if (rt)
@@ -170,7 +172,7 @@ bool CAccountDlg::initMem()
 	return rt;
 }
 
-bool CAccountDlg::initAccount()
+bool CAccountDlg::initAccount() //读取账号
 {
 	std::vector<std::string> vecA=tools::getInstance()->ReadTxt("..\\Account.txt");
 	if (vecA.empty())return false;
@@ -183,6 +185,15 @@ bool CAccountDlg::initAccount()
 		m_shareMemSer->m_pSMAllData->m_sm_data[i].passWord = (std::string)temp[1];
 		temp.clear();
 	}
+	return true;
+}
+
+bool CAccountDlg::initGameDir() //读取游戏目录
+{
+	std::vector<std::string> vecA = tools::getInstance()->ReadTxt(".\\cfg\\gamedir.cfg");
+	if (vecA.empty())return false;
+	GAME_DIR = vecA[0];
+	vecA.clear();
 	return true;
 }
 
@@ -236,6 +247,11 @@ void CAccountDlg::OnBnClickedButton2()
 // TODO:  开始脚本 判断当前复选框是否被选中，只登陆选中的
 void CAccountDlg::OnBnClickedButton3()
 {
+	if (GAME_DIR.empty())
+	{
+		AfxMessageBox("请先选择目录，到传奇世界data目录");
+		return;
+	}
 		for (int i = 0; i < MORE_OPEN_NUMBER; i++)
 	{		
 			if (!m_listCtl.GetCheck(i))continue; //未选中
@@ -258,4 +274,41 @@ void CAccountDlg::log_inject(int i)
 	//wchar_t* t = tools::getInstance()->char2wchar(dllPath.c_str());
 	//MessageBoxW(0,t,L" ",MB_OK);
 	in.eipinjectDll(tools::getInstance()->char2wchar(dllPath.c_str()),e.pi);
+}
+
+
+void CAccountDlg::OnBnClickedBtnCsDir()
+{
+	// TODO: 选择传世所在的目录
+	char szPath[MAX_PATH]; //存放选择的目录路径 
+	CString str;
+	ZeroMemory(szPath, sizeof(szPath));
+	BROWSEINFO bi;
+	bi.hwndOwner = m_hWnd;
+	bi.pidlRoot = NULL;
+	bi.pszDisplayName = szPath;
+	bi.lpszTitle = "请选择需要输出的目录：";
+	bi.ulFlags = 0;
+	bi.lpfn = NULL;
+	bi.lParam = 0;
+	bi.iImage = 0;
+	//弹出选择目录对话框
+	LPITEMIDLIST lp = SHBrowseForFolder(&bi);
+
+	if (lp && SHGetPathFromIDList(lp, szPath))
+	{
+		GAME_DIR=szPath;
+		GAME_DIR = GAME_DIR + "\\";
+		// 创建 cfg 文件夹（如果不存在）
+		CreateDirectory(".\\cfg", NULL);
+		// 将选择的目录路径写入 cfg/gamedir.cfg 文件中
+		tools::getInstance()->write2file(".\\cfg\\gamedir.cfg", GAME_DIR.c_str(), std::ios::out /*此模式打开丢弃文件所有内容*/);
+		AfxMessageBox(GAME_DIR.c_str());
+		//编辑框中显示所选内容
+		//CWnd* pWnd = GetDlgItem(IDC_EDIT_OUTNAME);
+		//pWnd->SetWindowText(szPath);
+		//pWnd->GetDC()->SetTextColor(m_TextBlackColor);
+	}
+	else
+		AfxMessageBox("无效的目录，请重新选择");
 }
