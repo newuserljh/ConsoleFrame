@@ -26,6 +26,7 @@ private:
 	std::shared_ptr<shareMemorySer>m_shareMemSer;
 	void threadCallBack();
 	bool initAccount();
+	bool initGameDir();
 
 public:
 	CListCtrl m_listCtl;
@@ -41,4 +42,5 @@ public:
 	afx_msg void OnBnClickedButton2();
 	afx_msg void OnBnClickedButton3();
 	void log_inject(int i);
+	afx_msg void OnBnClickedBtnCsDir();
 };
