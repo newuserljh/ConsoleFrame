@@ -3,6 +3,10 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+
+#我的排除项目
+*.cfg
+
 # User-specific files
 *.rsuser
 *.suo
