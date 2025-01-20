@@ -300,7 +300,6 @@ void CAccountDlg::OnBnClickedBtnCsDir()
 	{
 		GAME_DIR = szPath;
 		GAME_DIR = GAME_DIR + "\\";
-		AfxMessageBox(GAME_DIR.c_str());
 		if (!tools::getInstance()->fileIsexist(GAME_DIR + "woool.dat.update"))
 		{
 			AfxMessageBox("无效的目录，无法定位到woool.dat.update，请重新选择");
@@ -314,7 +313,6 @@ void CAccountDlg::OnBnClickedBtnCsDir()
 		{
 			AfxMessageBox("无法释放lua51.dll到游戏目录，请手动复制到指定目录");
 		}
-		AfxMessageBox("OK");
 	}
 	else
 		AfxMessageBox("无效的目录，请重新选择");
