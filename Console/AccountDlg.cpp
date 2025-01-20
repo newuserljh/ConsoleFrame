@@ -190,11 +190,12 @@ bool CAccountDlg::initAccount() //读取账号
 
 bool CAccountDlg::initGameDir() //读取游戏目录
 {
-	if (tools::getInstance()->fileIsexist(".\\cfg\\gamedir.cfg") == false)return false;
+	if (!tools::getInstance()->fileIsexist(".\\cfg\\gamedir.cfg"))return false;
 	std::vector<std::string> vecA = tools::getInstance()->ReadTxt(".\\cfg\\gamedir.cfg");
 	if (vecA.empty())return false;
 	GAME_DIR = vecA[0];
 	vecA.clear();
+	if(!tools::getInstance()->fileIsexist(GAME_DIR +"lua51.dll"))GAME_DIR.clear();
 	return true;
 }
 
@@ -277,7 +278,7 @@ void CAccountDlg::log_inject(int i)
 	in.eipinjectDll(tools::getInstance()->char2wchar(dllPath.c_str()),e.pi);
 }
 
-// TODO: 选择传世所在的目录
+// TODO: 选择传世所在的目录,并释放lua51.dll到游戏目录
 void CAccountDlg::OnBnClickedBtnCsDir()
 {
 	char szPath[MAX_PATH]; //存放选择的目录路径 
@@ -297,17 +298,23 @@ void CAccountDlg::OnBnClickedBtnCsDir()
 
 	if (lp && SHGetPathFromIDList(lp, szPath))
 	{
-		GAME_DIR=szPath;
+		GAME_DIR = szPath;
 		GAME_DIR = GAME_DIR + "\\";
-		// 创建 cfg 文件夹（如果不存在）
-		CreateDirectory(".\\cfg", NULL);
-		// 将选择的目录路径写入 cfg/gamedir.cfg 文件中
-		tools::getInstance()->write2file(".\\cfg\\gamedir.cfg", GAME_DIR.c_str(), std::ios::out /*此模式打开丢弃文件所有内容*/);
-		//AfxMessageBox(GAME_DIR.c_str());
-		//编辑框中显示所选内容
-		//CWnd* pWnd = GetDlgItem(IDC_EDIT_OUTNAME);
-		//pWnd->SetWindowText(szPath);
-		//pWnd->GetDC()->SetTextColor(m_TextBlackColor);
+		AfxMessageBox(GAME_DIR.c_str());
+		if (!tools::getInstance()->fileIsexist(GAME_DIR + "woool.dat.update"))
+		{
+			AfxMessageBox("无效的目录，无法定位到woool.dat.update，请重新选择");
+			return;
+		}
+		CreateDirectory(".\\cfg", NULL);// 创建 cfg 文件夹（如果不存在）
+		tools::getInstance()->write2file(".\\cfg\\gamedir.cfg", GAME_DIR.c_str(),// 目录写入 cfg/gamedir.cfg 
+			std::ios::out /*此模式打开丢弃文件所有内容*/);
+
+		if (!tools::getInstance()->ReleaseResource(IDR_DLLRES1,GAME_DIR+"lua51.dll", "DLLRES", false))
+		{
+			AfxMessageBox("无法释放lua51.dll到游戏目录，请手动复制到指定目录");
+		}
+		AfxMessageBox("OK");
 	}
 	else
 		AfxMessageBox("无效的目录，请重新选择");

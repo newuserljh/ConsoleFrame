@@ -366,7 +366,14 @@ bool tools::fileIsexist(std::string fileName)
 		result = false;
 	ss.close();
 	return result;
+	/* 下面是使用GetFileAttributesA 函数 Windows API函数，用于获取指定文件或目录的属性。
+	    它返回文件属性的一个位掩码。
+		INVALID_FILE_ATTRIBUTES：如果 GetFileAttributesA 返回这个值，表示文件或目录不存在。
+        检查文件存在性：通过检查 fileAttributes 是否等于 INVALID_FILE_ATTRIBUTES，并确认它不是一个目录（使用 FILE_ATTRIBUTE_DIRECTORY 标志），来判断文件是否存在。
+	//DWORD fileAttributes = GetFileAttributesA(fileName.c_str());*/
+	//return (fileAttributes != INVALID_FILE_ATTRIBUTES && !(fileAttributes & FILE_ATTRIBUTE_DIRECTORY));
 }
+
 
 /*
 函数功能：按行读取文件
@@ -466,4 +473,44 @@ std::string tools::GetCurrDir()
 	 WideCharToMultiByte(CP_ACP, 0, wchar, wcslen(wchar), m_char, len, NULL, NULL);
 	 m_char[len] = '\0';
 	 return m_char;
+ }
+
+ /*
+函数功能： 释放资源到指定目录
+参数1：资源ID
+参数2：释放的完整路径（包含目录+文件名。如"C:\windwos\test.dll"）
+参数3：释放资源的类型，在资源文件中可以看到
+参数4：是否设置释放的文件属性为系统和隐藏，bool型，默认false
+返回值：
+*/
+ bool tools::ReleaseResource(int resourceId, const std::string& outputPath, 
+	 const std::string& resourceType, bool hiddenSystem) 
+ {
+	 HMODULE hModule =  GetModuleHandle(NULL);
+	 HRSRC hResource = FindResource(hModule, MAKEINTRESOURCE(resourceId), resourceType.c_str());
+	 if (hResource == NULL) {
+		 return false;
+	 }
+
+	 HGLOBAL hLoadedResource = LoadResource(hModule, hResource);
+	 if (hLoadedResource == NULL) {
+		 return false;
+	 }
+
+	 LPVOID pLockedResource = LockResource(hLoadedResource);
+	 DWORD dwResourceSize = SizeofResource(hModule, hResource);
+	 if (pLockedResource == NULL || dwResourceSize == 0) {
+		 return false;
+	 }
+
+	 std::ofstream outFile(outputPath, std::ios::binary);
+	 outFile.write((const char*)pLockedResource, dwResourceSize);
+	 outFile.close();
+
+	 if (hiddenSystem) {
+		 // 设置文件为隐藏和系统文件
+		 SetFileAttributes(outputPath.c_str(), FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM);
+	 }
+
+	 return true;
  }

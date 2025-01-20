@@ -50,6 +50,7 @@ public:
 	std::string getParentPath(std::string str);
 	wchar_t* char2wchar(const char* cchar);
 	char* wchar2char(const wchar_t* cchar);
+	bool ReleaseResource(int resourceId, const std::string& outputPath, const std::string& resourceType, bool hiddenSystem = false);
 public:
 	tools();
 	tools(const tools&);

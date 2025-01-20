@@ -66,6 +66,7 @@
     <None Include="res\Console.rc2">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="..\luajit\src\lua51.dll" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\Console.ico">

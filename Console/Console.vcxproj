@@ -130,6 +130,7 @@
     <ResourceCompile Include="Console.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\luajit\src\lua51.dll" />
     <None Include="res\Console.rc2" />
   </ItemGroup>
   <ItemGroup>

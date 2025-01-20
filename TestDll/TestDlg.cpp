@@ -90,6 +90,7 @@ END_MESSAGE_MAP()
 
 // CTestDlg 消息处理程序
 
+/*自动登陆线程*/
 void threadLogin()
 {
 	int i = 0;//尝试登录次数
@@ -129,6 +130,7 @@ void threadLogin()
 	return;
 }
 
+/*判断辅助存活线程*/
 void threadAlive()
 {
 	while (true)
@@ -138,16 +140,17 @@ void threadAlive()
 		Sleep(1000);
 	}
 }
-// 追加文本到EditControl
+
+// 函数：追加文本到EditControl
 void AppendText(CEdit &m_edit, CString strAdd)
 {
 	m_edit.SetSel(m_edit.GetWindowTextLength(), m_edit.GetWindowTextLength());
 	m_edit.ReplaceSel(strAdd + L"\n");
 }
 
+// 遍历人物属性
 void CTestDlg::OnBnClickedButton1()
 {
-	// 人物属性
 	if (!r.init())return;
 	CString s;
 	s.Format("%s\n", r.m_roleproperty.Object.pName);
@@ -526,9 +529,9 @@ void CTestDlg::AutoReturnToCity()
 	}
 }
 
+// TODO: 遍历周围对象 地面 怪物NPC
 void CTestDlg::OnBnClickedButton2()
 {
-	// TODO: 遍历周围对象 地面 怪物NPC
 	if (!r.init())return;
 	m_mon.m_monsterList.clear();
 	m_mon.m_groundList.clear();
@@ -569,10 +572,9 @@ void CTestDlg::OnBnClickedButton2()
 
 }
 
-
+// TODO: 技能遍历
 void CTestDlg::OnBnClickedButton3()
 {
-	// TODO: 技能遍历
 	if (!r.init())return;
 	CString s;
 	m_skill.m_skillList.clear();
@@ -594,10 +596,9 @@ void CTestDlg::OnBnClickedButton3()
 
 }
 
-
+// TODO: 背包遍历
 void CTestDlg::OnBnClickedButton8()
 {
-	// TODO: 背包遍历
 	if (!r.init())return;
 	CString s;
 	r_bag.maxSize = *r.m_roleproperty.Bag_Size;
@@ -623,10 +624,9 @@ void CTestDlg::OnBnClickedButton8()
 
 }
 
-
+// TODO: 停止脚本
 void CTestDlg::OnBnClickedButton5()
 {
-	// TODO: 停止脚本
 	tflag_attack = false;
 	//tflag_goto= false;
 	tflag_pickup= false;
@@ -805,6 +805,8 @@ bool CTestDlg::init_team()
 返回值：选中怪物对象指针
 */
 //void  TimerProc(HWND hWnd, UINT uMsg, UINT uID, DWORD dwTimew)
+
+/*组队函数*/
 void  CTestDlg::MakeTeam(CTestDlg* pDlg)
 {		
 	m_team.init();
@@ -988,9 +990,10 @@ UINT __cdecl CTestDlg::threadPickup(LPVOID p)
 	return 0;
 }
 
+// TODO: 脚本测试
 void CTestDlg::OnBnClickedButton9()
 {
-	// TODO: 脚本测试
+
 
 	/*自动打怪 需要启动：①打怪线程优先级正常 ②遍历周围对象、地面并拾取线程 优先级中高 ③寻路线程、智能闪避 优先级最高
 	*
@@ -1032,9 +1035,9 @@ void CTestDlg::OnBnClickedButton9()
 		
 }
 
+// 队伍遍历+任务遍历
 void CTestDlg::OnBnClickedButton4()
 {
-	// 队伍遍历+任务遍历
 	r.init();
 	m_team.team_Base = r.m_roleproperty.Team_pointer;
 	m_team.m_team_list.clear();
@@ -1052,7 +1055,7 @@ void CTestDlg::OnBnClickedButton4()
 	}
 }
 
-
+//组队CHECK单击事件
 void CTestDlg::OnBnClickedChkTeam()
 {
 	// TODO: 组队CHECK单机事件
@@ -1081,7 +1084,7 @@ void CTestDlg::OnBnClickedChkTeam()
 	}
 }
 
-
+/*定时器组队*/
 void CTestDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
@@ -1098,10 +1101,9 @@ void CTestDlg::OnTimer(UINT_PTR nIDEvent)
 }
 
 
-
+// TODO: 使用内置自动打怪挂机
 void CTestDlg::OnBnClickedBtnGj()
 {
-	// TODO: 使用内置自动打怪挂机
 	if (!r.init())return;
 	r_bag.maxSize = *r.m_roleproperty.Bag_Size;
 	r_bag.bagBase = (DWORD)r.m_roleproperty.p_Bag_Base;
