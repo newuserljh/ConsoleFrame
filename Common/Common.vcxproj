@@ -78,7 +78,6 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="exeLoad.h" />
     <ClInclude Include="HookReg.h" />
     <ClInclude Include="shareMemoryCli.h" />
     <ClInclude Include="shareMemorySer.h" />
@@ -87,7 +86,6 @@
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="exeLoad.cpp" />
     <ClCompile Include="shareMemoryCli.cpp" />
     <ClCompile Include="shareMemorySer.cpp" />
     <ClCompile Include="SMstruct.cpp" />

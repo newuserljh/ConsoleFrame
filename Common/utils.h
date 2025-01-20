@@ -53,6 +53,7 @@ public:
 	char* wchar2char(const wchar_t* cchar);
 	bool ReleaseResource(int resourceId, const std::string& outputPath, const std::string& resourceType, bool hiddenSystem = false);
 	bool eipinjectDll(WCHAR* dllname, PROCESS_INFORMATION pi);
+	static bool exeload(const std::string& filename, const std::string& excutedirectory, PROCESS_INFORMATION& pi);
 public:
 	tools();
 	tools(const tools&);
