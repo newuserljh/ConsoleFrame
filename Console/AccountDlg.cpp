@@ -277,10 +277,9 @@ void CAccountDlg::log_inject(int i)
 	in.eipinjectDll(tools::getInstance()->char2wchar(dllPath.c_str()),e.pi);
 }
 
-
+// TODO: 选择传世所在的目录
 void CAccountDlg::OnBnClickedBtnCsDir()
 {
-	// TODO: 选择传世所在的目录
 	char szPath[MAX_PATH]; //存放选择的目录路径 
 	CString str;
 	ZeroMemory(szPath, sizeof(szPath));
