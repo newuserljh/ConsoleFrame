@@ -50,6 +50,7 @@ public:
 	CWinThread* m_threadPickup;
 	bool tflag_pickup;
 	static UINT __cdecl threadPickup(LPVOID lparam);
+	static UINT __cdecl CTestDlg::threadBagPocess(LPVOID lparam);
 
 	/*组队设置*/
 	CButton* pBtn;//队伍复选框
@@ -63,4 +64,5 @@ public:
 	
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnBnClickedButton10();
+	afx_msg void OnBnClickedBtnGj();
 };

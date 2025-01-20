@@ -77,7 +77,7 @@ BEGIN_MESSAGE_MAP(CTestDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON4, &CTestDlg::OnBnClickedButton4)
 	ON_BN_CLICKED(IDC_CHK_TEAM, &CTestDlg::OnBnClickedChkTeam)
 	ON_WM_TIMER()
-	ON_BN_CLICKED(IDC_BUTTON10, &CTestDlg::OnBnClickedButton10)
+	ON_BN_CLICKED(IDC_BTN_GJ, &CTestDlg::OnBnClickedBtnGj)
 END_MESSAGE_MAP()
 
 
@@ -624,15 +624,38 @@ UINT __cdecl CTestDlg::threadAttack(LPVOID p)
 	while (pDlg->tflag_attack)
 	{
 		shareCli.m_pSMAllData->m_sm_data[shareindex].cscript = std::string("打怪");
-		Auto_Attack(pDlg, pDlg->attack_monlist, pDlg->s_ID);
-		Sleep(ATTACK_SLEEP);
+		//Auto_Attack(pDlg, pDlg->attack_monlist, pDlg->s_ID);
+		mfun.start_end_AutoAttack(pDlg->tflag_attack);
+		//Sleep(ATTACK_SLEEP);
 	}
+	mfun.start_end_AutoAttack(pDlg->tflag_attack);
+	shareCli.m_pSMAllData->m_sm_data[shareindex].cscript = std::string("空闲");
 	s.Format("打怪线程停止");
 	AppendText(pDlg->m_edit2, s);
 	return 0;
 }
 
 /*捡物线程*/
+UINT __cdecl CTestDlg::threadBagPocess(LPVOID p)
+{
+	CString s;
+	CTestDlg* pDlg = (CTestDlg*)p;
+	s.Format("处理包裹线程开始");
+	AppendText(pDlg->m_edit2, s);
+	while (pDlg->tflag_attack)
+	{
+		if (r_bag.bSpace < 10)
+		{
+			
+		}
+	}
+	s.Format("处理包裹线程停止");
+	AppendText(pDlg->m_edit2, s);
+	return 0;
+}
+
+
+/*包裹处理*/
 UINT __cdecl CTestDlg::threadPickup(LPVOID p)
 {
 	CString s;
@@ -645,30 +668,30 @@ UINT __cdecl CTestDlg::threadPickup(LPVOID p)
 		if (need2pick_list.size())
 		{
 			GROUND_GOODS pick_temp = need2pick_list[0];
-			std::vector<MONSTER_PROPERTY> near_mon = mfun.sort_aroud_monster(r, pDlg->attack_monlist,6);		
+			std::vector<MONSTER_PROPERTY> near_mon = mfun.sort_aroud_monster(r, pDlg->attack_monlist, 6);
 			if (near_mon.size() < 5)
 			{
 				pDlg->m_threadAttack->SuspendThread();
-				s.Format("正在拾取物品:%s 坐标：%d,%d",pick_temp.pName,*pick_temp.X, *pick_temp.Y);
+				s.Format("正在拾取物品:%s 坐标：%d,%d", pick_temp.pName, *pick_temp.X, *pick_temp.Y);
 				AppendText(pDlg->m_edit2, s);
 				int pick_try_accounts = 0;
 				do
 				{
 					mfun.Run_or_Step_To(*pick_temp.X, *pick_temp.Y, 1);
 					Sleep(800);
-					mfun.Run_or_Step_To(*pick_temp.X, *pick_temp.Y,1);
+					mfun.Run_or_Step_To(*pick_temp.X, *pick_temp.Y, 1);
 					Sleep(800);
-					mfun.Run_or_Step_To(*pick_temp.X, *pick_temp.Y,1);
+					mfun.Run_or_Step_To(*pick_temp.X, *pick_temp.Y, 1);
 					Sleep(800);
 					pick_try_accounts++;
-					if( (*r.m_roleproperty.Object.X == *pick_temp.X) && (*r.m_roleproperty.Object.X == *pick_temp.Y))
+					if ((*r.m_roleproperty.Object.X == *pick_temp.X) && (*r.m_roleproperty.Object.X == *pick_temp.Y))
 					{
 						mfun.pickupGoods(*pick_temp.X, *pick_temp.Y);
 					}
 					need2pick_list.clear();
 					need2pick_list = mfun.sort_groud_goods(r, pDlg->pick_goods_list);
 					if (!need2pick_list.size())break;
-				} while ((need2pick_list[0].X == pick_temp.X)&&(need2pick_list[0].Y == pick_temp.Y) && (pick_try_accounts< 4));
+				} while ((need2pick_list[0].X == pick_temp.X) && (need2pick_list[0].Y == pick_temp.Y) && (pick_try_accounts < 4));
 				pDlg->m_threadAttack->ResumeThread();
 			}
 			else
@@ -682,7 +705,6 @@ UINT __cdecl CTestDlg::threadPickup(LPVOID p)
 	AppendText(pDlg->m_edit2, s);
 	return 0;
 }
-
 
 void CTestDlg::OnBnClickedButton9()
 {
@@ -794,13 +816,19 @@ void CTestDlg::OnTimer(UINT_PTR nIDEvent)
 }
 
 
-void CTestDlg::OnBnClickedButton10()
+
+void CTestDlg::OnBnClickedBtnGj()
 {
-	// TODO: 道士挂机测试
-
-
-
-
-
+	// TODO: 使用内置自动打怪挂机
+	r.init();
+	pDlg->tflag_attack = !pDlg->tflag_attack;
+	if (pDlg->tflag_attack)
+	{
+		pDlg->m_threadAttack = AfxBeginThread(threadAttack, (LPVOID)this);
+	}
+	else
+	{
+		WaitForSingleObject(pDlg->m_threadAttack, 60000);
+	}
 
 }

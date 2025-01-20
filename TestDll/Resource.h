@@ -14,6 +14,7 @@
 #define IDC_BUTTON8                     2009
 #define IDC_BUTTON9                     2010
 #define IDC_BUTTON10                    2016
+#define IDC_BTN_GJ                      2016
 #define IDD_DLGTEST                     4000
 #define IDC_CHK_TEAM                    5000
 
