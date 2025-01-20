@@ -1,5 +1,6 @@
 #pragma once
 #include "../GameData/role.h"
+#include "lua.hpp"
 // CTestDlg 对话框
 
 class CTestDlg : public CDialogEx
@@ -12,6 +13,9 @@ public:
 
 // 对话框数据
 	enum { IDD = IDD_DLGTEST };
+
+public:
+	lua_State* L; // Lua 状态变量
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持

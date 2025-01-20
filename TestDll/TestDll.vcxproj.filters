@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="附加依赖项">
+      <UniqueIdentifier>{6fd618a9-9e2a-4a99-b099-586fbf253eff}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -57,5 +60,13 @@
     <ResourceCompile Include="TestDll.rc">
       <Filter>资源文件</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\luajit\src\lua51.lib">
+      <Filter>附加依赖项</Filter>
+    </Library>
+    <Library Include="..\luajit\src\luajit.lib">
+      <Filter>附加依赖项</Filter>
+    </Library>
   </ItemGroup>
 </Project>

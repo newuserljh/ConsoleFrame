@@ -17,9 +17,13 @@
 #include "config.h"
 #pragma comment(lib , "Common.lib")
 #pragma comment(lib ,"GameData.lib")
+
 //#include "HookAPI.h"
 #include "HookReg.h"
 // CTestDlg 对话框
+
+
+
 shareMemoryCli shareCli(MORE_OPEN_NUMBER);
 int shareindex = -1;
 //初始化HOOk
@@ -51,6 +55,7 @@ extern CTestDlg* pDlg;
 
 IMPLEMENT_DYNAMIC(CTestDlg, CDialogEx)
 
+
 CTestDlg::CTestDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CTestDlg::IDD, pParent)
 {
@@ -59,6 +64,7 @@ CTestDlg::CTestDlg(CWnd* pParent /*=NULL*/)
 
 CTestDlg::~CTestDlg()
 {
+	lua_close(L);
 }
 
 void CTestDlg::DoDataExchange(CDataExchange* pDX)
@@ -81,7 +87,6 @@ BEGIN_MESSAGE_MAP(CTestDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_GJ, &CTestDlg::OnBnClickedBtnGj)
 	ON_BN_CLICKED(IDC_BTN_TESTCALL, &CTestDlg::OnBnClickedBtnTestcall)
 END_MESSAGE_MAP()
-
 
 // CTestDlg 消息处理程序
 
@@ -233,12 +238,38 @@ void CTestDlg::OnBnClickedButton1()
 //	return ret;
 //}
 
+//定义 Lua 调用的 C++ 函数
+int LuaAutoAttack(lua_State* L)
+{
+	gamecall* g = static_cast<gamecall*>(lua_touserdata(L, lua_upvalueindex(1)));
+	bool bl = static_cast<bool>(luaL_checknumber(L, 1));
+		g->start_end_AutoAttack(bl);
+	return 0;
+}
+
+//注册 Lua 函数:
+void RegisterLuaFunctions(lua_State* L, gamecall* g)
+{
+	lua_pushlightuserdata(L, g);
+	lua_pushcclosure(L, LuaAutoAttack, 1);
+	lua_setglobal(L, "autoattack");
+
+	//lua_pushlightuserdata(L, g);
+	//lua_pushcclosure(L, LuaLoginGame, 1);
+	//lua_setglobal(L, "loginGame");
+
+	// 注册其他函数...
+}
+
+
 BOOL CTestDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
  
 	// TODO:  在此添加额外的初始化
-
+	L = luaL_newstate();
+	luaL_openlibs(L);
+	RegisterLuaFunctions(L, &mfun); // 注册 Lua 函数
 
   //初始化共享内存,取得共享内存索引
 	if (!shareCli.openShareMemory())
@@ -285,6 +316,7 @@ bool CTestDlg:: initVariable()
 
 	return true;
 }
+
 
 /*
 函数功能:自动回收物品，将军团物品回收为经验，逆魔物品回收为元宝
@@ -1087,10 +1119,16 @@ void CTestDlg::OnBnClickedBtnGj()
 	}	
 }
 
-
+//lua脚本测试
 void CTestDlg::OnBnClickedBtnTestcall()
 {
-	// TODO: 在此添加控件通知处理程序代码
-
-
+	// 执行 Lua 脚本 .\\script\\test.lua
+	std::string scriptPath = (std::string)shareCli.m_pSMAllData->currDir+"\\script\\test.lua";
+	if (luaL_dofile(L, scriptPath.c_str()) != LUA_OK)
+	{
+		const char* error = lua_tostring(L, -1);
+		AfxMessageBox(CString(error));
+		lua_pop(L, 1);
+	}
+	
 }
