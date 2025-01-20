@@ -10,7 +10,7 @@
 #define Ground_Offset 0x412354 //地面物品遍历偏移
 
 
-
+/*call 参数*/
 #define CALL_ECX  0x135fb10 //所有call的ecx来源
 #define CALL_ECX_1 0x4E072C4 //寻路call的ecx
 #define CALL_ECX_2 0x0135FB08//按键CALL的ecx
@@ -21,6 +21,7 @@
 
 #define ID_LONGIN 0x8C00CFE5 //登录控件ID
 
+/*call*/
 #define CALL_LOGIN   0x689B90   //登录call
 #define CALL_PRESSKEY 0x0062C750 //按键call
 #define CALL_USESKILL 0x733640  //技能call地址
@@ -38,6 +39,7 @@
 #define CALL_START_END_ATTACK 0x5D2E60 //开关自动挂机
 #define CALL_OPEN_BAG_REC 0x6AC2D0 //获取角色对象
 #define CALL_RCV_GOODS 0x68F490 //回收物品
+#define CALL_SUBMIT_INPUTBOX 0x006E41E0 //提交输入框内容call
 
 
 

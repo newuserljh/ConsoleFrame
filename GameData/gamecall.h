@@ -36,6 +36,7 @@ public:
 	bool RecovryGoods(DWORD goodsId);
 	bool RecovryGoods_To_Exp(DWORD goodsId, unsigned	vip_level);
 	bool RecovryGoods_To_Gold(DWORD goodsId, unsigned	vip_level);
+	bool SubmitInputbox(char* content);
 private:
 	static bool comp(const MONSTER_PROPERTY& a, const MONSTER_PROPERTY& b);
 	static bool comp_groud(const GROUND_GOODS& a, const GROUND_GOODS& b);
@@ -757,4 +758,33 @@ bool  gamecall::RecovryGoods_To_Gold(DWORD goodsId, unsigned vip_level)
 	bool rtn= RecovryGoods(goodsId);
 	ChooseCmd("@Recovery_Gold_KaiQu");
 	return	rtn;
+}
+
+/*
+函数功能:提交输入框内容
+参数一:提交的内容
+返回值：bool
+*/
+bool gamecall::SubmitInputbox(char* content)
+{
+	try
+	{
+		_asm
+		{
+			pushad
+			push 1
+			push content
+			mov ecx, dword ptr ds : [CALL_EDX]
+			push ecx
+			mov ecx, dword ptr ds : [CALL_ECX]
+			mov edx, CALL_SUBMIT_INPUTBOX
+			call edx
+			popad
+		}
+	}
+	catch (...)
+	{
+		return false;
+	}
+	return true;
 }

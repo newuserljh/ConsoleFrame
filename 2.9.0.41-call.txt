@@ -44,3 +44,27 @@
 00CA5CA | 57                    | push edi                           |
 00CA5CA | E8 E6979EFF           | call <woool.dat.sub_68F490>        |
 00CA5CA | 5F                    | pop edi                            |
+
+
+
+0054C550 | 8D4C24 18                | lea ecx,dword ptr ss:[esp+18]           |
+0054C554 | 51                       | push ecx                                |
+0054C555 | 6A 00                    | push 0                                  |
+0054C557 | EB 14                    | jmp woool.dat.54C56D                    |
+0054C559 | 0FB695 0D030000          | movzx edx,byte ptr ss:[ebp+30D]         |
+0054C560 | 8B0D D4D91001            | mov ecx,dword ptr ds:[110D9D4]          |
+0054C566 | 52                       | push edx                                | 参数一：1
+0054C567 | 8D4424 18                | lea eax,dword ptr ss:[esp+18]           |
+0054C56B | 50                       | push eax                                | 参数二：输入框内容 string
+0054C56C | 51                       | push ecx                                | 参数三：[110d9d4]
+0054C56D | 8B0D 10FB3501            | mov ecx,dword ptr ds:[135FB10]          | ecx
+0054C573 | E8 687C1900              | call <woool.dat.sub_6E41E0>             | 提交输入框内容 call
+0054C578 | 8B8C24 18040000          | mov ecx,dword ptr ss:[esp+418]          |
+0054C57F | 64:890D 00000000         | mov dword ptr fs:[0],ecx                |
+0054C586 | 59                       | pop ecx                                 |
+0054C587 | 5F                       | pop edi                                 |
+0054C588 | 5E                       | pop esi                                 |
+0054C589 | 5D                       | pop ebp                                 |
+0054C58A | 8B8C24 04040000          | mov ecx,dword ptr ss:[esp+404]          |
+0054C591 | 33CC                     | xor ecx,esp                             |
+0054C593 | E8 A91A7B00              | call woool.dat.CFE041                   |
