@@ -32,10 +32,15 @@ public:
 	bool allowteam(std::string pName);
 	bool release_Promenade(void);
 	bool start_end_AutoAttack(int turn_flag);
+	bool OpenRecovry(unsigned vip_level);
+	bool RecovryGoods(DWORD goodsId);
+	bool RecovryGoods_To_Exp(DWORD goodsId, unsigned	vip_level);
+	bool RecovryGoods_To_Gold(DWORD goodsId, unsigned	vip_level);
 private:
 	static bool comp(const MONSTER_PROPERTY& a, const MONSTER_PROPERTY& b);
 	static bool comp_groud(const GROUND_GOODS& a, const GROUND_GOODS& b);
 };
+
 
 
 /*
@@ -200,6 +205,7 @@ bool gamecall::ChooseCmd(char* command)
 			push command
 			mov ecx, dword ptr ds : [CALL_ECX]
 			mov edx, dword ptr ds : [CALL_EDX]
+			push edx
 			mov edi, CALL_CHOOSE_CMD
 			call edi
 			popad
@@ -651,3 +657,104 @@ bool  gamecall::start_end_AutoAttack(int turn_flag)
 	return true;
 }
 
+/*
+函数功能:打开自动回收对话框
+参数一:VIP等级, vip等级>=1时，使用随身包裹回收，VIP等级为0时，使用NPC回收
+返回值：bool
+*/
+bool  gamecall::OpenRecovry(unsigned vip_level)
+{
+	if (vip_level>0)
+	{
+		try
+		{
+			_asm
+			{
+				pushad
+				push 0xFFFF
+				push 0xFFFF
+				push 0
+				push 0
+				push 0xF14DE0
+				push 0xFFFFFFEC
+				mov ecx, dword ptr ds : [CALL_ECX]
+				mov edx, CALL_OPEN_BAG_REC
+				call edx
+				popad
+			}
+		}
+		catch (...)
+		{
+			return false;
+		}
+	}
+	else
+	{
+		if (OpendNPC(NPC_ZJ_RCV))
+		{
+			if ((*(DWORD*)P_CURRENT_NPC_DLG == NPC_ZJ_RCV))return true;
+		}
+		return false;
+	}
+	return true;
+}
+
+/*
+函数功能:物品回收，根据对话框选择的回收经验或者元宝金币
+参数一:物品ID
+返回值：bool
+*/
+bool  gamecall::RecovryGoods(DWORD goodsId)
+{
+	try
+	{
+		_asm
+		{
+			pushad
+			push goodsId
+			mov ecx,P_CURRENT_NPC_DLG
+			mov ecx, dword ptr ds : [ecx]
+			push ecx
+			mov ecx, dword ptr ds : [CALL_ECX]
+			mov edx, CALL_RCV_GOODS
+			call edx
+			popad
+		}
+	}
+	catch (...)
+	{
+		return false;
+	}
+	return true;
+}
+
+
+/*
+函数功能:物品回收经验
+参数一:物品ID
+参数二:VIP等级
+返回值：bool
+*/
+bool  gamecall::RecovryGoods_To_Exp(DWORD goodsId,unsigned vip_level)
+{
+	OpenRecovry(vip_level);
+	ChooseCmd("@Recovery_Exp_KaiQu");
+	bool rtn= RecovryGoods(goodsId);
+	ChooseCmd("@Recovery_Exp_KaiQu");
+	return rtn;
+}
+
+/*
+函数功能:物品回收元宝或金币
+参数一:物品ID
+参数二:VIP等级
+返回值：bool
+*/
+bool  gamecall::RecovryGoods_To_Gold(DWORD goodsId, unsigned vip_level)
+{
+	OpenRecovry(vip_level);
+	ChooseCmd("@Recovery_Gold_KaiQu");
+	bool rtn= RecovryGoods(goodsId);
+	ChooseCmd("@Recovery_Gold_KaiQu");
+	return	rtn;
+}

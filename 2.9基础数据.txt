@@ -16,6 +16,7 @@ p_Role_Mp==Role_Hp+8
 p_Role_Mp_Max==Role_Hp+c
 p_Role_Map_X==Role_Hp+2c
 p_Role_Map_Y==Role_Hp+30
+p_Role_VIP_Level==[0x135fb30  ]+0x5cc //VIP等级
 p_Role_GJL_L==[0x135fb30  ]+0xA5C  //攻击
 p_Role_GJL_H==[0x135fb30  ]+0xA60
 p_Role_MFL_L==[0x135fb30  ]+0xA64 //魔法

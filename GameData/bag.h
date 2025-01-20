@@ -15,10 +15,13 @@ public:
 	int caclGoodsNumber(std::string pName);
 	int getGoodsIndex(std::string pName);
 	int ifHasPoison(void);
-
+	int caclMpGoodsNumer();
+	int caclHpGoodsNumer();
 	DWORD maxSize; //背包总大小
 	DWORD bSpace;//空格子数量
 	DWORD bagBase;//背包基地址
-    GOODS_PROPERTY m_bag[MAX_BAG_SIZE];
+	GOODS_PROPERTY m_bag[MAX_BAG_SIZE];//背包物品
+	int getBagSpace();
+
 };
 

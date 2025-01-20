@@ -14,6 +14,7 @@
 #include "utils.h"
 #include "gamecall.h"
 #include "shareMemoryCli.h"
+#include "config.h"
 #pragma comment(lib , "Common.lib")
 #pragma comment(lib ,"GameData.lib")
 //#include "HookAPI.h"
@@ -284,6 +285,213 @@ bool CTestDlg:: initVariable()
 	return true;
 }
 
+/*
+函数功能:自动回收物品，将军团物品回收为经验，逆魔物品回收为元宝
+*/
+void CTestDlg::AutoRecvGoods(void)
+{
+	/*回收经验*/
+	if (r_bag.caclGoodsNumber("幽冥项链") > 0) {
+		mfun.RecovryGoods_To_Exp(*(r_bag.m_bag[r_bag.getGoodsIndex("幽冥项链")].ID),*r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("阎罗手套") > 0) {
+		mfun.RecovryGoods_To_Exp(*(r_bag.m_bag[r_bag.getGoodsIndex("阎罗手套")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("光芒手套") > 0) {
+		mfun.RecovryGoods_To_Exp(*(r_bag.m_bag[r_bag.getGoodsIndex("光芒手套")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("天珠项链") > 0) {
+		mfun.RecovryGoods_To_Exp(*(r_bag.m_bag[r_bag.getGoodsIndex("天珠项链")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("心灵护腕") > 0) {
+		mfun.RecovryGoods_To_Exp(*(r_bag.m_bag[r_bag.getGoodsIndex("心灵护腕")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("白金戒指") > 0) {
+		mfun.RecovryGoods_To_Exp(*(r_bag.m_bag[r_bag.getGoodsIndex("白金戒指")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("生命项链") > 0) {
+		mfun.RecovryGoods_To_Exp(*(r_bag.m_bag[r_bag.getGoodsIndex("生命项链")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("魔魂手镯") > 0) {
+		mfun.RecovryGoods_To_Exp(*(r_bag.m_bag[r_bag.getGoodsIndex("魔魂手镯")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("红宝戒指") > 0) {
+		mfun.RecovryGoods_To_Exp(*(r_bag.m_bag[r_bag.getGoodsIndex("红宝戒指")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("龙戒") > 0) {
+		mfun.RecovryGoods_To_Exp(*(r_bag.m_bag[r_bag.getGoodsIndex("龙戒")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("记忆项链") > 0) {
+		mfun.RecovryGoods_To_Exp(*(r_bag.m_bag[r_bag.getGoodsIndex("记忆项链")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("记忆头盔") > 0) {
+		mfun.RecovryGoods_To_Exp(*(r_bag.m_bag[r_bag.getGoodsIndex("记忆头盔")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("战神(男)") > 0) {
+		mfun.RecovryGoods_To_Exp(*(r_bag.m_bag[r_bag.getGoodsIndex("战神(男)")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("战神(女)") > 0) {
+		mfun.RecovryGoods_To_Exp(*(r_bag.m_bag[r_bag.getGoodsIndex("战神(女)")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("幽灵战甲(男)") > 0) {
+		mfun.RecovryGoods_To_Exp(*(r_bag.m_bag[r_bag.getGoodsIndex("幽灵战甲(男)")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("幽灵战甲(女)") > 0) {
+		mfun.RecovryGoods_To_Exp(*(r_bag.m_bag[r_bag.getGoodsIndex("幽灵战甲(女)")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("恶魔长袍(男)") > 0) {
+		mfun.RecovryGoods_To_Exp(*(r_bag.m_bag[r_bag.getGoodsIndex("恶魔长袍(男)")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("恶魔长袍(女)") > 0) {
+		mfun.RecovryGoods_To_Exp(*(r_bag.m_bag[r_bag.getGoodsIndex("恶魔长袍(女)")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("离别钩") > 0) {
+		mfun.RecovryGoods_To_Exp(*(r_bag.m_bag[r_bag.getGoodsIndex("离别钩")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("方天画戢") > 0) {
+		mfun.RecovryGoods_To_Exp(*(r_bag.m_bag[r_bag.getGoodsIndex("方天画戢")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("井中月") > 0) {
+		mfun.RecovryGoods_To_Exp(*(r_bag.m_bag[r_bag.getGoodsIndex("井中月")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("铜锤") > 0) {
+		mfun.RecovryGoods_To_Exp(*(r_bag.m_bag[r_bag.getGoodsIndex("铜锤")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("无极") > 0) {
+		mfun.RecovryGoods_To_Exp(*(r_bag.m_bag[r_bag.getGoodsIndex("无极")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("魔法权杖") > 0) {
+		mfun.RecovryGoods_To_Exp(*(r_bag.m_bag[r_bag.getGoodsIndex("魔法权杖")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(500);
+	}
+
+	/*回收元宝*/
+	if (r_bag.caclGoodsNumber("恶魔铃") > 0) {
+		mfun.RecovryGoods_To_Gold(*(r_bag.m_bag[r_bag.getGoodsIndex("恶魔铃")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("龙鳞手镯") > 0) {
+		mfun.RecovryGoods_To_Gold(*(r_bag.m_bag[r_bag.getGoodsIndex("龙鳞手镯")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("碧螺戒指") > 0) {
+		mfun.RecovryGoods_To_Gold(*(r_bag.m_bag[r_bag.getGoodsIndex("碧螺戒指")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("魔龙腰带") > 0) {
+		mfun.RecovryGoods_To_Gold(*(r_bag.m_bag[r_bag.getGoodsIndex("魔龙腰带")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("魔龙法靴") > 0) {
+		mfun.RecovryGoods_To_Gold(*(r_bag.m_bag[r_bag.getGoodsIndex("魔龙法靴")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("黑铁头盔") > 0) {
+		mfun.RecovryGoods_To_Gold(*(r_bag.m_bag[r_bag.getGoodsIndex("黑铁头盔")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("绿色项链") > 0) {
+		mfun.RecovryGoods_To_Gold(*(r_bag.m_bag[r_bag.getGoodsIndex("绿色项链")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("猛士手镯") > 0) {
+		mfun.RecovryGoods_To_Gold(*(r_bag.m_bag[r_bag.getGoodsIndex("猛士手镯")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("力量戒指") > 0) {
+		mfun.RecovryGoods_To_Gold(*(r_bag.m_bag[r_bag.getGoodsIndex("力量戒指")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("雷霆腰带") > 0) {
+		mfun.RecovryGoods_To_Gold(*(r_bag.m_bag[r_bag.getGoodsIndex("雷霆腰带")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("雷霆战靴") > 0) {
+		mfun.RecovryGoods_To_Gold(*(r_bag.m_bag[r_bag.getGoodsIndex("雷霆战靴")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("灵魂项链") > 0) {
+		mfun.RecovryGoods_To_Gold(*(r_bag.m_bag[r_bag.getGoodsIndex("灵魂项链")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("三眼护腕") > 0) {
+		mfun.RecovryGoods_To_Gold(*(r_bag.m_bag[r_bag.getGoodsIndex("三眼护腕")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("泰坦戒指") > 0) {
+		mfun.RecovryGoods_To_Gold(*(r_bag.m_bag[r_bag.getGoodsIndex("泰坦戒指")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("风云腰带") > 0) {
+		mfun.RecovryGoods_To_Gold(*(r_bag.m_bag[r_bag.getGoodsIndex("风云腰带")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+	if (r_bag.caclGoodsNumber("风云道靴") > 0) {
+		mfun.RecovryGoods_To_Gold(*(r_bag.m_bag[r_bag.getGoodsIndex("风云道靴")].ID), *r.m_roleproperty.VIP_Level);
+		Sleep(200);
+	}
+}
+
+/*
+函数功能:回城处理
+*/
+void CTestDlg::AutoReturnToCity()
+{
+	// 检查背包中是否有回城卷轴
+	if (r_bag.caclGoodsNumber("永久回城神石") > 0)
+	{
+		// 使用回城卷轴
+		mfun.useGoods(r_bag.getGoodsIndex("永久回城神石"));
+		Sleep(2000); // 等待回城操作完成
+
+		// 回城后处理包裹
+		AutoRecvGoods();
+
+		// 检查背包空间
+		if (r_bag.getBagSpace() < 10)
+		{
+			// 背包空间不足，处理多余物品
+			if (r_bag.caclGoodsNumber("强效太阳神水") > REMAIN_TAIYANG)
+			{
+				mfun.useGoods(r_bag.getGoodsIndex("强效太阳神水"));
+				Sleep(100);
+			}
+			if (r_bag.caclGoodsNumber("治疗药水") > REMAIN_TAIYANG)
+			{
+				mfun.useGoods(r_bag.getGoodsIndex("治疗药水"));
+				Sleep(200);
+			}
+		}
+	}
+	else
+	{
+		// 背包中没有回城卷轴，提示用户
+		AfxMessageBox("背包中没有回城卷轴，请补充！");
+	}
+}
 
 void CTestDlg::OnBnClickedButton2()
 {
@@ -362,6 +570,9 @@ void CTestDlg::OnBnClickedButton8()
 		AppendText(m_edit2, s);
 		return;
 	}
+	s.Format("大小:%d   剩余: %d\n", r_bag.maxSize, r_bag.getBagSpace());
+	AppendText(m_edit2, s);
+
 	for (size_t i=0;i<r_bag.maxSize;i++)
 	{
 		if (*(r_bag.m_bag[i].ID))
@@ -370,6 +581,7 @@ void CTestDlg::OnBnClickedButton8()
 			AppendText(m_edit2, s);
 		}
 	}
+
 
 }
 
@@ -385,8 +597,6 @@ void CTestDlg::OnBnClickedButton5()
 	WaitForSingleObject(m_threadAttack, 60000);
 	WaitForSingleObject(m_threadPickup, 60000);
 }
-
-
 
 
 
@@ -635,7 +845,7 @@ UINT __cdecl CTestDlg::threadAttack(LPVOID p)
 	return 0;
 }
 
-/*捡物线程*/
+/*包裹处理*/
 UINT __cdecl CTestDlg::threadBagPocess(LPVOID p)
 {
 	CString s;
@@ -644,10 +854,44 @@ UINT __cdecl CTestDlg::threadBagPocess(LPVOID p)
 	AppendText(pDlg->m_edit2, s);
 	while (pDlg->tflag_attack)
 	{
-		if (r_bag.bSpace < 10)
+		if (r_bag.getBagSpace() < 35)
 		{
-			
+			pDlg->AutoRecvGoods();
+			if (r_bag.caclGoodsNumber("1个绑定元宝") > 0) {
+				mfun.useGoods(r_bag.getGoodsIndex("1个绑定元宝"));
+				Sleep(200);
+			}
+			if (r_bag.caclGoodsNumber("2个绑定元宝") > 0) {
+				mfun.useGoods(r_bag.getGoodsIndex("2个绑定元宝"));
+				Sleep(200);
+			}
+			if (r_bag.caclGoodsNumber("5个绑定元宝") > 0) {
+				mfun.useGoods(r_bag.getGoodsIndex("5个绑定元宝"));
+				Sleep(200);
+			}
+			if (r_bag.caclGoodsNumber("10个绑定元宝") > 0) {
+				mfun.useGoods(r_bag.getGoodsIndex("10个绑定元宝"));
+				Sleep(200);
+			}
+			if (r_bag.caclGoodsNumber("20个绑定元宝") > 0)
+			{
+				mfun.useGoods(r_bag.getGoodsIndex("20个绑定元宝"));
+				Sleep(200);
+			}
+	    }
+		if (r_bag.getBagSpace() < 10)
+		{
+			if (r_bag.caclGoodsNumber("强效太阳神水") > REMAIN_TAIYANG)
+			{
+				mfun.useGoods(r_bag.getGoodsIndex("强效太阳神水"));
+				Sleep(100);
+			}
+			if (r_bag.caclGoodsNumber("治疗药水") > REMAIN_TAIYANG) {
+				mfun.useGoods(r_bag.getGoodsIndex("治疗药水"));
+				Sleep(200);
+			}
 		}
+		Sleep(2000);
 	}
 	s.Format("处理包裹线程停止");
 	AppendText(pDlg->m_edit2, s);
@@ -655,7 +899,7 @@ UINT __cdecl CTestDlg::threadBagPocess(LPVOID p)
 }
 
 
-/*包裹处理*/
+/*捡物线程*/
 UINT __cdecl CTestDlg::threadPickup(LPVOID p)
 {
 	CString s;
@@ -820,15 +1064,19 @@ void CTestDlg::OnTimer(UINT_PTR nIDEvent)
 void CTestDlg::OnBnClickedBtnGj()
 {
 	// TODO: 使用内置自动打怪挂机
-	r.init();
-	pDlg->tflag_attack = !pDlg->tflag_attack;
-	if (pDlg->tflag_attack)
+	if (!r.init())return;
+	r_bag.maxSize = *r.m_roleproperty.Bag_Size;
+	r_bag.bagBase = (DWORD)r.m_roleproperty.p_Bag_Base;
+	r_bag.init();
+    tflag_attack = !tflag_attack;
+	if (tflag_attack)
 	{
-		pDlg->m_threadAttack = AfxBeginThread(threadAttack, (LPVOID)this);
+		m_threadAttack = AfxBeginThread(threadAttack, (LPVOID)this);
+		m_threadBagProcess = AfxBeginThread(threadBagPocess, (LPVOID)this);
 	}
 	else
 	{
-		WaitForSingleObject(pDlg->m_threadAttack, 60000);
-	}
-
+		WaitForSingleObject(m_threadAttack, 60000);
+		WaitForSingleObject(m_threadBagProcess, 60000);
+	}	
 }

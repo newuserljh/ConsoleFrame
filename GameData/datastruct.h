@@ -25,6 +25,7 @@ struct ROLE_PROPERTY
 	ROLE_PROPERTY();
 	~ROLE_PROPERTY();	
 	MONSTER_PROPERTY Object;
+	DWORD* VIP_Level; //+0x5cc VIP等级
 	DWORD* Job;//  +0xe4 //职业 0/战士  1/法师 2/道士
 	DWORD* Level;// +0xec //等级
 	DWORD* Sex; //+0xdc 性别 0男 1女

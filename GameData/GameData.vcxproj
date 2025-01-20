@@ -87,6 +87,7 @@
     <ClInclude Include="skill.h" />
     <ClInclude Include="task.h" />
     <ClInclude Include="team.h" />
+    <ClInclude Include="config.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bag.cpp" />

@@ -36,3 +36,27 @@
 #define CALL_ALLOW_TEAM 0x7358C0    //同意组队请求
 #define CALL_RELEASE_PROMENADE 0x754F80 //释放元神
 #define CALL_START_END_ATTACK 0x5D2E60 //开关自动挂机
+#define CALL_OPEN_BAG_REC 0x6AC2D0 //获取角色对象
+#define CALL_RCV_GOODS 0x68F490 //回收物品
+
+
+
+
+#define P_CURRENT_NPC_DLG 0x110d9d4 //当前对话NPC ID指针 ,跟选择对话call的EDX指针一样
+/*NPC ID*/
+#define NPC_ZJ_RCV 0xcc716a0 //中州 物资回收使者
+#define NPC_ZJ_CZHK 0xcc74300 //中州 充值回馈
+#define NPC_ZJ_FBHW 0x d411d60 //中州 副本护卫
+#define NPC_ZJ_ZHP 0xcc3da30 //中州 杂货铺掌柜
+#define NPC_ZJ_LB 0xcd141e0 //中州 老兵
+#define NPC_ZJ_RCRW 0xcc6d410 //中州 日常任务仙子 
+#define NPC_ZJ_ZBKJ 0xcc70070 //中州 珍宝空间 
+#define NPC_ZJ_YXSZ 0xcc58300 //中州 游戏使者
+#define NPC_ZJ_RANDOM 0xcc9e0e0 //中州 随机传送门   
+#define NPC_ZJ_YDZG 0xcc36b40 //中州 药店掌柜 ID: cc36b40
+#define NPC_ZJ_BJCSM 0xcc75930 //中州 便捷传送门 ID: cc75930
+#define NPC_ZJ_BS 0xcc6bde0 //中州 镖师 ID: cc6bde0
+#define NPC_ZJ_TJ 0xcc328b0 //中州 铁匠 ID: cc328b0
+#define NPC_ZJ_CK 0xcc3add0 //中州 仓库保管员 ID: cc3add0
+#define NPC_ZJ_SJLR 0xcc4faa0 //中州 赏金猎人 ID: cc4faa0
+                                

@@ -50,6 +50,8 @@ public:
 	CWinThread* m_threadPickup;
 	bool tflag_pickup;
 	static UINT __cdecl threadPickup(LPVOID lparam);
+
+	CWinThread* m_threadBagProcess;
 	static UINT __cdecl CTestDlg::threadBagPocess(LPVOID lparam);
 
 	/*组队设置*/
@@ -60,6 +62,11 @@ public:
 
 	CCriticalSection g_criticalsection; //边界锁，线程间同步用的。
 
+
+	void AutoRecvGoods(void);//回收将军经验，逆魔装备元宝
+
+
+	void AutoReturnToCity(); // 回城处理函数声明
 	
 	
 	afx_msg void OnTimer(UINT_PTR nIDEvent);

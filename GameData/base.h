@@ -7,6 +7,7 @@
 #include <vector>
 #include <sstream>
 #include <memory>
+#include "config.h"
 class base
 {
 public:

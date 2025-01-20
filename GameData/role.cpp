@@ -23,6 +23,7 @@ bool role::init()
 		m_roleproperty.Object.X = (DWORD*)(*(DWORD*)RoleBase +0xac);
 		m_roleproperty.Object.Y = (DWORD*)(*(DWORD*)RoleBase + 0xb0);
 		m_roleproperty.Object.IsPosion = (BYTE*)(*(DWORD*)RoleBase + 0x34b  );
+		m_roleproperty.VIP_Level = (DWORD*)(*(DWORD*)RoleBase + 0x5cc);
 		m_roleproperty.Job = (DWORD*)(*(DWORD*)RoleBase + 0xe4);
 		m_roleproperty.Level = (DWORD*)(*(DWORD*)RoleBase + 0xec);
 		m_roleproperty.Sex = (DWORD*)(*(DWORD*)RoleBase + 0xdc);

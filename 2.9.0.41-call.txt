@@ -6,3 +6,41 @@
 007DFDF3 | B9 F0B4D603              | mov ecx,woool.dat.3D6B4F0               | 常量 mov ecx, 0x3D6B4F0
 007DFDF8 | E8 6330DFFF              | call <woool.dat.sub_5D2E60>             | 自动打怪开关call
 007DFDFD | EB 3D                    | jmp woool.dat.7DFE3C                    |
+
+
+
+00CB775 | 8B0D 10FB3501         | mov ecx,dword ptr ds:[135FB10]     | ecx:NtUserPeekMessage+C
+00CB775 | 68 FFFF0000           | push FFFF                          |
+00CB776 | 68 FFFF0000           | push FFFF                          |
+00CB776 | 6A 00                 | push 0                             |
+00CB776 | 6A 00                 | push 0                             |
+00CB776 | 68 E04DF100           | push woool.dat.F14DE0              | F14DE0:"@main"
+00CB777 | 6A EC                 | push FFFFFFEC                      |
+00CB777 | E8 574B9FFF           | call <woool.dat.sub_6AC2D0>        | 打开包裹中的 物品回收
+00CB777 | E9 36030000           | jmp woool.dat.CB7AB4               |
+00CB777 | 3BB7 98020000         | cmp esi,dword ptr ds:[edi+298]     |
+
+
+00CA5C7 | 57                    | push edi                           |
+00CA5C7 | E8 54979EFF           | call <woool.dat.sub_68F3D0>        |
+00CA5C7 | 5F                    | pop edi                            |
+00CA5C7 | 5E                    | pop esi                            |
+00CA5C7 | B0 01                 | mov al,1                           |
+00CA5C8 | 5D                    | pop ebp                            |
+00CA5C8 | C2 0C00               | ret C                              |
+00CA5C8 | 6A 02                 | push 2                             |
+00CA5C8 | EB DC                 | jmp woool.dat.CA5C64               |
+00CA5C8 | 8B0D 10FB3501         | mov ecx,dword ptr ds:[135FB10]     | ecx
+00CA5C8 | 56                    | push esi                           | 物品ID
+00CA5C8 | 57                    | push edi                           | [0110D9D4] 基质
+00CA5C9 | E8 FB979EFF           | call <woool.dat.sub_68F490>        | 提交物品到回收框？
+00CA5C9 | 5F                    | pop edi                            |
+00CA5C9 | 5E                    | pop esi                            |
+00CA5C9 | B0 01                 | mov al,1                           |
+00CA5C9 | 5D                    | pop ebp                            |
+00CA5C9 | C2 0C00               | ret C                              |
+00CA5C9 | 8B0D 10FB3501         | mov ecx,dword ptr ds:[135FB10]     |
+00CA5CA | 56                    | push esi                           |
+00CA5CA | 57                    | push edi                           |
+00CA5CA | E8 E6979EFF           | call <woool.dat.sub_68F490>        |
+00CA5CA | 5F                    | pop edi                            |
