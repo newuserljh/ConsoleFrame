@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Console", "Console\Console.vcxproj", "{A0C441F8-7685-48D1-8E6F-13FA17D60BFD}"
 EndProject
@@ -9,13 +9,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GameData", "GameData\GameDa
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestDll", "TestDll\TestDll.vcxproj", "{FC2B9039-0004-4835-9A91-EF0A5337F268}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GameDll", "GameDll\GameDll.vcxproj", "{45D4994E-2CCA-4444-9EB0-571AE42BDB13}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "d3d8Inject", "d3d8Inject\d3d8Inject.vcxproj", "{D4BC161A-3C9B-4966-979B-2B314D659467}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "Common\Common.vcxproj", "{A4A68ADF-6355-485C-9563-56049DAD2AF5}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "shareMemTest", "shareMemTest\shareMemTest.vcxproj", "{6A1A166A-E1EB-49FB-8DF5-F9D9D20D6CE4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,22 +29,10 @@ Global
 		{FC2B9039-0004-4835-9A91-EF0A5337F268}.Debug|Win32.Build.0 = Debug|Win32
 		{FC2B9039-0004-4835-9A91-EF0A5337F268}.Release|Win32.ActiveCfg = Release|Win32
 		{FC2B9039-0004-4835-9A91-EF0A5337F268}.Release|Win32.Build.0 = Release|Win32
-		{45D4994E-2CCA-4444-9EB0-571AE42BDB13}.Debug|Win32.ActiveCfg = Debug|Win32
-		{45D4994E-2CCA-4444-9EB0-571AE42BDB13}.Debug|Win32.Build.0 = Debug|Win32
-		{45D4994E-2CCA-4444-9EB0-571AE42BDB13}.Release|Win32.ActiveCfg = Release|Win32
-		{45D4994E-2CCA-4444-9EB0-571AE42BDB13}.Release|Win32.Build.0 = Release|Win32
-		{D4BC161A-3C9B-4966-979B-2B314D659467}.Debug|Win32.ActiveCfg = Debug|Win32
-		{D4BC161A-3C9B-4966-979B-2B314D659467}.Debug|Win32.Build.0 = Debug|Win32
-		{D4BC161A-3C9B-4966-979B-2B314D659467}.Release|Win32.ActiveCfg = Release|Win32
-		{D4BC161A-3C9B-4966-979B-2B314D659467}.Release|Win32.Build.0 = Release|Win32
 		{A4A68ADF-6355-485C-9563-56049DAD2AF5}.Debug|Win32.ActiveCfg = Debug|Win32
 		{A4A68ADF-6355-485C-9563-56049DAD2AF5}.Debug|Win32.Build.0 = Debug|Win32
 		{A4A68ADF-6355-485C-9563-56049DAD2AF5}.Release|Win32.ActiveCfg = Release|Win32
 		{A4A68ADF-6355-485C-9563-56049DAD2AF5}.Release|Win32.Build.0 = Release|Win32
-		{6A1A166A-E1EB-49FB-8DF5-F9D9D20D6CE4}.Debug|Win32.ActiveCfg = Debug|Win32
-		{6A1A166A-E1EB-49FB-8DF5-F9D9D20D6CE4}.Debug|Win32.Build.0 = Debug|Win32
-		{6A1A166A-E1EB-49FB-8DF5-F9D9D20D6CE4}.Release|Win32.ActiveCfg = Release|Win32
-		{6A1A166A-E1EB-49FB-8DF5-F9D9D20D6CE4}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
