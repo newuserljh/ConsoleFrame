@@ -1,0 +1,65 @@
+
+@Recovery_Exp_KaiQu            
+@Recovery_Gold_KaiQu
+ 
+
+与中州老兵对话 选择 快速到达其他地区  @main1..........  
+                    选择 去西域奇境 @west
+                     选择 确定去往西域 @west1
+ 
+
+与中州老兵对话 选择 快速到达其他地区  @main1..........  
+                    选择 我要去皇宫 @Shop_GO&SH000&14&52
+                     选择 确定去往西域 @west1
+
+与西域老兵对话 选择 快速到达其他地区  @main1..........
+                    选择 去通天塔 @ttta
+                     选择 我要去 @ta
+
+与赏金猎人对话 选择 交还赏金令牌  @givenpai         
+
+与充值回馈对话 选择神行千里  @Vip_神行千里&1
+                    选择 下一页 @Vip_神行千里&2
+                      选择 下一页 @Vip_神行千里&3
+                     选择 逆魔古刹四层 @Vip_Map&S018&160@293&3
+
+
+与游戏活动对话 选择 领取加群礼包 @领取加群礼包
+                    选择 领取每日加群福利 @PromoteGift
+                    wooolc2024
+
+与日常任务仙子对话 选择 每日任务 @toTaskMenu
+                    选择 接取任务 @toAcceptTask
+			选择 完成任务 @toCompleteTask
+              		选择 删除任务 @EndOffTask
+ 		选择 确定删除任务 @EndOffTask1
+			选择 元宝完成任务 @toCompleteTaskAuto
+                      选择 确定 @toCompleteTaskAuto0&6
+			选择 绑定元宝完成任务 @toCompleteTaskAutoUseBindYuanBao
+                      选择 确定 @toCompleteTaskAutoUseBindYuanBao_KOUYB&2
+
+与中州皇宫 每日免费福利 对话 选择 领取每日福利  @玩家福利123  
+                    选择 领取普通玩家每日福利 @玩家福利
+        
+
+
+与中州皇宫 钱庄老板 对话 选择 金币兑换元宝  @Everyday_yuanbao  
+                    选择 我要去皇宫 @Shop_GO&SH000&14&52
+                     选择 确定去往西域 @west1
+
+
+
+与中州老兵对话 选择 挑战炼狱  @_LB_newlianyu
+ 				选择 进入 @_LB_newenter
+
+与海岛 炼狱传送门 对话 选择 直接前往滨海平原 @gonew
+
+与滨海平原 炼狱传送门 对话 选择 直接前往密林 @gomap&MH012&35&95
+
+与密林 炼狱传送门 对话 选择 我准备好了，前进 @next2
+
+
+
+
+
+

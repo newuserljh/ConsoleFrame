@@ -15,6 +15,8 @@
 #define IDC_BUTTON9                     2010
 #define IDC_BUTTON10                    2016
 #define IDC_BTN_GJ                      2016
+#define IDC_BUTTON11                    2017
+#define IDC_BTN_TESTCALL                2017
 #define IDD_DLGTEST                     4000
 #define IDC_CHK_TEAM                    5000
 
@@ -24,7 +26,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        2004
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         2017
+#define _APS_NEXT_CONTROL_VALUE         2018
 #define _APS_NEXT_SYMED_VALUE           2000
 #endif
 #endif

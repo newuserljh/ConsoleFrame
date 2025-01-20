@@ -79,6 +79,7 @@ BEGIN_MESSAGE_MAP(CTestDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_CHK_TEAM, &CTestDlg::OnBnClickedChkTeam)
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_BTN_GJ, &CTestDlg::OnBnClickedBtnGj)
+	ON_BN_CLICKED(IDC_BTN_TESTCALL, &CTestDlg::OnBnClickedBtnTestcall)
 END_MESSAGE_MAP()
 
 
@@ -517,7 +518,12 @@ void CTestDlg::OnBnClickedButton2()
 	AppendText(m_edit2, s);
 	for (size_t i = 0; i < m_mon.m_monsterList.size(); i++)
 	{
-		s.Format("%s ID: %x\n", m_mon.m_monsterList[i].pName, *(m_mon.m_monsterList[i].ID));
+		s.Format("%s ID: %x, 坐标(x,y)：%d, %d   距离：%.2f\n",
+			m_mon.m_monsterList[i].pName, 
+			*(m_mon.m_monsterList[i].ID),
+			*(m_mon.m_monsterList[i].X),
+			*(m_mon.m_monsterList[i].Y),
+			mfun.caclDistance(*(r.m_roleproperty.Object.X), *(r.m_roleproperty.Object.Y), *(m_mon.m_monsterList[i].X), *(m_mon.m_monsterList[i].Y)));
 		AppendText(m_edit2, s);
 	}
 
@@ -1079,4 +1085,12 @@ void CTestDlg::OnBnClickedBtnGj()
 		WaitForSingleObject(m_threadAttack, 60000);
 		WaitForSingleObject(m_threadBagProcess, 60000);
 	}	
+}
+
+
+void CTestDlg::OnBnClickedBtnTestcall()
+{
+	// TODO: 在此添加控件通知处理程序代码
+
+
 }

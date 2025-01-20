@@ -72,4 +72,5 @@ public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnBnClickedButton10();
 	afx_msg void OnBnClickedBtnGj();
+	afx_msg void OnBnClickedBtnTestcall();
 };

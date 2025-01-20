@@ -59,4 +59,30 @@
 #define NPC_ZJ_TJ 0xcc328b0 //中州 铁匠 ID: cc328b0
 #define NPC_ZJ_CK 0xcc3add0 //中州 仓库保管员 ID: cc3add0
 #define NPC_ZJ_SJLR 0xcc4faa0 //中州 赏金猎人 ID: cc4faa0
-                                
+
+#define NPC_ZJ_HG_MRMFFL 0xcc60820 //中州皇宫 每日免费福利 ID: cc60820
+#define NPC_ZJ_HG_TSL 0xcc5c590//中州皇宫 太史令 ID: cc5c590
+#define NPC_ZJ_HG_QZLB 0xcc5dbc0 //中州皇宫 钱庄老板 ID: cc5dbc0
+#define NPC_ZJ_HG_OZZ 0xcc5af60 //中州皇宫 欧治子 ID: cc5af60
+#define NPC_ZJ_HG_JZL 0xcc5f1f0 //中州皇宫 金子陵 ID: cc5f1f0
+#define NPC_ZJ_HG_GW 0xccabec0 //中州皇宫 国王 ID: ccabec0
+
+#define NPC_XY_LB 0xcceef40 //西域奇境 老兵 ID: cceef40
+
+#define NPC_LY_HD_MJCSM 0xcde4550 //海岛 魔镜传送门 ID: cde4550
+#define NPC_LY_HD_LYCSM 0xcde71b0 //海岛 炼狱传送门 ID: cde71b0
+#define NPC_LY_BHPY_FHCSM 0xcd98fb0 //滨海平原 返回海岛传送门 ID: cd98fb0
+#define NPC_LY_BHPY_LYCSM 0xcd8ad90 //滨海平原 炼狱传送门 传送门 ID: cd8ad90
+
+#define NPC_LY_ML_FHCSM 0xcd97980 //密林 返回海岛传送门 ID: cd97980
+#define NPC_LY_ML_LYCSM 0xcd89760 //密林 炼狱传送门 ID: cd89760
+
+
+
+
+
+
+
+
+
+
