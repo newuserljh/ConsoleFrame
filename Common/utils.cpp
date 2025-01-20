@@ -514,3 +514,56 @@ std::string tools::GetCurrDir()
 
 	 return true;
  }
+
+
+ /*
+函数功能： 劫持 EIP（指令指针寄存器）来注入 DLL 到目标进程中
+参数1：dll路径
+参数2：注入目标进程的的进程信息 PROCESS_INFORMATION 结构体
+返回值：
+*/
+ bool tools::eipinjectDll(WCHAR* dllname, PROCESS_INFORMATION pi) {
+
+	 SuspendThread(pi.hThread); //挂起线程 
+	 CONTEXT ct = { 0 };
+	 ct.ContextFlags = CONTEXT_CONTROL;
+	 GetThreadContext(pi.hThread, &ct); //获取，保存线程寄存器相关 
+
+	 DWORD dwSize = sizeof(WCHAR) * 1024; //0-0x100 写代码 之后写数据 
+	 BYTE* pProcessMem = (BYTE*)::VirtualAllocEx(pi.hProcess, NULL, dwSize, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	 if (NULL == pProcessMem)return  false;
+	 DWORD dwWrited = 0;
+	 if (!::WriteProcessMemory(pi.hProcess, (pProcessMem + 0x100), (LPVOID)dllname, //先把路径（数据）写到内存里，从0x100开始 
+		 (wcslen(dllname) + 1) * sizeof(WCHAR), &dwWrited))return false;
+
+	 // 获取 LoadLibraryW 函数地址
+	 FARPROC pLoadLibraryW = (FARPROC)::GetProcAddress(::GetModuleHandle("Kernel32"), "LoadLibraryW");
+	 if (NULL == pLoadLibraryW)return false;
+
+	 // 构造 ShellCode
+	 BYTE ShellCode[32] = { 0 };
+	 DWORD* pdwAddr = NULL;
+
+	 ShellCode[0] = 0x60; // pushad 
+	 ShellCode[1] = 0x9c; // pushfd 
+	 ShellCode[2] = 0x68; // push 
+	 pdwAddr = (DWORD*)&ShellCode[3]; // ShellCode[3/4/5/6] 
+	 *pdwAddr = (DWORD)(pProcessMem + 0x100);
+	 ShellCode[7] = 0xe8;//call 
+	 pdwAddr = (DWORD*)&ShellCode[8]; // ShellCode[8/9/10/11] 
+	 *pdwAddr = (DWORD)pLoadLibraryW - ((DWORD)(pProcessMem + 7) + 5); // 因为直接call地址了，所以对应机器码需要转换，计算VA 
+	 ShellCode[12] = 0x9d; // popfd 
+	 ShellCode[13] = 0x61; // popad 
+	 ShellCode[14] = 0xe9; // jmp 
+	 pdwAddr = (DWORD*)&ShellCode[15]; // ShellCode[15/16/17/18] 
+	 *pdwAddr = ct.Eip - ((DWORD)(pProcessMem + 14) + 5); //因为直接jmp地址了，所以对应机器码需要转换，计算VA 
+
+	 // 将 ShellCode 写入目标进程内存
+	 if (!::WriteProcessMemory(pi.hProcess, pProcessMem, ShellCode, sizeof(ShellCode), &dwWrited))return false;
+
+	 // 修改 EIP 指向 ShellCode
+	 ct.Eip = (DWORD)pProcessMem;
+	 ::SetThreadContext(pi.hThread, &ct);
+	 ::ResumeThread(pi.hThread);
+	 return true;
+ }

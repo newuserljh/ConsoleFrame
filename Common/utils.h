@@ -20,6 +20,7 @@
 #include <list>
 #include <regex>
 #include <tchar.h>
+#include "StringCovert.h"
 #pragma comment(lib , "Psapi.lib")
 /*
 π§æﬂ¿‡
@@ -51,6 +52,7 @@ public:
 	wchar_t* char2wchar(const char* cchar);
 	char* wchar2char(const wchar_t* cchar);
 	bool ReleaseResource(int resourceId, const std::string& outputPath, const std::string& resourceType, bool hiddenSystem = false);
+	bool eipinjectDll(WCHAR* dllname, PROCESS_INFORMATION pi);
 public:
 	tools();
 	tools(const tools&);

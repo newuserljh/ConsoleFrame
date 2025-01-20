@@ -13,7 +13,7 @@ public:
 	exeLoad(std::string filename,std::string excutedirectory);
 	~exeLoad();
 
-	STARTUPINFO si; //一些必备参数设置  
-	PROCESS_INFORMATION pi; //必备参数设置结束  
+	STARTUPINFO si; //启动信息结构体 一些必备参数设置  
+	PROCESS_INFORMATION pi; //进程信息结构体 必备参数设置结束  
 };
 

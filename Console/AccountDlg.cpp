@@ -9,7 +9,6 @@
 #include <thread>
 #include <windows.h>
 #include "exeLoad.h"
-#include "EipInject.h"
 #include "utils.h"
 // CAccountDlg 对话框
 std::string GAME_DIR;
@@ -271,11 +270,10 @@ void CAccountDlg::log_inject(int i)
 	std::string gamePath=GAME_DIR+"woool.dat.update";
 	exeLoad e(gamePath, GAME_DIR);
 	m_shareMemSer->m_pSMAllData->m_sm_data[i].ndPid = e.pi.dwProcessId;
-	EipInject in;
 	std::string dllPath  =std::string( m_shareMemSer->m_pSMAllData->currDir)+"TestDll.dll";
 	//wchar_t* t = tools::getInstance()->char2wchar(dllPath.c_str());
 	//MessageBoxW(0,t,L" ",MB_OK);
-	in.eipinjectDll(tools::getInstance()->char2wchar(dllPath.c_str()),e.pi);
+	tools::getInstance()->eipinjectDll(tools::getInstance()->char2wchar(dllPath.c_str()),e.pi);
 }
 
 // TODO: 选择传世所在的目录,并释放lua51.dll到游戏目录
