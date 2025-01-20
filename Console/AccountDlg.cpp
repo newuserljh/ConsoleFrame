@@ -304,7 +304,7 @@ void CAccountDlg::OnBnClickedBtnCsDir()
 		CreateDirectory(".\\cfg", NULL);
 		// 将选择的目录路径写入 cfg/gamedir.cfg 文件中
 		tools::getInstance()->write2file(".\\cfg\\gamedir.cfg", GAME_DIR.c_str(), std::ios::out /*此模式打开丢弃文件所有内容*/);
-		AfxMessageBox(GAME_DIR.c_str());
+		//AfxMessageBox(GAME_DIR.c_str());
 		//编辑框中显示所选内容
 		//CWnd* pWnd = GetDlgItem(IDC_EDIT_OUTNAME);
 		//pWnd->SetWindowText(szPath);
