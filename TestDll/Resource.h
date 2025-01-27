@@ -17,7 +17,6 @@
 #define IDC_BTN_GJ                      2016
 #define IDC_BUTTON11                    2017
 #define IDC_BTN_TESTCALL                2017
-#define IDC_BTN_REC_npc                 2018
 #define IDC_BTN_RECNPC                  2018
 #define IDD_DLGTEST                     4000
 #define IDC_CHK_TEAM                    5000

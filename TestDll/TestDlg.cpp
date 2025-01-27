@@ -1151,21 +1151,37 @@ _declspec(naked) void CallRecord()
 	_asm  popad
 	_asm ret
 }
-bool rec_flag = true;
 
+bool rec_flag = true;
 //hook录制NPC
 void CTestDlg::OnBnClickedBtnRecnpc()
 {
+	CButton* pButton = (CButton*)GetDlgItem(IDC_BTN_RECNPC);
+	CString s;
 	if (rec_flag)
 	{
-		hook_npc_cmd.hookReg(0xCAC543, 10, &CallRecord);
-		rec_flag = false;
-		//添加按钮修改名字的代码
+		if (hook_npc_cmd.hookReg(0xCAC543, 10, &CallRecord))
+		{
+			rec_flag = false;
+			s.Format("开始录制NPC对话，存储到/script/record.lua文件中");
+			AppendText(m_edit2, s);
+			//添加按钮修改名字的代码
+			if (pButton != nullptr)
+			{
+				pButton->SetWindowText(_T("停止录制"));
+			}
+		}
+
 	}
 	else
 	{
+		rec_flag = true;
 		hook_npc_cmd.Unhook();
+		if (pButton != nullptr)
+		{
+			pButton->SetWindowText(_T("录制NPC"));
+			s.Format("停止录制NPC对话");
+			AppendText(m_edit2, s);
+		}
 	}
-	
-
 }

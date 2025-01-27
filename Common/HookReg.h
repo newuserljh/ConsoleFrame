@@ -188,11 +188,12 @@ bool HookReg::hookReg(DWORD hookadd, UINT length, LPVOID MyCall)
 
 bool HookReg::Unhook()
 {
+
 	if (!VirtualProtectEx(handle, (LPVOID)hookAddr, hookLength, PAGE_EXECUTE_READWRITE, &OldProtect))
 	{
 		return false;
 	}
-	if (!WriteProcessMemory(handle, (LPVOID)hookAddr, hookCode, 5, NULL))/*向源地址写入跳转指令*/
+	if (!WriteProcessMemory(handle, (LPVOID)hookAddr, hookCode, hookLength, NULL))/*恢复*/
 	{
 		return false;
 	}
