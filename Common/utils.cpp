@@ -192,7 +192,7 @@ bool tools::write2file(std::string fileName, std::string data, std::ios_base::op
 参数4：打开模式
 返回值：BOOL
 */
-bool tools::write2file_c(char* fileName, char* data, DWORD npc_id, const char* _model)
+bool tools::write2file_c(const char* fileName, const char* data, DWORD npc_id, const char* _model)
 {
 	FILE* fp;
 	errno_t err = fopen_s(&fp, fileName, _model); // 使用 fopen_s 代替 fopen
@@ -213,7 +213,7 @@ bool tools::write2file_c(char* fileName, char* data, DWORD npc_id, const char* _
 参数3：尺寸
 返回值：BOOL
 */
-bool tools::write(DWORD _addr, unsigned char* _data, int _size)
+bool tools::write(DWORD _addr, const char* _data, int _size)
 {
 	if (!improveProcPriv())
 	{
@@ -240,7 +240,7 @@ bool tools::write(DWORD _addr, unsigned char* _data, int _size)
 参数3：尺寸
 返回值：BOOL
 */
-bool tools::read(DWORD _addr, unsigned char* _data, int _size)
+bool tools::read(DWORD _addr, const char* _data, int _size)
 {
 	unsigned long oldProtect = 0;
 	if ( S_OK != VirtualProtect((void*)_addr, _size, PAGE_READONLY, &oldProtect))

@@ -36,12 +36,12 @@ public:
 	MODULEINFO getModuleInfo(const char* moduleName);
 	bool log2file(std::string fileName, std::string data, std::ios_base::open_mode _model = std::ios::app);
 	bool write2file(std::string fileName, std::string data, std::ios_base::open_mode _model= std::ios::app);
-	bool write2file_c(char* fileName, char* data, DWORD npc_id, const char* _model = "a+");
-	bool read(DWORD _addr, unsigned char* _data, int _size);
-	bool write(DWORD _addr, unsigned char* _data, int _size);
-	bool byte2hex(BYTE src, char* desc);
+	bool write2file_c(const char* fileName, const char* data, DWORD npc_id, const char* _model = "a+");
+	bool read(DWORD _addr, const char* _data, int _size);
+	bool write(DWORD _addr, const char* _data, int _size);
+	bool byte2hex(BYTE src,  char* desc);
 	bool lower2upper(char& ch);
-	bool hexstr2upper(char* src);
+	bool hexstr2upper( char* src);
 	char hex2byte(const char& ch1, const char& ch2);
 	bool bytes2hexstr(BYTE* src, DWORD ndSize, char* desc); //字节数组到hex数组的转换 
 	bool hexstr2bytes(char* src, char* desc); //hex字符串到字节数组的转换

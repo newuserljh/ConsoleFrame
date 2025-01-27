@@ -93,6 +93,7 @@
     <ClCompile Include="bag.cpp" />
     <ClCompile Include="base.cpp" />
     <ClCompile Include="datastruct.cpp" />
+    <ClCompile Include="gamecall.cpp" />
     <ClCompile Include="monster.cpp" />
     <ClCompile Include="role.cpp" />
     <ClCompile Include="skill.cpp" />

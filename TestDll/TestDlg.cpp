@@ -132,14 +132,28 @@ void threadLogin()
 	return;
 }
 
-/*判断辅助存活线程*/
-void threadAlive()
+/*判断角色活着*/
+bool RoleIsAlive(void)
+{
+	if (*r.m_roleproperty.Object.HP_MAX = 0)return false;
+	if (*r.m_roleproperty.Object.HP > 0)return true;
+	else { return false; }
+}
+
+/*判断辅助存活,判断角色是否活着，线程*/
+void threadAlive(LPVOID p)
 {
 	while (true)
 	{
+		if (!RoleIsAlive())
+		{
+			shareCli.m_pSMAllData->m_sm_data[shareindex].server_alive = false;
+		    shareCli.m_pSMAllData->m_sm_data[shareindex].cscript = std::string("角色死亡，重登");
+			return;
+		}
 		shareCli.m_pSMAllData->m_sm_data[shareindex].rcv_rand = shareCli.m_pSMAllData->m_sm_data[shareindex].send_rand;//验证外挂存活
 		shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid=GetCurrentProcessId();//验证外挂存活
-		Sleep(1000);
+		Sleep(5000);
 	}
 }
 
@@ -243,38 +257,12 @@ void CTestDlg::OnBnClickedButton1()
 //	return ret;
 //}
 
-//定义 Lua 调用的 C++ 函数
-int LuaAutoAttack(lua_State* L)
-{
-	gamecall* g = static_cast<gamecall*>(lua_touserdata(L, lua_upvalueindex(1)));
-	bool bl = static_cast<bool>(luaL_checknumber(L, 1));
-		g->start_end_AutoAttack(bl);
-	return 0;
-}
-
-//注册 Lua 函数:
-void RegisterLuaFunctions(lua_State* L, gamecall* g)
-{
-	lua_pushlightuserdata(L, g);
-	lua_pushcclosure(L, LuaAutoAttack, 1);
-	lua_setglobal(L, "autoattack");
-
-	//lua_pushlightuserdata(L, g);
-	//lua_pushcclosure(L, LuaLoginGame, 1);
-	//lua_setglobal(L, "loginGame");
-
-	// 注册其他函数...
-}
-
 
 BOOL CTestDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
- 
-	// TODO:  在此添加额外的初始化
-	L = luaL_newstate();
-	luaL_openlibs(L);
-	RegisterLuaFunctions(L, &mfun); // 注册 Lua 函数
+	m_luaInterface.registerClasses();// 初始化 lua接口对象
+	L = m_luaInterface.getLuaState(); //初始化Lua状态
 
   //初始化共享内存,取得共享内存索引
 	if (!shareCli.openShareMemory())

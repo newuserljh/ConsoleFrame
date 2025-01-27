@@ -1,6 +1,8 @@
 #pragma once
 #include "../GameData/role.h"
-#include "lua.hpp"
+#include "resource.h" 
+#include "lua_interface.h"
+
 // CTestDlg 对话框
 
 class CTestDlg : public CDialogEx
@@ -78,4 +80,8 @@ public:
 	afx_msg void OnBnClickedBtnGj();
 	afx_msg void OnBnClickedBtnTestcall();
 	afx_msg void OnBnClickedBtnRecnpc();
+
+
+protected:
+	lua_interface m_luaInterface; // 添加 lua_interface 成员变量
 };
