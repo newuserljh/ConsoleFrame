@@ -77,4 +77,5 @@ public:
 	afx_msg void OnBnClickedButton10();
 	afx_msg void OnBnClickedBtnGj();
 	afx_msg void OnBnClickedBtnTestcall();
+	afx_msg void OnBnClickedBtnRecnpc();
 };

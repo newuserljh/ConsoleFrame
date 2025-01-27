@@ -28,6 +28,7 @@ shareMemoryCli shareCli(MORE_OPEN_NUMBER);
 int shareindex = -1;
 //初始化HOOk
 HookReg hook;
+HookReg hook_npc_cmd;
 role r;//角色
 role Promenade; //元神
 monster m_mon;
@@ -86,6 +87,7 @@ BEGIN_MESSAGE_MAP(CTestDlg, CDialogEx)
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_BTN_GJ, &CTestDlg::OnBnClickedBtnGj)
 	ON_BN_CLICKED(IDC_BTN_TESTCALL, &CTestDlg::OnBnClickedBtnTestcall)
+	ON_BN_CLICKED(IDC_BTN_RECNPC, &CTestDlg::OnBnClickedBtnRecnpc)
 END_MESSAGE_MAP()
 
 // CTestDlg 消息处理程序
@@ -894,8 +896,6 @@ UINT __cdecl CTestDlg::threadBagPocess(LPVOID p)
 	AppendText(pDlg->m_edit2, s);
 	while (pDlg->tflag_attack)
 	{
-		if (r_bag.getBagSpace() < 35)
-		{
 			pDlg->AutoRecvGoods();
 			if (r_bag.caclGoodsNumber("1个绑定元宝") > 0) {
 				mfun.useGoods(r_bag.getGoodsIndex("1个绑定元宝"));
@@ -918,7 +918,6 @@ UINT __cdecl CTestDlg::threadBagPocess(LPVOID p)
 				mfun.useGoods(r_bag.getGoodsIndex("20个绑定元宝"));
 				Sleep(200);
 			}
-	    }
 		if (r_bag.getBagSpace() < 10)
 		{
 			if (r_bag.caclGoodsNumber("强效太阳神水") > REMAIN_TAIYANG)
@@ -1133,4 +1132,40 @@ void CTestDlg::OnBnClickedBtnTestcall()
 		lua_pop(L, 1);
 	}
 	
+}
+
+
+_declspec(naked) void CallRecord()
+{
+	_asm pushad
+	char* command;
+	const char* dir;
+	const char* data;
+	dir = shareCli.m_pSMAllData->currDir;
+	data = "\\script\\record.lua";
+	command = (char*)hook_npc_cmd.EAX;
+	char path[MAX_PATH];
+	strcpy_s(path, dir);
+	strcat_s(path, data);
+	tools::getInstance()->write2file_c(path, command,hook_npc_cmd.EDX);
+	_asm  popad
+	_asm ret
+}
+bool rec_flag = true;
+
+//hook录制NPC
+void CTestDlg::OnBnClickedBtnRecnpc()
+{
+	if (rec_flag)
+	{
+		hook_npc_cmd.hookReg(0xCAC543, 10, &CallRecord);
+		rec_flag = false;
+		//添加按钮修改名字的代码
+	}
+	else
+	{
+		hook_npc_cmd.Unhook();
+	}
+	
+
 }

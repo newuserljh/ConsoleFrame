@@ -185,6 +185,28 @@ bool tools::write2file(std::string fileName, std::string data, std::ios_base::op
 }
 
 /*
+函数功能：c方式写文件，用于录制NPC的ID 和对话内容
+参数1：文件名
+参数2：数据
+参数3：NPC的ID
+参数4：打开模式
+返回值：BOOL
+*/
+bool tools::write2file_c(char* fileName, char* data, DWORD npc_id, const char* _model)
+{
+	FILE* fp;
+	errno_t err = fopen_s(&fp, fileName, _model); // 使用 fopen_s 代替 fopen
+	if (err != 0 || fp == NULL) {
+		perror("Error opening file");
+		return false;
+	}
+	fprintf(fp, "NPC ID: %x  %s\n", npc_id, data); // 将格式化的数据写入文件
+	fclose(fp); // 关闭文件
+	return true;
+}
+
+
+/*
 函数功能：写内存字节集
 参数1: 内存地址
 参数2：字节集
@@ -422,9 +444,9 @@ std::string tools::GetCurrDir()
 	TCHAR szDrive[_MAX_DRIVE];
 	TCHAR szDir[_MAX_DIR];
 	::GetModuleFileName(NULL, szFull, sizeof(szFull) / sizeof(TCHAR));
-	_tsplitpath(szFull, szDrive, szDir, NULL, NULL);
-	_tcscpy(szFull, szDrive);
-	_tcscat(szFull, szDir);
+	_splitpath_s(szFull, szDrive, sizeof(szDrive) / sizeof(TCHAR), szDir, sizeof(szDir) / sizeof(TCHAR), NULL, 0, NULL, 0);
+	_tcscpy_s(szFull, szDrive);
+	_tcscat_s(szFull, szDir);
 	std::string strPath(szFull);
 	return strPath;
 }

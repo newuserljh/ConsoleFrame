@@ -36,6 +36,7 @@ public:
 	MODULEINFO getModuleInfo(const char* moduleName);
 	bool log2file(std::string fileName, std::string data, std::ios_base::open_mode _model = std::ios::app);
 	bool write2file(std::string fileName, std::string data, std::ios_base::open_mode _model= std::ios::app);
+	bool write2file_c(char* fileName, char* data, DWORD npc_id, const char* _model = "a+");
 	bool read(DWORD _addr, unsigned char* _data, int _size);
 	bool write(DWORD _addr, unsigned char* _data, int _size);
 	bool byte2hex(BYTE src, char* desc);
