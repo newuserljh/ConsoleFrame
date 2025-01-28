@@ -109,6 +109,8 @@ void lua_interface::registerClasses()
 		.endNamespace();
 }
 
+
+
 lua_State* lua_interface::getLuaState() const
 {
 	return L;

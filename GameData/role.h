@@ -21,5 +21,7 @@ public:
 	GOODS_PROPERTY m_euip[21];
 private:
 
+
+
 };
 
