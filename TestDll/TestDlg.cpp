@@ -1127,13 +1127,17 @@ _declspec(naked) void CallRecord()
 {
 	_asm pushad
 	char* command;
+	char* roleName;
 	const char* dir;
 	const char* data;
 	dir = shareCli.m_pSMAllData->currDir;
-	data = "\\script\\record.lua";
+	roleName = r.m_roleproperty.Object.pName;
+	data = "\\script\\";
 	command = (char*)hook_npc_cmd.EAX;
 	char path[MAX_PATH];
 	strcpy_s(path, dir);
+	strcat_s(path, data);
+	data = ".lua";
 	strcat_s(path, data);
 	tools::getInstance()->write2file_c(path, command,hook_npc_cmd.EDX);
 	_asm  popad
