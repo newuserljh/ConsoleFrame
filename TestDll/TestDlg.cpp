@@ -257,6 +257,8 @@ BOOL CTestDlg::OnInitDialog()
 	m_luaInterface.registerClasses();// 初始化 lua接口对象
 	L = m_luaInterface.getLuaState(); //初始化Lua状态
 
+	auto_avoid_mon = false; //初始化设置智能闪避关闭
+
   //初始化共享内存,取得共享内存索引
 	if (!shareCli.openShareMemory())
 	{
@@ -271,7 +273,6 @@ BOOL CTestDlg::OnInitDialog()
 
 	//登录成功之后设置 启动通讯线程,定时验证存活消息
 	CloseHandle(::CreateThread(NULL, NULL, LPTHREAD_START_ROUTINE(threadAlive), NULL, NULL, NULL));
-
 
 	//hookAPI(WSARecv, MyWSARecv);
 
@@ -1064,7 +1065,50 @@ void CTestDlg::OnBnClickedChkTeam()
 	}
 }
 
-/*定时器组队*/
+//智能闪避，自动躲避怪物
+void CTestDlg::AutoAvoidMonsters()
+{
+	if (!r.init()) return;
+
+	// 获取周围怪物信息
+	m_mon.m_monsterList.clear();
+	if (!r.Get_Envionment(m_mon.pOb_list))
+	{
+		CString s;
+		s.Format("获取周围怪物信息错误：\n");
+		AppendText(m_edit2, s);
+		return;
+	}
+	m_mon.init();
+
+	// 遍历怪物列表，找到最近的怪物
+	MONSTER_PROPERTY* nearestMonster = nullptr;
+	float minDistance = FLT_MAX;
+	for (auto& monster : m_mon.m_monsterList)
+	{
+		float distance = mfun.caclDistance(*r.m_roleproperty.Object.X, *r.m_roleproperty.Object.Y, *monster.X, *monster.Y);
+		if (distance < minDistance)
+		{
+			minDistance = distance;
+			nearestMonster = &monster;
+		}
+	}
+
+	// 如果找到最近的怪物，并且距离小于一定值，则进行躲避
+	if (nearestMonster && minDistance < 3.0f) // 假设3.0f是需要躲避的距离阈值
+	{
+		// 计算躲避方向
+		int dx = *r.m_roleproperty.Object.X - *nearestMonster->X;
+		int dy = *r.m_roleproperty.Object.Y - *nearestMonster->Y;
+
+		// 移动到相反方向
+		int newX = *r.m_roleproperty.Object.X + dx;
+		int newY = *r.m_roleproperty.Object.Y + dy;
+		mfun.Run_or_Step_To(newX, newY,2);
+	}
+}
+
+/*定时器 1.组队 2.智能闪避 */
 void CTestDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
@@ -1072,6 +1116,9 @@ void CTestDlg::OnTimer(UINT_PTR nIDEvent)
 	{
 	case 11111:
 		MakeTeam(this);
+		break;
+	case 22222: 
+		AutoAvoidMonsters();
 		break;
 	default:
 		break;
@@ -1085,6 +1132,7 @@ void CTestDlg::OnTimer(UINT_PTR nIDEvent)
 void CTestDlg::OnBnClickedBtnGj()
 {
 	if (!r.init())return;
+	if (*r.m_roleproperty.Job > 0)auto_avoid_mon = true;//不是战士 开启智能闪避
 	r_bag.maxSize = *r.m_roleproperty.Bag_Size;
 	r_bag.bagBase = (DWORD)r.m_roleproperty.p_Bag_Base;
 	r_bag.init();
@@ -1093,11 +1141,17 @@ void CTestDlg::OnBnClickedBtnGj()
 	{
 		m_threadAttack = AfxBeginThread(threadAttack, (LPVOID)this);
 		m_threadBagProcess = AfxBeginThread(threadBagPocess, (LPVOID)this);
+		if (auto_avoid_mon)
+		{
+			// 设置定时器，用于自动躲避怪物
+			SetTimer(22222, 500, NULL); // 每秒检查一次
+		}
 	}
 	else
 	{
 		WaitForSingleObject(m_threadAttack, 60000);
 		WaitForSingleObject(m_threadBagProcess, 60000);
+		KillTimer(22222);//停止计时器
 	}	
 }
 

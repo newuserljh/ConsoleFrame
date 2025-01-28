@@ -5,7 +5,7 @@
 #pragma pack(4)
 
 #define  FILE_MAP_NAME	 "xxooyy"
-#define  MORE_OPEN_NUMBER 5
+#define  MORE_OPEN_NUMBER 10
 //¹²ÏíÄÚ´æ
 typedef struct _SM_SHARE_DATA
 {

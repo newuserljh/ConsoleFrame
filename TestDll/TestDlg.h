@@ -68,11 +68,13 @@ public:
 	void  MakeTeam(CTestDlg* p);
 	int m_team_check_id;
 
+	//智能闪避变量
+	bool auto_avoid_mon;
+
 	CCriticalSection g_criticalsection; //边界锁，线程间同步用的。
 
-
 	void AutoRecvGoods(void);//回收将军经验，逆魔装备元宝
-
+	void AutoAvoidMonsters();//智能闪避
 
 	void AutoReturnToCity(); // 回城处理函数声明
 	
