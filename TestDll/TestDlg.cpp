@@ -86,8 +86,8 @@ BEGIN_MESSAGE_MAP(CTestDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_CHK_TEAM, &CTestDlg::OnBnClickedChkTeam)
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_BTN_GJ, &CTestDlg::OnBnClickedBtnGj)
-	ON_BN_CLICKED(IDC_BTN_TESTCALL, &CTestDlg::OnBnClickedBtnTestcall)
 	ON_BN_CLICKED(IDC_BTN_RECNPC, &CTestDlg::OnBnClickedBtnRecnpc)
+	ON_BN_CLICKED(IDC_BTN_LUATST, &CTestDlg::OnBnClickedBtnLuatst)
 END_MESSAGE_MAP()
 
 // CTestDlg 消息处理程序
@@ -132,28 +132,21 @@ void threadLogin()
 	return;
 }
 
-/*判断角色活着*/
-bool RoleIsAlive(void)
-{
-	if (*r.m_roleproperty.Object.HP_MAX = 0)return false;
-	if (*r.m_roleproperty.Object.HP > 0)return true;
-	else { return false; }
-}
 
 /*判断辅助存活,判断角色是否活着，线程*/
-void threadAlive(LPVOID p)
+void threadAlive()
 {
 	while (true)
 	{
-		if (!RoleIsAlive())
-		{
-			shareCli.m_pSMAllData->m_sm_data[shareindex].server_alive = false;
-		    shareCli.m_pSMAllData->m_sm_data[shareindex].cscript = std::string("角色死亡，重登");
-			return;
-		}
+		//if ((*r.m_roleproperty.Object.HP_MAX != 0) && (*r.m_roleproperty.Object.HP == 0))
+		//{
+		//	shareCli.m_pSMAllData->m_sm_data[shareindex].server_alive = false;
+		//	shareCli.m_pSMAllData->m_sm_data[shareindex].cscript = std::string("角色死亡，重登");
+		//	return;
+		//}
 		shareCli.m_pSMAllData->m_sm_data[shareindex].rcv_rand = shareCli.m_pSMAllData->m_sm_data[shareindex].send_rand;//验证外挂存活
-		shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid=GetCurrentProcessId();//验证外挂存活
-		Sleep(5000);
+		shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid=GetCurrentProcessId();//读取游戏进程PID
+		Sleep(2000);
 	}
 }
 
@@ -275,8 +268,8 @@ BOOL CTestDlg::OnInitDialog()
 	hook.hookReg(0x5F8B69, 5, CallTest);
 
 	CloseHandle(::CreateThread(NULL, NULL, LPTHREAD_START_ROUTINE(threadLogin), NULL, NULL, NULL));
+
 	//登录成功之后设置 启动通讯线程,定时验证存活消息
-	
 	CloseHandle(::CreateThread(NULL, NULL, LPTHREAD_START_ROUTINE(threadAlive), NULL, NULL, NULL));
 
 
@@ -977,7 +970,7 @@ UINT __cdecl CTestDlg::threadPickup(LPVOID p)
 	return 0;
 }
 
-// TODO: 脚本测试
+// TODO: 脚本测试-无实现
 void CTestDlg::OnBnClickedButton9()
 {
 
@@ -988,37 +981,37 @@ void CTestDlg::OnBnClickedButton9()
 	*自动打怪***   打怪：判断打死
 	*          ****继续打怪
 	* */
-	r.init();
-	r.Get_Envionment(m_mon.pOb_list);
-	r.Get_Ground(m_mon.pGr_list);
-	m_mon.init();
-	r_bag.maxSize = *r.m_roleproperty.Bag_Size;
-	r_bag.bagBase = (DWORD)r.m_roleproperty.p_Bag_Base;
-	m_skill.skillBase = (DWORD)r.m_roleproperty.p_Skill_Base;
-	r_bag.init();
-	m_skill.init();
+	//r.init();
+	//r.Get_Envionment(m_mon.pOb_list);
+	//r.Get_Ground(m_mon.pGr_list);
+	//m_mon.init();
+	//r_bag.maxSize = *r.m_roleproperty.Bag_Size;
+	//r_bag.bagBase = (DWORD)r.m_roleproperty.p_Bag_Base;
+	//m_skill.skillBase = (DWORD)r.m_roleproperty.p_Skill_Base;
+	//r_bag.init();
+	//m_skill.init();
 
-	initVariable();
-	//CString s;
-	//std::vector<GROUND_GOODS> need2pick_list = mfun.sort_groud_goods(r, pick_goods_list);
-	//for (auto i=0;i< need2pick_list.size();i++)
-	//{
-	//	s.Format("%s %d/%d  %f", need2pick_list[i].pName, *need2pick_list[i].X, *need2pick_list[i].Y, need2pick_list[i].Distance);
-	//	AppendText(m_edit2, s);
-	//}
+	//initVariable();
+	////CString s;
+	////std::vector<GROUND_GOODS> need2pick_list = mfun.sort_groud_goods(r, pick_goods_list);
+	////for (auto i=0;i< need2pick_list.size();i++)
+	////{
+	////	s.Format("%s %d/%d  %f", need2pick_list[i].pName, *need2pick_list[i].X, *need2pick_list[i].Y, need2pick_list[i].Distance);
+	////	AppendText(m_edit2, s);
+	////}
 
-	//if (need2pick_list.size())
-	//{
-	//	GROUND_GOODS pick_temp = need2pick_list[0];
-	//	s.Format("%s %d/%d  %f", pick_temp.pName, *pick_temp.X, *pick_temp.Y, pick_temp.Distance);
-	//	AppendText(m_edit2, s);
-	//	mfun.CurrentMapMove(*pick_temp.X, *pick_temp.Y);
-	//	Sleep(2000);
-	//	//mfun.pickupGoods(*pick_temp.X, *pick_temp.Y);
-	//}
-	//m_threadGoto=AfxBeginThread(threadGoto, (LPVOID)this, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
-	m_threadAttack= AfxBeginThread(threadAttack, (LPVOID)this);
-	m_threadPickup= AfxBeginThread(threadPickup, (LPVOID)this, THREAD_PRIORITY_ABOVE_NORMAL);
+	////if (need2pick_list.size())
+	////{
+	////	GROUND_GOODS pick_temp = need2pick_list[0];
+	////	s.Format("%s %d/%d  %f", pick_temp.pName, *pick_temp.X, *pick_temp.Y, pick_temp.Distance);
+	////	AppendText(m_edit2, s);
+	////	mfun.CurrentMapMove(*pick_temp.X, *pick_temp.Y);
+	////	Sleep(2000);
+	////	//mfun.pickupGoods(*pick_temp.X, *pick_temp.Y);
+	////}
+	////m_threadGoto=AfxBeginThread(threadGoto, (LPVOID)this, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
+	//m_threadAttack= AfxBeginThread(threadAttack, (LPVOID)this);
+	//m_threadPickup= AfxBeginThread(threadPickup, (LPVOID)this, THREAD_PRIORITY_ABOVE_NORMAL);
 		
 }
 
@@ -1108,37 +1101,24 @@ void CTestDlg::OnBnClickedBtnGj()
 	}	
 }
 
-//lua脚本测试
-void CTestDlg::OnBnClickedBtnTestcall()
-{
-	// 执行 Lua 脚本 .\\script\\test.lua
-	std::string scriptPath = (std::string)shareCli.m_pSMAllData->currDir+"\\script\\test.lua";
-	if (luaL_dofile(L, scriptPath.c_str()) != LUA_OK)
-	{
-		const char* error = lua_tostring(L, -1);
-		AfxMessageBox(CString(error));
-		lua_pop(L, 1);
-	}
-	
-}
-
 
 _declspec(naked) void CallRecord()
 {
 	_asm pushad
 	char* command;
+	char path[MAX_PATH];
 	char* roleName;
-	const char* dir;
+	char* dir;
 	const char* data;
 	dir = shareCli.m_pSMAllData->currDir;
-	roleName = r.m_roleproperty.Object.pName;
-	data = "\\script\\";
-	command = (char*)hook_npc_cmd.EAX;
-	char path[MAX_PATH];
 	strcpy_s(path, dir);
+	data = "\\script\\";
 	strcat_s(path, data);
+	roleName = r.m_roleproperty.Object.pName;
+	strcat_s(path, roleName);
 	data = ".lua";
 	strcat_s(path, data);
+	command = (char*)hook_npc_cmd.EAX;
 	tools::getInstance()->write2file_c(path, command,hook_npc_cmd.EDX);
 	_asm  popad
 	_asm ret
@@ -1155,7 +1135,7 @@ void CTestDlg::OnBnClickedBtnRecnpc()
 		if (hook_npc_cmd.hookReg(0xCAC543, 10, &CallRecord))
 		{
 			rec_flag = false;
-			s.Format("开始录制NPC对话，存储到/script/record.lua文件中");
+			s.Format("开始录制NPC对话，存储到/script/(角色名字).lua文件中");
 			AppendText(m_edit2, s);
 			//添加按钮修改名字的代码
 			if (pButton != nullptr)
@@ -1175,5 +1155,19 @@ void CTestDlg::OnBnClickedBtnRecnpc()
 			s.Format("停止录制NPC对话");
 			AppendText(m_edit2, s);
 		}
+	}
+}
+
+
+//lua脚本测试
+void CTestDlg::OnBnClickedBtnLuatst()
+{
+	// 执行 lua 脚本 .\\script\\test.lua
+	std::string scriptpath = (std::string)shareCli.m_pSMAllData->currDir + "\\script\\test.lua";
+	if (luaL_dofile(L, scriptpath.c_str()) != LUA_OK)
+	{
+		const char* error = lua_tostring(L, -1);
+		AfxMessageBox(CString(error));
+		lua_pop(L, 1);
 	}
 }

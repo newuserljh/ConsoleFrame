@@ -1,6 +1,8 @@
 #pragma once
 #include "../GameData/role.h"
 #include "resource.h" 
+//#include "lua.hpp"
+//#include "LuaBridge/LuaBridge.h"
 #include "lua_interface.h"
 
 // CTestDlg 对话框
@@ -78,10 +80,11 @@ public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnBnClickedButton10();
 	afx_msg void OnBnClickedBtnGj();
-	afx_msg void OnBnClickedBtnTestcall();
 	afx_msg void OnBnClickedBtnRecnpc();
 
 
 protected:
 	lua_interface m_luaInterface; // 添加 lua_interface 成员变量
+public:
+	afx_msg void OnBnClickedBtnLuatst();
 };

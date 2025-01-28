@@ -7,6 +7,9 @@ lua_interface::lua_interface()
 	L = luaL_newstate();
 	luaL_openlibs(L);
 	registerClasses();
+	m_role.init();
+	m_bag.init();
+
 }
 
 lua_interface::~lua_interface()
