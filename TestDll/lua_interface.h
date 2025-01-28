@@ -3,7 +3,7 @@
 #include "role.h"
 #include "utils.h"
 #include "gamecall.h"
-#include <lua.hpp>
+#include <../luajit/src/lua.hpp>
 #include <LuaBridge/LuaBridge.h>
 
 class lua_interface
