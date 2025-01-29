@@ -853,7 +853,7 @@ UINT __cdecl CTestDlg::threadAttack(LPVOID p)
 {
 	CTestDlg* pDlg = (CTestDlg*)p;
 	CString s;
-	s.Format("打怪线程开始");
+	s.Format("打怪线程开始\n ");
 	AppendText(pDlg->m_edit2, s);
 	while (pDlg->tflag_attack)
 	{
@@ -864,7 +864,7 @@ UINT __cdecl CTestDlg::threadAttack(LPVOID p)
 	}
 	mfun.start_end_AutoAttack(pDlg->tflag_attack);
 	shareCli.m_pSMAllData->m_sm_data[shareindex].cscript = std::string("空闲");
-	s.Format("打怪线程停止");
+	s.Format("打怪线程停止\n");
 	AppendText(pDlg->m_edit2, s);
 	return 0;
 }
@@ -874,7 +874,7 @@ UINT __cdecl CTestDlg::threadBagPocess(LPVOID p)
 {
 	CString s;
 	CTestDlg* pDlg = (CTestDlg*)p;
-	s.Format("处理包裹线程开始");
+	s.Format("处理包裹线程开始\n ");
 	AppendText(pDlg->m_edit2, s);
 	while (pDlg->tflag_attack)
 	{
@@ -914,11 +914,27 @@ UINT __cdecl CTestDlg::threadBagPocess(LPVOID p)
 		}
 		Sleep(2000);
 	}
-	s.Format("处理包裹线程停止");
+	s.Format("处理包裹线程停止\n");
 	AppendText(pDlg->m_edit2, s);
 	return 0;
 }
 
+/*智能闪避线程*/
+UINT __cdecl CTestDlg::threadAutoAvoidMon(LPVOID p)
+{
+	CString s;
+	CTestDlg* pDlg = (CTestDlg*)p;
+	s.Format("智能闪避线程开始\n ");
+	AppendText(pDlg->m_edit2, s);
+	while (pDlg->tflag_attack)
+	{
+		pDlg->AutoAvoidMonsters();
+		Sleep(2000);
+	}
+	s.Format("智能闪避线程停止\n");
+	AppendText(pDlg->m_edit2, s);
+	return 0;
+}
 
 /*捡物线程*/
 UINT __cdecl CTestDlg::threadPickup(LPVOID p)
@@ -971,9 +987,77 @@ UINT __cdecl CTestDlg::threadPickup(LPVOID p)
 	return 0;
 }
 
-// TODO: 脚本测试-无实现
+// TODO: 功能测试
 void CTestDlg::OnBnClickedButton9()
 {
+
+	if (!r.init()) return;
+
+	// 获取周围怪物信息
+		CString s;
+
+	
+		
+			int newX = *r.m_roleproperty.Object.X - 0;
+			int newY = *r.m_roleproperty.Object.Y - 2;
+			mfun.Run_or_Step_To(newX, newY, 2);
+			Sleep(500);
+
+
+		//判断是否成功 移动到 0 ，+2
+	
+			newX = *r.m_roleproperty.Object.X - 0;
+			newY = *r.m_roleproperty.Object.Y + 2;
+			mfun.Run_or_Step_To(newX, newY, 2);
+			Sleep(500);
+
+
+		//判断是否成功 移动到 -2 ，-2
+	
+			newX = *r.m_roleproperty.Object.X - 2;
+			newY = *r.m_roleproperty.Object.Y - 2;
+			mfun.Run_or_Step_To(newX, newY, 2);
+			Sleep(500);
+		
+
+
+		//判断是否成功 移动到 -2 ，0
+		
+			newX = *r.m_roleproperty.Object.X - 2;
+			newY = *r.m_roleproperty.Object.Y + 0;
+			mfun.Run_or_Step_To(newX, newY, 2);
+			Sleep(500);
+
+
+		//判断是否成功 移动到 -2 ，+2
+		
+			newX = *r.m_roleproperty.Object.X - 2;
+			newY = *r.m_roleproperty.Object.Y + 2;
+			mfun.Run_or_Step_To(newX, newY, 2);
+			Sleep(500);
+
+		//判断是否成功 移动到 +2 ，+2
+			newX = *r.m_roleproperty.Object.X + 2;
+			newY = *r.m_roleproperty.Object.Y + 2;
+			mfun.Run_or_Step_To(newX, newY, 2);
+			Sleep(500);
+
+		//判断是否成功 移动到 +2 ，0
+			newX = *r.m_roleproperty.Object.X + 2;
+			newY = *r.m_roleproperty.Object.Y + 0;
+			mfun.Run_or_Step_To(newX, newY, 2);
+			Sleep(500);
+	
+
+		//判断是否成功 移动到 +2 ，-2
+			newX = *r.m_roleproperty.Object.X + 2;
+			newY = *r.m_roleproperty.Object.Y - 2;
+			mfun.Run_or_Step_To(newX, newY, 2);
+			Sleep(500);
+
+
+
+
 
 
 	/*自动打怪 需要启动：①打怪线程优先级正常 ②遍历周围对象、地面并拾取线程 优先级中高 ③寻路线程、智能闪避 优先级最高
@@ -1098,17 +1182,93 @@ void CTestDlg::AutoAvoidMonsters()
 	if (nearestMonster && minDistance < 3.0f) // 假设3.0f是需要躲避的距离阈值
 	{
 		// 计算躲避方向
-		int dx = *r.m_roleproperty.Object.X - *nearestMonster->X;
-		int dy = *r.m_roleproperty.Object.Y - *nearestMonster->Y;
+		int rx = *r.m_roleproperty.Object.X;
+		int ry = *r.m_roleproperty.Object.Y;
+		int dx = rx - *nearestMonster->X;
+		int dy = ry - *nearestMonster->Y;
 
-		// 移动到相反方向
-		int newX = *r.m_roleproperty.Object.X + dx;
-		int newY = *r.m_roleproperty.Object.Y + dy;
+		// 移动到相反方向	
+		int newX = rx + dx;
+		int newY = rx + dy;
 		mfun.Run_or_Step_To(newX, newY,2);
+		Sleep(500);
+		//判断是否成功 移动到 0 ，-4
+		if ((*r.m_roleproperty.Object.X == rx) && (*r.m_roleproperty.Object.Y == ry))
+		{
+			newX = rx - 0;
+			newY = ry -3;
+			mfun.Run_or_Step_To(newX, newY, 2);
+			Sleep(500);
+		}
+
+		//判断是否成功 移动到 0 ，+2
+		if ((*r.m_roleproperty.Object.X == rx) && (*r.m_roleproperty.Object.Y == ry))
+		{
+			newX = rx - 0;
+			newY = ry + 3;
+			mfun.Run_or_Step_To(newX, newY, 2);
+			Sleep(500);
+		}
+
+		//判断是否成功 移动到 -2 ，-2
+		if ((*r.m_roleproperty.Object.X == rx) && (*r.m_roleproperty.Object.Y == ry))
+		{
+			newX = rx - 3;
+			newY = ry -3;
+			mfun.Run_or_Step_To(newX, newY, 2);
+			Sleep(500);
+		}
+
+
+		//判断是否成功 移动到 -2 ，0
+		if ((*r.m_roleproperty.Object.X == rx) && (*r.m_roleproperty.Object.Y == ry))
+		{
+			newX = rx- 3;
+			newY = ry +0;
+			mfun.Run_or_Step_To(newX, newY, 2);
+			Sleep(500);
+		}
+	
+
+		//判断是否成功 移动到 -2 ，+2
+		if ((*r.m_roleproperty.Object.X == rx) && (*r.m_roleproperty.Object.Y == ry))
+		{
+			newX = rx -3;
+			newY = ry + 3;
+			mfun.Run_or_Step_To(newX, newY, 2);
+			Sleep(500);
+		}
+
+		//判断是否成功 移动到 +2 ，+2
+		if ((*r.m_roleproperty.Object.X == rx) && (*r.m_roleproperty.Object.Y == ry))
+		{
+			newX = rx +3;
+			newY = ry + 3;
+			mfun.Run_or_Step_To(newX, newY, 2);
+			Sleep(500);
+		}
+
+		//判断是否成功 移动到 +2 ，0
+		if ((*r.m_roleproperty.Object.X == rx) && (*r.m_roleproperty.Object.Y == ry))
+		{
+			newX =rx+ 3;
+			newY = ry + 0;
+			mfun.Run_or_Step_To(newX, newY, 2);
+			Sleep(500);
+		}
+
+		//判断是否成功 移动到 +2 ，-2
+		if ((*r.m_roleproperty.Object.X == rx) && (*r.m_roleproperty.Object.Y == ry))
+		{
+			newX =rx + 3;
+			newY =ry -3;
+			mfun.Run_or_Step_To(newX, newY, 2);
+			Sleep(500);
+		}
 	}
 }
 
-/*定时器 1.组队 2.智能闪避 */
+/*定时器 1.组队  */
 void CTestDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
@@ -1116,9 +1276,6 @@ void CTestDlg::OnTimer(UINT_PTR nIDEvent)
 	{
 	case 11111:
 		MakeTeam(this);
-		break;
-	case 22222: 
-		AutoAvoidMonsters();
 		break;
 	default:
 		break;
@@ -1143,15 +1300,18 @@ void CTestDlg::OnBnClickedBtnGj()
 		m_threadBagProcess = AfxBeginThread(threadBagPocess, (LPVOID)this);
 		if (auto_avoid_mon)
 		{
-			// 设置定时器，用于自动躲避怪物
-			SetTimer(22222, 500, NULL); // 每秒检查一次
+			// 设置智能闪避线程，用于自动躲避怪物
+			m_threadAutoAvoid=AfxBeginThread(threadAutoAvoidMon, (LPVOID)this);
 		}
 	}
 	else
 	{
 		WaitForSingleObject(m_threadAttack, 60000);
 		WaitForSingleObject(m_threadBagProcess, 60000);
-		KillTimer(22222);//停止计时器
+		if (auto_avoid_mon)
+		{
+			WaitForSingleObject(m_threadAutoAvoid ,60000);
+		}
 	}	
 }
 

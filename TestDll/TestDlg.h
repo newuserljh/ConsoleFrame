@@ -70,6 +70,8 @@ public:
 
 	//智能闪避变量
 	bool auto_avoid_mon;
+	CWinThread* m_threadAutoAvoid;
+	static UINT __cdecl threadAutoAvoidMon(LPVOID p);
 
 	CCriticalSection g_criticalsection; //边界锁，线程间同步用的。
 
