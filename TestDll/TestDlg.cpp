@@ -1184,7 +1184,7 @@ void CTestDlg::AutoAvoidMonsters()
 		int rx = *r.m_roleproperty.Object.X;
 		int ry = *r.m_roleproperty.Object.Y;
 		int dx = rx - *nearestMonster->X;
-		int dy = ry - *nearestMonster->Y
+		int dy = ry - *nearestMonster->Y;
 		
 
 		// 尝试移动到多个方向，直到成功
