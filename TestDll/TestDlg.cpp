@@ -1177,7 +1177,6 @@ void CTestDlg::AutoAvoidMonsters()
 			nearestMonster = &monster;
 		}
 	}
-
 	// 如果找到最近的怪物，并且距离小于一定值，则进行躲避
 	if (nearestMonster && minDistance < 3.0f) // 假设3.0f是需要躲避的距离阈值
 	{
@@ -1185,87 +1184,30 @@ void CTestDlg::AutoAvoidMonsters()
 		int rx = *r.m_roleproperty.Object.X;
 		int ry = *r.m_roleproperty.Object.Y;
 		int dx = rx - *nearestMonster->X;
-		int dy = ry - *nearestMonster->Y;
+		int dy = ry - *nearestMonster->Y
+		
 
-		// 移动到相反方向	
-		int newX = rx + dx;
-		int newY = rx + dy;
-		mfun.Run_or_Step_To(newX, newY,2);
-		Sleep(500);
-		//判断是否成功 移动到 0 ，-4
-		if ((*r.m_roleproperty.Object.X == rx) && (*r.m_roleproperty.Object.Y == ry))
+		// 尝试移动到多个方向，直到成功
+		std::vector<std::pair<int, int>> directions = {
+			{dx, dy}, {0, -3}, {0, 3}, {-3, -3}, {-3, 0}, {-3, 3}, {3, 3}, {3, 0}, {3, -3}
+		};
+
+		for (const auto& dir : directions)
 		{
-			newX = rx - 0;
-			newY = ry -3;
+			int newX = rx + dir.first;
+			int newY = ry + dir.second;
 			mfun.Run_or_Step_To(newX, newY, 2);
 			Sleep(500);
-		}
 
-		//判断是否成功 移动到 0 ，+2
-		if ((*r.m_roleproperty.Object.X == rx) && (*r.m_roleproperty.Object.Y == ry))
-		{
-			newX = rx - 0;
-			newY = ry + 3;
-			mfun.Run_or_Step_To(newX, newY, 2);
-			Sleep(500);
-		}
-
-		//判断是否成功 移动到 -2 ，-2
-		if ((*r.m_roleproperty.Object.X == rx) && (*r.m_roleproperty.Object.Y == ry))
-		{
-			newX = rx - 3;
-			newY = ry -3;
-			mfun.Run_or_Step_To(newX, newY, 2);
-			Sleep(500);
-		}
-
-
-		//判断是否成功 移动到 -2 ，0
-		if ((*r.m_roleproperty.Object.X == rx) && (*r.m_roleproperty.Object.Y == ry))
-		{
-			newX = rx- 3;
-			newY = ry +0;
-			mfun.Run_or_Step_To(newX, newY, 2);
-			Sleep(500);
-		}
-	
-
-		//判断是否成功 移动到 -2 ，+2
-		if ((*r.m_roleproperty.Object.X == rx) && (*r.m_roleproperty.Object.Y == ry))
-		{
-			newX = rx -3;
-			newY = ry + 3;
-			mfun.Run_or_Step_To(newX, newY, 2);
-			Sleep(500);
-		}
-
-		//判断是否成功 移动到 +2 ，+2
-		if ((*r.m_roleproperty.Object.X == rx) && (*r.m_roleproperty.Object.Y == ry))
-		{
-			newX = rx +3;
-			newY = ry + 3;
-			mfun.Run_or_Step_To(newX, newY, 2);
-			Sleep(500);
-		}
-
-		//判断是否成功 移动到 +2 ，0
-		if ((*r.m_roleproperty.Object.X == rx) && (*r.m_roleproperty.Object.Y == ry))
-		{
-			newX =rx+ 3;
-			newY = ry + 0;
-			mfun.Run_or_Step_To(newX, newY, 2);
-			Sleep(500);
-		}
-
-		//判断是否成功 移动到 +2 ，-2
-		if ((*r.m_roleproperty.Object.X == rx) && (*r.m_roleproperty.Object.Y == ry))
-		{
-			newX =rx + 3;
-			newY =ry -3;
-			mfun.Run_or_Step_To(newX, newY, 2);
-			Sleep(500);
+			// 如果成功移动到新位置，则退出循环
+			if (*r.m_roleproperty.Object.X != rx || *r.m_roleproperty.Object.Y != ry)
+			{
+				break;
+			}
 		}
 	}
+	
+	
 }
 
 /*定时器 1.组队  */
