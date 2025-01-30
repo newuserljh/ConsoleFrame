@@ -6,6 +6,7 @@
 #include <../luajit/src/lua.hpp>
 #include <LuaBridge/LuaBridge.h>
 
+
 class lua_interface
 {
 public:
@@ -22,5 +23,8 @@ private:
 	gamecall m_gcall;
 	tools &m_tools; // 单例类的引用
 
+public:
+	//导出本类函数
+	bool presskey(int vkcode);
 };
 

@@ -91,4 +91,8 @@ protected:
 	lua_interface m_luaInterface; // 添加 lua_interface 成员变量
 public:
 	afx_msg void OnBnClickedBtnLuatst();
+
+	//成员
+public:
+	DWORD mPid;
 };

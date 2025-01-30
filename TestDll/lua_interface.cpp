@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "lua_interface.h"
 
+
+
 lua_interface::lua_interface()
 	: m_tools(*tools::getInstance())// 初始化单例类的引用
 {
@@ -97,6 +99,12 @@ void lua_interface::registerClasses()
 		.addFunction("RecovryGoods_To_Exp", &gamecall::RecovryGoods_To_Exp)
 		.addFunction("RecovryGoods_To_Gold", &gamecall::RecovryGoods_To_Gold)
 		//.addFunction("SubmitInputbox", &gamecall::SubmitInputbox)
+		.endClass()
+				    
+	    .beginClass<lua_interface>("lua_interface")// 导出 lua_interface 类
+		.addConstructor<void(*)()>()
+		.addFunction("presskey", &lua_interface::presskey)
+		//.addData("exampleMember", &lua_interface::exampleMember)
 		.endClass();
 
 	// 将对象导出到 Lua
@@ -115,3 +123,11 @@ lua_State* lua_interface::getLuaState() const
 {
 	return L;
 }
+
+//封装presskey
+bool lua_interface::presskey(int vkcode)
+{
+	return m_gcall.presskey(::GetCurrentProcessId(),vkcode);
+}
+
+//导出函数到lua全局
