@@ -855,12 +855,30 @@ UINT __cdecl CTestDlg::threadAttack(LPVOID p)
 	CString s;
 	s.Format("打怪线程开始\n ");
 	AppendText(pDlg->m_edit2, s);
+	mfun.start_end_AutoAttack(pDlg->tflag_attack);
+	DWORD* pt = mfun.getTargetP(r);
 	while (pDlg->tflag_attack)
 	{
 		shareCli.m_pSMAllData->m_sm_data[shareindex].cscript = std::string("打怪");
 		//Auto_Attack(pDlg, pDlg->attack_monlist, pDlg->s_ID);
 		mfun.start_end_AutoAttack(pDlg->tflag_attack);
-		//Sleep(ATTACK_SLEEP);
+		Sleep(100);
+		pt = mfun.getTargetP(r);
+		if (nullptr != pt)//判断是否有目标
+		{
+			if (m_skill.getSkillId("施毒术") && (r_bag.ifHasPoison() > 0))//判断是否有施毒术和毒药
+			{
+
+					if (*(BYTE*)((DWORD)pt + 0x34b) < 0x40)//是否中毒 0没毒，0x40红毒，0x80绿毒，0xc0红绿毒,
+					{
+						mfun.start_end_AutoAttack(false);
+						Sleep(500);
+						mfun.presskey(::GetCurrentProcessId(), VK_F2);
+						Sleep(ATTACK_SLEEP);
+						mfun.presskey(::GetCurrentProcessId(), VK_F2);
+					}
+			}
+		}
 	}
 	mfun.start_end_AutoAttack(pDlg->tflag_attack);
 	shareCli.m_pSMAllData->m_sm_data[shareindex].cscript = std::string("空闲");

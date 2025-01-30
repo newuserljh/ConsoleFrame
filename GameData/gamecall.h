@@ -37,6 +37,7 @@ public:
 	bool RecovryGoods_To_Exp(DWORD goodsId, unsigned	vip_level);
 	bool RecovryGoods_To_Gold(DWORD goodsId, unsigned	vip_level);
 	bool SubmitInputbox(const char* content);
+	DWORD* getTargetP(role &r);
 private:
 	static bool comp(const MONSTER_PROPERTY& a, const MONSTER_PROPERTY& b);
 	static bool comp_groud(const GROUND_GOODS& a, const GROUND_GOODS& b);

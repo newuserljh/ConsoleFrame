@@ -236,7 +236,7 @@ bool gamecall::loginGame(const char* user, const char* pass)
 
 
 /*
-函数功能:模拟按键 不支持回车键
+函数功能:模拟按键 不支持回车键,不可用
 参数一:按键码
 */
 bool gamecall::presskey(int vkcode)
@@ -287,13 +287,7 @@ HWND gamecall::GetHwndByPid(DWORD dwProcessID)
 }
 
 /*
-函数功能:向HWND及其所有子控件发送指定按键消息
-参数一:指定的父窗口句柄
-参数二:消息 缺省为回车键
-*/
-
-/*
-函数功能:postMessage模拟按键 支持回车键
+函数功能:postMessage模拟按键 支持回车键 向HWND及其所有子控件发送指定按键消息
 参数一:进程PID
 参数一:按键码 缺省为回车
 */
@@ -747,4 +741,25 @@ bool gamecall::SubmitInputbox(const char* content)
 		return false;
 	}
 	return true;
+}
+
+/*
+函数功能:获取角色 的目标的对象指针
+参数一:role对象
+返回值：对象指针
+*/
+DWORD* gamecall::getTargetP(role &r)
+{
+	if (*r.m_roleproperty.p_Target_ID)
+	{
+		DWORD id = *r.m_roleproperty.p_Target_ID;
+		std::vector<DWORD> vec;
+		r.Get_Envionment(vec);
+		
+		for (auto it:vec)
+		{
+			if (*(DWORD*)(it + 0x8) == id) return (DWORD*)it;
+		}
+	}
+	return nullptr;
 }
