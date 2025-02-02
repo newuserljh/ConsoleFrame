@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 #include <thread>
 #include <mutex>
-#include "monster.h"
+#include "m_object.h"
 #include "skill.h"
 #include "bag.h"
 #include "team.h"
@@ -31,7 +31,7 @@ HookReg hook;
 HookReg hook_npc_cmd;
 role r;//角色
 role Promenade; //元神
-monster m_mon;
+m_object m_obj;
 skill m_skill;
 bag r_bag;
 gamecall mfun;
@@ -517,40 +517,75 @@ void CTestDlg::AutoReturnToCity()
 void CTestDlg::OnBnClickedButton2()
 {
 	if (!r.init())return;
-	m_mon.m_monsterList.clear();
-	m_mon.m_groundList.clear();
 	CString s;
-	if (!r.Get_Envionment(m_mon.pOb_list))
+	if (!r.Get_Envionment(m_obj.p_pets, m_obj.p_npcs, m_obj.p_monster, m_obj.p_players))
 	{
 		s.Format("遍历周围错误：\n");
 		AppendText(m_edit2, s);
 		return;
 	}	
-	if (!r.Get_Ground(m_mon.pGr_list))
+	if (!r.Get_Ground(m_obj.p_ground))
 	{
 		s.Format("遍历地面错误：\n");
 		AppendText(m_edit2, s);
 		return;
 	}
-	m_mon.init();
-	s.Format("周围对象列表（怪物、NPC、其他玩家、宠物）：\n");
+	m_obj.init();
+	s.Format("周围对象列表：\n  怪物：\n");
 	AppendText(m_edit2, s);
-	for (size_t i = 0; i < m_mon.m_monsterList.size(); i++)
+	for (size_t i = 0; i < m_obj.m_monster.size(); i++)
 	{
-		s.Format("指针:%x  %s ID: %x, 坐标(x,y)：%d, %d   距离：%.2f\n", (DWORD)m_mon.m_monsterList[i].pName-0x10,
-			m_mon.m_monsterList[i].pName, 
-			*(m_mon.m_monsterList[i].ID),
-			*(m_mon.m_monsterList[i].X),
-			*(m_mon.m_monsterList[i].Y),
-			mfun.caclDistance(*(r.m_roleproperty.Object.X), *(r.m_roleproperty.Object.Y), *(m_mon.m_monsterList[i].X), *(m_mon.m_monsterList[i].Y)));
+		s.Format("指针:%x  %s ID: %x, 坐标(x,y)：%d, %d   距离：%.2f\n", (DWORD)m_obj.m_monster[i].pName-0x10,
+			m_obj.m_monster[i].pName,
+			*(m_obj.m_monster[i].ID),
+			*(m_obj.m_monster[i].X),
+			*(m_obj.m_monster[i].Y),
+			mfun.caclDistance(*(r.m_roleproperty.Object.X), *(r.m_roleproperty.Object.Y), *(m_obj.m_monster[i].X), *(m_obj.m_monster[i].Y)));
+		AppendText(m_edit2, s);
+	}
+	s.Format("玩家：\n");
+	AppendText(m_edit2, s);
+	for (size_t i = 0; i < m_obj.m_players.size(); i++)
+	{
+		s.Format("指针:%x  %s ID: %x, 坐标(x,y)：%d, %d   距离：%.2f\n", (DWORD)m_obj.m_players[i].pName - 0x10,
+			m_obj.m_players[i].pName,
+			*(m_obj.m_players[i].ID),
+			*(m_obj.m_players[i].X),
+			*(m_obj.m_players[i].Y),
+			mfun.caclDistance(*(r.m_roleproperty.Object.X), *(r.m_roleproperty.Object.Y), *(m_obj.m_players[i].X), *(m_obj.m_players[i].Y)));
+		AppendText(m_edit2, s);
+	}
+
+	s.Format("宝宝：\n");
+	AppendText(m_edit2, s);
+	for (size_t i = 0; i < m_obj.m_pets.size(); i++)
+	{
+		s.Format("指针:%x  %s ID: %x, 坐标(x,y)：%d, %d   距离：%.2f\n", (DWORD)m_obj.m_pets[i].pName - 0x10,
+			m_obj.m_pets[i].pName,
+			*(m_obj.m_pets[i].ID),
+			*(m_obj.m_pets[i].X),
+			*(m_obj.m_pets[i].Y),
+			mfun.caclDistance(*(r.m_roleproperty.Object.X), *(r.m_roleproperty.Object.Y), *(m_obj.m_pets[i].X), *(m_obj.m_pets[i].Y)));
+		AppendText(m_edit2, s);
+	}
+	s.Format("NPC：\n");
+	AppendText(m_edit2, s);
+	for (size_t i = 0; i < m_obj.m_npcs.size(); i++)
+	{
+		s.Format("指针:%x  %s ID: %x, 坐标(x,y)：%d, %d   距离：%.2f\n", (DWORD)m_obj.m_npcs[i].pName - 0x10,
+			m_obj.m_npcs[i].pName,
+			*(m_obj.m_npcs[i].ID),
+			*(m_obj.m_npcs[i].X),
+			*(m_obj.m_npcs[i].Y),
+			mfun.caclDistance(*(r.m_roleproperty.Object.X), *(r.m_roleproperty.Object.Y), *(m_obj.m_npcs[i].X), *(m_obj.m_npcs[i].Y)));
 		AppendText(m_edit2, s);
 	}
 
 	s.Format("地面：\n");
 	AppendText(m_edit2, s);
-	for (size_t i = 0; i < m_mon.m_groundList.size(); i++)
+	for (size_t i = 0; i < m_obj.m_ground.size(); i++)
 	{
-		s.Format(" %s : %d/%d\n", m_mon.m_groundList[i].pName, *m_mon.m_groundList[i].X, *m_mon.m_groundList[i].Y);
+		s.Format(" %s : %d/%d\n", m_obj.m_ground[i].pName, *m_obj.m_ground[i].X, *m_obj.m_ground[i].Y);
 		AppendText(m_edit2, s);
 	}
 
@@ -1085,9 +1120,9 @@ void CTestDlg::OnBnClickedButton9()
 	*          ****继续打怪
 	* */
 	//r.init();
-	//r.Get_Envionment(m_mon.pOb_list);
-	//r.Get_Ground(m_mon.pGr_list);
-	//m_mon.init();
+	//r.Get_Envionment(m_obj.pOb_list);
+	//r.Get_Ground(m_obj.pGr_list);
+	//m_obj.init();
 	//r_bag.maxSize = *r.m_roleproperty.Bag_Size;
 	//r_bag.bagBase = (DWORD)r.m_roleproperty.p_Bag_Base;
 	//m_skill.skillBase = (DWORD)r.m_roleproperty.p_Skill_Base;
@@ -1173,20 +1208,19 @@ void CTestDlg::AutoAvoidMonsters()
 	if (!r.init()) return;
 
 	// 获取周围怪物信息
-	m_mon.m_monsterList.clear();
-	if (!r.Get_Envionment(m_mon.pOb_list))
+	if (!r.Get_Envionment(m_obj.p_pets,m_obj.p_npcs,m_obj.p_monster,m_obj.p_players))
 	{
 		CString s;
 		s.Format("获取周围怪物信息错误：\n");
 		AppendText(m_edit2, s);
 		return;
 	}
-	m_mon.init();
+	m_obj.init();
 
 	// 遍历怪物列表，找到最近的怪物
 	MONSTER_PROPERTY* nearestMonster = nullptr;
 	float minDistance = FLT_MAX;
-	for (auto& monster : m_mon.m_monsterList)
+	for (auto& monster : m_obj.m_monster)
 	{
 		float distance = mfun.caclDistance(*r.m_roleproperty.Object.X, *r.m_roleproperty.Object.Y, *monster.X, *monster.Y);
 		if (distance < minDistance)

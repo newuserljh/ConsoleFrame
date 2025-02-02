@@ -170,16 +170,24 @@ bool role::init_equip()
 
 
 /*遍历周围对象*/
-bool role:: Get_Envionment(std::vector<DWORD> &vec, DWORD g_range)
+bool role::Get_Envionment(std::vector<DWORD>& pets, std::vector<DWORD>& npcs, std::vector<DWORD>& monsters, std::vector<DWORD>& players, DWORD g_range)
 {
-	vec.clear();
-	DWORD p_temp=0;
-	for (int i = (int)*m_roleproperty.Object.X- (int)g_range; i < (int)*m_roleproperty.Object.X + (int)g_range; i++)
+	pets.clear();
+	npcs.clear();
+	monsters.clear();
+	players.clear();
+	DWORD p_temp = 0;
+
+	// 宝宝名字的子字符串集合
+	std::vector<std::string> petNames = { "级踏云豹", "级震天狮", "级傲天凤", "级麒麟","级小麒麟", "级强化骷髅", "级变异骷髅", "级尸灵",
+		"级青铜兽", "级滚刀手", "级石人", "级铜锤手", "级火烈鸟", "级兽骑兵", "级兽骑统领", "级招魂使", "级烈焰使", "级猛魔统领" };
+
+	for (int i = (int)*m_roleproperty.Object.X - (int)g_range; i < (int)*m_roleproperty.Object.X + (int)g_range; i++)
 	{
-		if (i <= 0)i = 1;
+		if (i <= 0) i = 1;
 		for (int j = (int)*m_roleproperty.Object.Y - (int)g_range; j < (int)*m_roleproperty.Object.Y + (int)g_range; j++)
 		{
-			if (j <= 0)j = 1;
+			if (j <= 0) j = 1;
 			try
 			{
 				_asm
@@ -219,7 +227,44 @@ bool role:: Get_Envionment(std::vector<DWORD> &vec, DWORD g_range)
 				}
 				if (p_temp != 0)
 				{
-					if ((*(DWORD*)(p_temp + 0x80)!=0))vec.push_back(p_temp);/*周围其他对象*/
+					WORD t = *(WORD*)(p_temp + 0x68); //玩家
+					if (t==0)
+					{
+						players.push_back(p_temp);
+					}
+					else if (t==1) //NPC
+					{
+						npcs.push_back(p_temp);
+					}
+					else if (t==0x400)//怪物 0x400为心魔类怪物，个地图守卫
+					{
+						monsters.push_back(p_temp);
+					}
+					else if (t==2)
+					{
+						std::string name = (char*)((DWORD)p_temp + 0x10);
+						bool isPet = false;
+						for (const auto& petName : petNames)
+						{
+							if (name.find(petName) != std::string::npos)
+							{
+								isPet = true;
+								break;
+							}
+						}
+						if (isPet)
+						{
+							pets.push_back(p_temp);
+						}
+						else
+						{
+							monsters.push_back(p_temp);
+						}
+					}
+					else
+					{
+						//其他类型 后续输出到文件 debug
+					}					
 				}
 			}
 			catch (...)
@@ -229,7 +274,6 @@ bool role:: Get_Envionment(std::vector<DWORD> &vec, DWORD g_range)
 		}
 	}
 	return true;
-
 }
 
 bool role::Get_Ground(std::vector<DWORD>& vec, DWORD g_range)

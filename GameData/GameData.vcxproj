@@ -82,7 +82,7 @@
     <ClInclude Include="baseaddr.h" />
     <ClInclude Include="datastruct.h" />
     <ClInclude Include="gamecall.h" />
-    <ClInclude Include="monster.h" />
+    <ClInclude Include="m_object.h" />
     <ClInclude Include="role.h" />
     <ClInclude Include="skill.h" />
     <ClInclude Include="task.h" />
@@ -94,7 +94,7 @@
     <ClCompile Include="base.cpp" />
     <ClCompile Include="datastruct.cpp" />
     <ClCompile Include="gamecall.cpp" />
-    <ClCompile Include="monster.cpp" />
+    <ClCompile Include="m_object.cpp" />
     <ClCompile Include="role.cpp" />
     <ClCompile Include="skill.cpp" />
     <ClCompile Include="task.cpp" />

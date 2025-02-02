@@ -382,8 +382,8 @@ bool gamecall::comp(const MONSTER_PROPERTY& a, const MONSTER_PROPERTY& b)
 std::vector<MONSTER_PROPERTY> gamecall::sort_aroud_monster(role& r, std::vector<std::string>& vec, DWORD e_range)
 {
 	std::vector<MONSTER_PROPERTY> ret;
-	std::vector<DWORD>  near_Mon;
-	r.Get_Envionment(near_Mon, e_range); /*找到7格已内的怪物*/
+	std::vector<DWORD>  near_Mon,npcs,players,pets;
+	r.Get_Envionment(pets,npcs,near_Mon,players,e_range); /*找到7格已内的怪物*/
 	if (near_Mon.size())
 	{
 		for (unsigned i = 0; i < near_Mon.size(); i++)
@@ -753,9 +753,9 @@ DWORD* gamecall::getTargetP(role &r)
 	if (*r.m_roleproperty.p_Target_ID)
 	{
 		DWORD id = *r.m_roleproperty.p_Target_ID;
-		std::vector<DWORD> vec;
-		r.Get_Envionment(vec);
-		
+		std::vector<DWORD> vec,npcs,pets,players;
+		r.Get_Envionment(pets,npcs,vec,players);	
+
 		for (auto it:vec)
 		{
 			if (*(DWORD*)(it + 0x8) == id) return (DWORD*)it;

@@ -24,7 +24,7 @@
     <ClInclude Include="role.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="monster.h">
+    <ClInclude Include="m_object.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="skill.h">
@@ -59,7 +59,7 @@
     <ClCompile Include="role.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="monster.cpp">
+    <ClCompile Include="m_object.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="skill.cpp">
