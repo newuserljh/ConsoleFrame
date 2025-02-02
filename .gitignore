@@ -354,3 +354,4 @@ MigrationBackup/
 .ionide/
 /ConsoleFrame.sln
 /ConsoleFrame.sln
+/Console/cfg/gamedir.cfg

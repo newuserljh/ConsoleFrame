@@ -513,7 +513,7 @@ void CTestDlg::AutoReturnToCity()
 	}
 }
 
-// TODO: 遍历周围对象 地面 怪物NPC
+//  遍历周围对象 地面 怪物NPC
 void CTestDlg::OnBnClickedButton2()
 {
 	if (!r.init())return;
@@ -537,7 +537,7 @@ void CTestDlg::OnBnClickedButton2()
 	AppendText(m_edit2, s);
 	for (size_t i = 0; i < m_mon.m_monsterList.size(); i++)
 	{
-		s.Format("%s ID: %x, 坐标(x,y)：%d, %d   距离：%.2f\n",
+		s.Format("指针:%x  %s ID: %x, 坐标(x,y)：%d, %d   距离：%.2f\n", (DWORD)m_mon.m_monsterList[i].pName-0x10,
 			m_mon.m_monsterList[i].pName, 
 			*(m_mon.m_monsterList[i].ID),
 			*(m_mon.m_monsterList[i].X),

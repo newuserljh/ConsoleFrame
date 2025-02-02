@@ -10,7 +10,8 @@ struct MONSTER_PROPERTY
 
 	DWORD*  ID;// +8
 	char*  pName;// +0x10
-	DWORD*  HP;// +0x80
+	WORD* oType;// +0x68 //对象类型 0为玩家 ，1 为NPC， 2为怪物和宝宝(大刀和弓箭也是2)，0x400为心魔(各大地图守卫)
+ 	DWORD*  HP;// +0x80
 	DWORD*  HP_MAX;// +0x84
 	DWORD*  MP;// +0x88
 	DWORD*  MP_MAX;// +0x8c
