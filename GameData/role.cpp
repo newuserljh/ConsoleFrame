@@ -227,8 +227,10 @@ bool role::Get_Envionment(std::vector<DWORD>& pets, std::vector<DWORD>& npcs, st
 				}
 				if (p_temp != 0)
 				{
-					WORD t = *(WORD*)(p_temp + 0x68); //玩家
-					if (t==0)
+					if (*(DWORD*)(p_temp + 0x80) == 0)continue; //过滤死亡对象
+
+					WORD t = *(WORD*)(p_temp + 0x68); 
+					if (t==0)//玩家
 					{
 						players.push_back(p_temp);
 					}
