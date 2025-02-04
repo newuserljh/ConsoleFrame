@@ -1,6 +1,5 @@
 #include "m_object.h"
 
-
 m_object::m_object()
 {
 }
@@ -10,113 +9,36 @@ m_object::~m_object()
 {
 }
 
+// 初始化函数
 bool m_object::init()
 {
 	return init_ground() && init_object();
 }
 
+
+
+// 初始化对象（怪物、宠物、NPC、玩家）
 bool m_object::init_object()
 {
-	m_monster.clear();
-	m_npcs.clear();
-	m_pets.clear();
-	m_players.clear();
-	if (!p_monster.empty())
-	{
-		for (size_t i = 0; i < p_monster.size(); i++)
-		{
-			try
-			{
-				MONSTER_PROPERTY temp((DWORD*)p_monster[i]);
-				m_monster.push_back(temp);
-			}
-			catch (...)
-			{
-				return false;
-			}
-		}
-	}
-	
-	if (!p_pets.empty())
-	{
-		for (size_t i = 0; i < p_pets.size(); i++)
-		{
-			try
-			{
-				MONSTER_PROPERTY temp((DWORD*)p_pets[i]);
-				m_pets.push_back(temp);
-			}
-			catch (...)
-			{
-				return false;
-			}
-		}
-	}
-
-	if (!p_npcs.empty())
-	{
-		for (size_t i = 0; i < p_npcs.size(); i++)
-		{
-			try
-			{
-				MONSTER_PROPERTY temp((DWORD*)p_npcs[i]);
-				m_npcs.push_back(temp);
-			}
-			catch (...)
-			{
-				return false;
-			}
-		}
-	}
-
-	if (!p_players.empty())
-	{
-		for (size_t i = 0; i < p_players.size(); i++)
-		{
-			try
-			{
-				MONSTER_PROPERTY temp((DWORD*)p_players[i]);
-				m_players.push_back(temp);
-			}
-			catch (...)
-			{
-				return false;
-			}
-		}
-	}
-	return true;
+	return init_entities(p_monster, m_monster) &&
+		init_entities(p_pets, m_pets) &&
+		init_entities(p_npcs, m_npcs) &&
+		init_entities(p_players, m_players);
 }
 
+// 初始化地面物品
 bool m_object::init_ground()
 {
-	m_ground.clear();
-	if (!p_ground.empty())
-	{
-		for (size_t i = 0; i < p_ground.size(); i++)
-		{
-			try
-			{
-				GROUND_GOODS temp((DWORD*)p_ground[i]);
-				m_ground.push_back(temp);
-			}
-			catch (...)
-			{
-				return false;
-			}
-		}
-	}
-	return true;
+	return init_entities(p_ground, m_ground);
 }
 
-
+// 生成包含所有怪物名字的消息字符串
 std::string m_object::message()
 {
 	std::stringstream ss;
-	for (int i = 0; i != m_monster.size(); i++)
+	for (const auto& monster : m_monster)
 	{
-		ss << "怪物名字：" << m_monster[i].pName << std::endl;
+		ss << "怪物名字：" << monster.pName << std::endl;
 	}
 	return ss.str();
 }
-
-
