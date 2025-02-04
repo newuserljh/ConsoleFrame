@@ -531,7 +531,7 @@ void CTestDlg::OnBnClickedButton2()
 		return;
 	}
 	m_obj.init();
-	s.Format("周围对象列表：\n  怪物：\n");
+	s.Format("周围对象列表：\r\n怪物：\n");
 	AppendText(m_edit2, s);
 	for (size_t i = 0; i < m_obj.m_monster.size(); i++)
 	{
@@ -543,7 +543,7 @@ void CTestDlg::OnBnClickedButton2()
 			mfun.caclDistance(*(r.m_roleproperty.Object.X), *(r.m_roleproperty.Object.Y), *(m_obj.m_monster[i].X), *(m_obj.m_monster[i].Y)));
 		AppendText(m_edit2, s);
 	}
-	s.Format("玩家：\n");
+	s.Format("\r\n玩家：\n");
 	AppendText(m_edit2, s);
 	for (size_t i = 0; i < m_obj.m_players.size(); i++)
 	{
@@ -556,7 +556,7 @@ void CTestDlg::OnBnClickedButton2()
 		AppendText(m_edit2, s);
 	}
 
-	s.Format("宝宝：\n");
+	s.Format("\r\n宝宝：\n");
 	AppendText(m_edit2, s);
 	for (size_t i = 0; i < m_obj.m_pets.size(); i++)
 	{
@@ -568,7 +568,7 @@ void CTestDlg::OnBnClickedButton2()
 			mfun.caclDistance(*(r.m_roleproperty.Object.X), *(r.m_roleproperty.Object.Y), *(m_obj.m_pets[i].X), *(m_obj.m_pets[i].Y)));
 		AppendText(m_edit2, s);
 	}
-	s.Format("NPC：\n");
+	s.Format("\r\nNPC：\n");
 	AppendText(m_edit2, s);
 	for (size_t i = 0; i < m_obj.m_npcs.size(); i++)
 	{
@@ -581,7 +581,7 @@ void CTestDlg::OnBnClickedButton2()
 		AppendText(m_edit2, s);
 	}
 
-	s.Format("地面：\n");
+	s.Format("\r\n地面：\n");
 	AppendText(m_edit2, s);
 	for (size_t i = 0; i < m_obj.m_ground.size(); i++)
 	{
