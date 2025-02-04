@@ -1340,6 +1340,8 @@ void CTestDlg::OnBnClickedBtnRecnpc()
 	CString s;
 	if (rec_flag)
 	{
+		std::string scriptpath = (std::string)shareCli.m_pSMAllData->currDir + "\\script";
+		CreateDirectory(scriptpath.c_str(), NULL);// 创建 script 文件夹（如果不存在）
 		if (hook_npc_cmd.hookReg(0xCAC543, 10, &CallRecord))
 		{
 			rec_flag = false;
