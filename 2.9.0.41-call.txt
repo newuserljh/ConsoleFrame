@@ -68,3 +68,51 @@
 0054C58A | 8B8C24 04040000          | mov ecx,dword ptr ss:[esp+404]          |
 0054C591 | 33CC                     | xor ecx,esp                             |
 0054C593 | E8 A91A7B00              | call woool.dat.CFE041                   |
+
+
+
+00E310D5 | 81FB 01020000            | cmp ebx,201                             |
+00E310DB | 56                       | push esi                                |
+00E310DC | 57                       | push edi                                |
+00E310DD | 8B7C24 18                | mov edi,dword ptr ss:[esp+18]           |
+00E310E1 | 8BF1                     | mov esi,ecx                             |
+00E310E3 | 75 7F                    | jne woool.dat.E31164                    |
+00E310E5 | 85FF                     | test edi,edi                            |
+00E310E7 | 74 7B                    | je woool.dat.E31164                     |
+00E310E9 | 3BBE 5C020000            | cmp edi,dword ptr ds:[esi+25C]          |
+00E310EF | 75 0F                    | jne woool.dat.E31100                    |
+00E310F1 | 6A 02                    | push 2                                  | 1个参数 2  mov ecx, dword ptr ds:[0x0135FB10]
+00E310F3 | E8 D8F5FFFF              | call woool.dat.E306D0                   | 立即复活 
+00E310F8 | 5F                       | pop edi                                 |
+00E310F9 | 5E                       | pop esi                                 |
+00E310FA | B0 01                    | mov al,1                                |
+00E310FC | 5B                       | pop ebx                                 |
+00E310FD | C2 0C00                  | ret C                                   |
+00E31100 | 3BBE 60020000            | cmp edi,dword ptr ds:[esi+260]          |
+
+
+006279A8 | 75 3C                    | jne woool.dat.6279E6                    |
+006279AA | 8B0D 08FB3501            | mov ecx,dword ptr ds:[135FB08]          |
+006279B0 | 8B01                     | mov eax,dword ptr ds:[ecx]              |
+006279B2 | 8B90 FC000000            | mov edx,dword ptr ds:[eax+FC]           |
+006279B8 | 6A 00                    | push 0                                  |
+006279BA | 68 00000100              | push 10000                              |
+006279BF | 68 04030000              | push 304                                |
+006279C4 | FFD2                     | call edx                                |
+006279C6 | 8B06                     | mov eax,dword ptr ds:[esi]              |
+006279C8 | 8B90 8C010000            | mov edx,dword ptr ds:[eax+18C]          |
+006279CE | 8BCE                     | mov ecx,esi                             |
+006279D0 | FFD2                     | call edx                                |
+006279D2 | 8B0D 10FB3501            | mov ecx,dword ptr ds:[135FB10]          |
+006279D8 | 6A 01                    | push 1                                  | 1个参数 1  mov ecx, dword ptr ds:[0x0135FB10]
+006279DA | E8 71680600              | call woool.dat.68E250                   | 小退
+006279DF | B0 01                    | mov al,1                                |
+006279E1 | E9 58030000              | jmp woool.dat.627D3E                    |
+006279E6 | 3D C8000500              | cmp eax,500C8                           |
+006279EB | 0F85 A1000000            | jne woool.dat.627A92                    |
+006279F1 | 8B06                     | mov eax,dword ptr ds:[esi]              |
+006279F3 | 8B90 8C010000            | mov edx,dword ptr ds:[eax+18C]          |
+006279F9 | FFD2                     | call edx                                |
+006279FB | 8B0D 10FB3501            | mov ecx,dword ptr ds:[135FB10]          |
+00627A01 | E8 1A130600              | call woool.dat.688D20                   |
+00627A06 | 8B0D 08FB3501            | mov ecx,dword ptr ds:[135FB08]          |

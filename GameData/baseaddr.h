@@ -40,7 +40,8 @@
 #define CALL_OPEN_BAG_REC 0x6AC2D0 //获取角色对象
 #define CALL_RCV_GOODS 0x68F490 //回收物品
 #define CALL_SUBMIT_INPUTBOX 0x006E41E0 //提交输入框内容call
-
+#define CALL_SMALL_EXIT 0x68E250//小退call
+#define CALL_IMMDIA_REBIRTH 0x00E306D0 //立即复活call
 
 
 

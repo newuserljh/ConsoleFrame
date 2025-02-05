@@ -763,3 +763,55 @@ DWORD* gamecall::getTargetP(role &r)
 	}
 	return nullptr;
 }
+
+/*
+函数功能:角色死亡后立即复活
+参数一:0
+返回值：bool
+*/
+bool  gamecall::immdia_rebirth(void)
+{
+	try
+	{
+		_asm
+		{
+			pushad
+			push 0x2
+			mov ecx, dword ptr ds : [CALL_ECX]
+			mov edx, CALL_IMMDIA_REBIRTH
+			call edx
+			popad
+		}
+	}
+	catch (...)
+	{
+		return false;
+	}
+	return true;
+}
+
+/*
+函数功能:小退游戏到角色选择界面
+参数一:0
+返回值：bool
+*/
+bool  gamecall::small_exit(void)
+{
+	try
+	{
+		_asm
+		{
+			pushad
+			push 0x1
+			mov ecx, dword ptr ds : [CALL_ECX]
+			mov edx, CALL_SMALL_EXIT
+			call edx
+			popad
+		}
+	}
+	catch (...)
+	{
+		return false;
+	}
+	return true;
+}

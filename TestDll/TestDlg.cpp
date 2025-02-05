@@ -867,6 +867,7 @@ void  CTestDlg::MakeTeam(CTestDlg* pDlg)
 }
 
 
+
 /*寻路线程*/
 UINT __cdecl CTestDlg::threadGoto(LPVOID p)
 {
@@ -1271,6 +1272,9 @@ void CTestDlg::OnTimer(UINT_PTR nIDEvent)
 	case 11111:
 		MakeTeam(this);
 		break;
+	case 22222:
+
+		break;
 	default:
 		break;
 	}
@@ -1297,6 +1301,7 @@ void CTestDlg::OnBnClickedBtnGj()
 			// 设置智能闪避线程，用于自动躲避怪物
 			m_threadAutoAvoid=AfxBeginThread(threadAutoAvoidMon, (LPVOID)this);
 		}
+		SetTimer(22222, 5000, NULL);;	//设置定时器5s 检测角色是否死亡
 	}
 	else
 	{
@@ -1306,6 +1311,7 @@ void CTestDlg::OnBnClickedBtnGj()
 		{
 			WaitForSingleObject(m_threadAutoAvoid ,60000);
 		}
+		KillTimer(22222);
 	}	
 }
 
