@@ -266,6 +266,7 @@ BOOL CTestDlg::OnInitDialog()
 	}
 	shareindex = shareCli.getIndexByPID(GetCurrentProcessId());
 
+
 	//HOOK连接服务器失败代码
 	hook.hookReg(0x5F8B69, 5, CallTest);
 
@@ -866,6 +867,38 @@ void  CTestDlg::MakeTeam(CTestDlg* pDlg)
 	}
 }
 
+/*检测角色是否死亡*/
+void  CTestDlg::RoleIsDeath(void)
+{
+	r.init();
+	if (*r.m_roleproperty.Object.HP>0)return;
+	if (tflag_attack) //停止打怪 闪避 背包处理线程
+	{
+		tflag_attack = false;
+		WaitForSingleObject(m_threadAttack, 60000);
+		WaitForSingleObject(m_threadBagProcess, 60000);
+		if (auto_avoid_mon)
+		{
+			WaitForSingleObject(m_threadAutoAvoid, 60000);
+		}
+		KillTimer(22222);
+	}
+
+	mfun.immdia_rebirth();//立即复活
+	Sleep(2000);
+	mfun.presskey(GetCurrentProcessId());
+	Sleep(200);
+	mfun.presskey(GetCurrentProcessId());
+	if (*r.m_roleproperty.Object.HP > 0)return; 
+	mfun.small_exit();//小退
+	Sleep(2000);
+	mfun.presskey(GetCurrentProcessId());
+	Sleep(200);
+	mfun.presskey(GetCurrentProcessId());
+	if (*r.m_roleproperty.Object.HP > 0)return;
+	shareCli.m_pSMAllData->m_sm_data[shareindex].server_alive = false;//由控制台大退
+}
+
 
 
 /*寻路线程*/
@@ -1273,7 +1306,7 @@ void CTestDlg::OnTimer(UINT_PTR nIDEvent)
 		MakeTeam(this);
 		break;
 	case 22222:
-
+		RoleIsDeath();
 		break;
 	default:
 		break;

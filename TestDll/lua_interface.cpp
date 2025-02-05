@@ -96,6 +96,8 @@ void lua_interface::registerClasses()
 		.addFunction("RecovryGoods", &gamecall::RecovryGoods)
 		.addFunction("RecovryGoods_To_Exp", &gamecall::RecovryGoods_To_Exp)
 		.addFunction("RecovryGoods_To_Gold", &gamecall::RecovryGoods_To_Gold)
+		.addFunction("Ð¡ÍË", &gamecall::small_exit)
+		.addFunction("Á¢¼´¸´»î", &gamecall::immdia_rebirth)
 		//.addFunction("SubmitInputbox", &gamecall::SubmitInputbox)
 		.endClass()
 				    

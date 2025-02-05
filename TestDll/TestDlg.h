@@ -68,6 +68,8 @@ public:
 	void  MakeTeam(CTestDlg* p);
 	int m_team_check_id;
 
+	void  RoleIsDeath(void);//死亡处理
+
 	//智能闪避变量
 	bool auto_avoid_mon;
 	CWinThread* m_threadAutoAvoid;
