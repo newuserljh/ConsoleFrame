@@ -40,6 +40,8 @@ public:
 	DWORD* getTargetP(role &r);
 	bool immdia_rebirth(void);
 	bool small_exit(void);
+	DWORD  get_buy_goods_ID(DWORD goods_index=0);
+	bool buyGoods(std::string& goodsName, DWORD npcId,DWORD isBind=0, unsigned number=1);
 
 private:
 	static bool comp(const MONSTER_PROPERTY& a, const MONSTER_PROPERTY& b);

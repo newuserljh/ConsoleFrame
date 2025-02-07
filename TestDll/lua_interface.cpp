@@ -130,4 +130,118 @@ bool lua_interface::presskey(int vkcode)
 	return m_gcall.presskey(::GetCurrentProcessId(),vkcode);
 }
 
-//导出函数到lua全局
+
+
+
+// 加载并检查已解析的文件
+void lua_interface::load_and_store_map_data(lua_State* L, const std::string& file_path, MapNames& map_names, Transitions& transitions) 
+{
+	int result = luaL_loadfile(L, file_path.c_str());
+	if(result != 0) {
+		std::cerr << "Lua error: " << lua_tostring(L, -1) << std::endl;
+		lua_pop(L, 1); // 移除错误消息
+		return;
+	}
+
+	// 执行 Lua 文件
+	result = lua_pcall(L, 0, LUA_MULTRET, 0);
+	if (result != 0) {
+		std::cerr << "Lua error: " << lua_tostring(L, -1) << std::endl;
+		lua_pop(L, 1); // 移除错误消息
+		return;
+	}
+
+	// 获取返回值（应该是一个表）
+	if (!lua_istable(L, -1)) {
+		std::cerr << "预期返回一个表" << std::endl;
+		return;
+	}
+
+	lua_pushnil(L); // 第一个键
+	while (lua_next(L, -2) != 0) {
+		// 'key' 是在栈顶 (-1)，'value' 是在栈顶的下一个位置 (-2)
+		if (lua_type(L, -2) == LUA_TSTRING) {
+			const char* key = lua_tostring(L, -2);
+			if (std::string(key) == "map_names") {
+				lua_pushnil(L); // 第一个键
+				while (lua_next(L, -2) != 0) {
+					const char* map_id = lua_tostring(L, -2);
+					const char* map_name = lua_tostring(L, -1);
+					map_names[map_id] = map_name;
+					lua_pop(L, 1); // 移除 'value'，保留 'key' 以便继续迭代
+				}
+			}
+			else if (std::string(key) == "transitions") {
+				lua_pushnil(L); // 第一个键
+				while (lua_next(L, -2) != 0) {
+					const char* from_map = lua_tostring(L, -2);
+					TransitionMap transition_map;
+					lua_pushnil(L); // 第一个键
+					while (lua_next(L, -2) != 0) {
+						const char* to_map = lua_tostring(L, -2);
+						std::vector<Position> positions;
+						lua_pushnil(L); // 第一个键
+						while (lua_next(L, -2) != 0) {
+							Position pos;
+							pos.x = lua_tointeger(L, -2);
+							pos.y = lua_tointeger(L, -1);
+							positions.push_back(pos);
+							lua_pop(L, 1); // 移除 'value'，保留 'key' 以便继续迭代
+						}
+						transition_map[to_map] = positions;
+						lua_pop(L, 1); // 移除 'value'，保留 'key' 以便继续迭代
+					}
+					transitions[from_map] = transition_map;
+					lua_pop(L, 1); // 移除 'value'，保留 'key' 以便继续迭代
+				}
+			}
+		}
+		lua_pop(L, 1); // 移除 'value'，保留 'key' 以便继续迭代
+	}
+}
+
+//找到跨图路径
+bool lua_interface::find_path(const MapNames& map_names, const Transitions& transitions, const std::string& start, const std::string& end, 
+	std::vector<std::pair<std::string, std::vector<Position>>>& path_with_positions)
+{
+	std::unordered_map<std::string, std::string> came_from;
+	std::queue<std::string> queue;
+
+	queue.push(start);
+	came_from[start] = "";
+
+	while (!queue.empty()) {
+		std::string current = queue.front();
+		queue.pop();
+
+		if (current == end) {
+			// 回溯路径
+			std::string node = end;
+			std::vector<std::pair<std::string, std::vector<Position>>> temp_path;
+			while (!node.empty()) {
+				auto it = transitions.find(node);
+				if (it != transitions.end() && !came_from[node].empty()) {
+					const std::string& prev_node = came_from[node];
+					temp_path.push_back({ node, it->second.at(prev_node) });
+				}
+				node = came_from[node];
+			}
+			std::reverse(temp_path.begin(), temp_path.end());
+			path_with_positions = temp_path;
+			return true;
+		}
+
+		auto it = transitions.find(current);
+		if (it != transitions.end()) {
+			for (auto transition_it = it->second.begin(); transition_it != it->second.end(); ++transition_it) {
+				const std::string& to_map = transition_it->first;
+				if (came_from.find(to_map) == came_from.end()) {
+					queue.push(to_map);
+					came_from[to_map] = current;
+				}
+			}
+		}
+	}
+
+	return false;
+}

@@ -5,7 +5,16 @@
 #include "gamecall.h"
 #include <../luajit/src/lua.hpp>
 #include <LuaBridge/LuaBridge.h>
+#include <unordered_map>
+#include <queue>
 
+struct Position {
+	int x, y;
+};
+
+using TransitionMap = std::unordered_map<std::string, std::vector<Position>>;
+using MapNames = std::unordered_map<std::string, std::string>;
+using Transitions = std::unordered_map<std::string, TransitionMap>;
 
 class lua_interface
 {
@@ -26,5 +35,10 @@ private:
 public:
 	//导出本类函数
 	bool presskey(int vkcode);
+	bool find_path(const MapNames& map_names, const Transitions& transitions, const std::string& start, const std::string& end,
+		std::vector<std::pair<std::string, std::vector<Position>>>& path_with_positions);
+	void load_and_store_map_data(lua_State* L, const std::string& file_path, MapNames& map_names, Transitions& transitions);
+private:
+
 };
 

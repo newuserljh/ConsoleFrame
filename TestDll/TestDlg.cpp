@@ -266,6 +266,8 @@ BOOL CTestDlg::OnInitDialog()
 	}
 	shareindex = shareCli.getIndexByPID(GetCurrentProcessId());
 
+	std::string cfgtpath = (std::string)shareCli.m_pSMAllData->currDir + "\\cfg";
+	CreateDirectory(cfgtpath.c_str(), NULL);// 创建 cfg 文件夹（如果不存在）
 
 	//HOOK连接服务器失败代码
 	hook.hookReg(0x5F8B69, 5, CallTest);
@@ -872,7 +874,12 @@ void  CTestDlg::RoleIsDeath(void)
 {
 	r.init();
 	if (*r.m_roleproperty.Object.HP>0)return;
-	if (tflag_attack) //停止打怪 闪避 背包处理线程
+	//保存正在执行的任务到 ./cfg/角色名字.cfg
+	std::string cfg_file_path = (std::string)shareCli.m_pSMAllData->currDir + "\\cfg";
+	cfg_file_path = cfg_file_path + r.m_roleproperty.Object.pName +".cfg";
+	tools::getInstance()->write2file(cfg_file_path, "当前任务", std::ios::out);
+
+		if (tflag_attack) //停止打怪 闪避 背包处理线程
 	{
 		tflag_attack = false;
 		WaitForSingleObject(m_threadAttack, 60000);
@@ -889,13 +896,27 @@ void  CTestDlg::RoleIsDeath(void)
 	mfun.presskey(GetCurrentProcessId());
 	Sleep(200);
 	mfun.presskey(GetCurrentProcessId());
-	if (*r.m_roleproperty.Object.HP > 0)return; 
+	if (*r.m_roleproperty.Object.HP > 0)
+	{
+		auto curr_tast = tools::getInstance()->ReadTxt(cfg_file_path);
+		//继续执行保存的任务
+
+		return;
+	}
+
 	mfun.small_exit();//小退
 	Sleep(2000);
 	mfun.presskey(GetCurrentProcessId());
 	Sleep(200);
 	mfun.presskey(GetCurrentProcessId());
-	if (*r.m_roleproperty.Object.HP > 0)return;
+	if (*r.m_roleproperty.Object.HP > 0)
+	{
+		auto curr_tast = tools::getInstance()->ReadTxt(cfg_file_path);
+		//继续执行保存的任务
+
+		return;
+	}
+
 	shareCli.m_pSMAllData->m_sm_data[shareindex].server_alive = false;//由控制台大退
 }
 
@@ -1082,70 +1103,51 @@ void CTestDlg::OnBnClickedButton9()
 
 	// 获取周围怪物信息
 		CString s;
-
-	
+		std::ostringstream output;
 		
-			int newX = *r.m_roleproperty.Object.X - 0;
-			int newY = *r.m_roleproperty.Object.Y - 2;
-			mfun.Run_or_Step_To(newX, newY, 2);
-			Sleep(500);
+		MapNames map_names;
+		Transitions transitions;
+		std::string input_file = (std::string)shareCli.m_pSMAllData->currDir + "\\map\\map_data.lua";
+		m_luaInterface.load_and_store_map_data(L, input_file, map_names, transitions);
 
+		// 查找路径
+		std::string start_name = "落霞岛";
+		std::string end_name = "尸王殿";
 
-		//判断是否成功 移动到 0 ，+2
-	
-			newX = *r.m_roleproperty.Object.X - 0;
-			newY = *r.m_roleproperty.Object.Y + 2;
-			mfun.Run_or_Step_To(newX, newY, 2);
-			Sleep(500);
+		std::string start_id, end_id;
+		for (const auto& pair : map_names) {
+			if (pair.second == start_name) {
+				start_id = pair.first;
+			}
+			if (pair.second == end_name) {
+				end_id = pair.first;
+			}
+		}
+		s.Format("%s  %s \t\n", start_id.c_str(),end_id.c_str());
+		AppendText(m_edit2, s);
+		if (start_id.empty() || end_id.empty()) {
+			std::cerr << "未找到指定的地图名称" << std::endl;
+			return;
+		}
 
-
-		//判断是否成功 移动到 -2 ，-2
-	
-			newX = *r.m_roleproperty.Object.X - 2;
-			newY = *r.m_roleproperty.Object.Y - 2;
-			mfun.Run_or_Step_To(newX, newY, 2);
-			Sleep(500);
-		
-
-
-		//判断是否成功 移动到 -2 ，0
-		
-			newX = *r.m_roleproperty.Object.X - 2;
-			newY = *r.m_roleproperty.Object.Y + 0;
-			mfun.Run_or_Step_To(newX, newY, 2);
-			Sleep(500);
-
-
-		//判断是否成功 移动到 -2 ，+2
-		
-			newX = *r.m_roleproperty.Object.X - 2;
-			newY = *r.m_roleproperty.Object.Y + 2;
-			mfun.Run_or_Step_To(newX, newY, 2);
-			Sleep(500);
-
-		//判断是否成功 移动到 +2 ，+2
-			newX = *r.m_roleproperty.Object.X + 2;
-			newY = *r.m_roleproperty.Object.Y + 2;
-			mfun.Run_or_Step_To(newX, newY, 2);
-			Sleep(500);
-
-		//判断是否成功 移动到 +2 ，0
-			newX = *r.m_roleproperty.Object.X + 2;
-			newY = *r.m_roleproperty.Object.Y + 0;
-			mfun.Run_or_Step_To(newX, newY, 2);
-			Sleep(500);
-	
-
-		//判断是否成功 移动到 +2 ，-2
-			newX = *r.m_roleproperty.Object.X + 2;
-			newY = *r.m_roleproperty.Object.Y - 2;
-			mfun.Run_or_Step_To(newX, newY, 2);
-			Sleep(500);
-
-
-
-
-
+		std::vector<std::pair<std::string, std::vector<Position>>> path_with_positions;
+		if (m_luaInterface.find_path(map_names, transitions, start_id, end_id, path_with_positions)) {
+			output << "找到路径：" << std::endl;
+			for (const auto& entry : path_with_positions) {
+				const std::string& id = entry.first;
+				const std::vector<Position>& positions = entry.second;
+				output << map_names.at(id) << " -> ";
+				for (const auto& pos : positions) {
+					output << "(" << pos.x << ", " << pos.y << ") ";
+				}
+				output << std::endl;
+			}
+		}
+		else {
+			output << "未找到从 " << start_name << " 到 " << end_name << " 的路径\n";
+		}
+		s.Format("%s \t\n", output.str().c_str());
+		AppendText(m_edit2, s);
 
 	/*自动打怪 需要启动：①打怪线程优先级正常 ②遍历周围对象、地面并拾取线程 优先级中高 ③寻路线程、智能闪避 优先级最高
 	*
@@ -1340,7 +1342,7 @@ void CTestDlg::OnBnClickedBtnGj()
 	{
 		WaitForSingleObject(m_threadAttack, 60000);
 		WaitForSingleObject(m_threadBagProcess, 60000);
-		if (auto_avoid_mon)
+		if (m_threadAutoAvoid !=NULL)
 		{
 			WaitForSingleObject(m_threadAutoAvoid ,60000);
 		}

@@ -815,3 +815,154 @@ bool  gamecall::small_exit(void)
 	}
 	return true;
 }
+
+/*
+函数功能:获取购买物品封包的物品ID，需要先选择物品之后才可以调用
+参数一:索引从0开始，默认0（第一个）
+返回值：物品ID
+*/
+DWORD  gamecall::get_buy_goods_ID(DWORD goods_index)
+{
+	DWORD goodsid = 0;
+	try
+	{
+		_asm
+		{
+			pushad
+			push goods_index
+			mov ecx, 0x110D9E8
+			mov edx, CALL_GET_BUY_GOODS_ID
+			call edx
+			mov eax, dword ptr ds : [eax + 0x20]
+			mov goodsid,eax
+			popad
+		}
+	}
+	catch (...)
+	{
+		return false;
+	}
+	return goodsid;
+}
+
+
+/*
+函数功能:买物品
+参数一:物品名字
+参数二:NPC——ID
+参数三:是否绑定，默认不绑定，选择绑定金币购买的话，设置为1
+参数四:买入物品数量,为空的话买1个
+返回值：bool
+*/
+bool gamecall::buyGoods(std::string& goodsName,DWORD npcId,DWORD isBind,unsigned number)
+{
+	/*  std::vector<std::string> drug = {"强效太阳神水", "太阳神水", "金创药(小量)", "金创药(中量)","金创药(大量)", "魔法药(小量)", "魔法药(中量)", "魔法药(大量)",
+		"金创药（小）包", "金创药（中）包", "魔法药（小）包", "魔法药（中）包", "超级金创药", "超级魔法药", "特级金创药", "特级魔法药", "特级金创药包", "特级魔法药包" ,
+		"万年雪霜","鹿茸","治疗药水" }; //0x64
+	std::vector<std::string> books = { "初级剑法", "血影刀法", "残影刀法", "金创药(中量)","攻杀剑法", "护身真气", "刺杀剑术", "抱月刀",
+	"半月弯刀", "野蛮冲撞", "战魂真悟", "雷霆剑", "烈火剑法", "破击剑法", "破盾斩", "突斩", "金刚护体", "擒龙手" ,"移形换影" ,"小火球" ,"抗拒火环" ,"诱惑之光" ,"地狱火焰" ,"雷电术" ,
+	"冰箭术","瞬间移动","火炎刀" ,"风火轮" ,"爆裂火焰" ,"火墙" ,"疾光电影" ,"冰龙破" ,"玄冰刃" ,"地狱雷光" ,"法之魄" ,"魔法盾" ,"圣言术" ,"五雷轰" ,"冰咆哮" ,"风影盾" ,"兽灵术" ,"冰旋风" ,
+	"狂龙紫电","化身蝙蝠" ,"魔魂术","流星火雨" ,"治疗术" ,"精神战法" ,"诅咒术" ,"赶尸" ,"隐身术" ,"替身法符" ,"集体隐身术" ,"幽灵盾" ,"神圣战甲术" ,"狮子吼" ,"困魔咒" ,"灵魂墙" ,"道心清明" ,
+		"群体治愈术" ,"召唤神兽" ,"神光术" ,"解毒术" ,"幽冥火咒" ,"强化骷髅术" ,"心灵召唤" ,"遁地" };//0x32  */
+
+
+		//先处理物品名字和npc，确定call的第四个参数   0x64（药）  0x32（书，地牢，随机）  0x1E(沙回，地牢包) 1（回城） 0xA（随机包，修复油）
+	DWORD param_4 = 0;
+	if (npcId==NPC_ZJ_YDZG) //中州药店
+	{
+		if ((goodsName.find("毒药") != std::string::npos) || (goodsName.find("稻草人") != std::string::npos))
+		{
+			param_4 = get_buy_goods_ID(); //买毒药
+		}
+		else
+		{
+			param_4 = 0x64;//买药
+		}
+	}
+	if (npcId==NPC_ZJ_ZHP)//杂货
+	{
+		if (goodsName == "沙城回城卷" || goodsName == "地牢逃脱卷包")
+		{
+			param_4 = 0x32;
+		}
+		if (goodsName=="地牢卷轴"|| goodsName == "随机卷轴")
+		{
+			param_4 = 0x32;
+		}
+		if (goodsName == "回城卷轴" )
+		{
+			param_4 = 1;
+		}
+		if (goodsName == "随机传送卷包" || goodsName == "修复油")
+		{
+			param_4 = 0xA;
+		}
+		if (goodsName == "道符" || goodsName == "道符（大）")
+		{
+			param_4 = get_buy_goods_ID();
+		}
+	}
+	//if (npcId == NPC_ZJ_SDZG)param_4 = 0x32; //买书，书店老板在屋里 暂时未实现
+	else
+	{
+		param_4 = get_buy_goods_ID();
+	}
+	if (param_4 == 0) return false;
+
+	const char* gname = goodsName.c_str();
+
+	if ((param_4< 0x65) && (param_4>0)) //购买要 卷轴等 不需要物品ID
+	{
+		for (unsigned i = 0; i < number; i++)
+		{
+			try
+			{
+				_asm
+				{
+					pushad
+					push 0
+					push isBind
+					push gname
+					push param_4
+					push npcId
+					mov ecx, dword ptr ds : [CALL_ECX]
+					mov edx, CALL_BUY_GOODS
+					call edx
+					popad
+				}
+			}
+			catch (...)
+			{
+				return false;
+			}
+		}
+	}
+	else //需要ID
+	{
+		for (unsigned i = 0; i < number; i++)
+		{
+			param_4 = get_buy_goods_ID(i);
+			try
+			{
+				_asm
+				{
+					pushad
+					push 0
+					push isBind
+					push gname
+					push param_4
+					push npcId
+					mov ecx, dword ptr ds : [CALL_ECX]
+					mov edx, CALL_BUY_GOODS
+					call edx
+					popad
+				}
+			}
+			catch (...)
+			{
+				return false;
+			}
+		}
+	}
+	return true;
+}

@@ -116,3 +116,113 @@
 006279FB | 8B0D 10FB3501            | mov ecx,dword ptr ds:[135FB10]          |
 00627A01 | E8 1A130600              | call woool.dat.688D20                   |
 00627A06 | 8B0D 08FB3501            | mov ecx,dword ptr ds:[135FB08]          |
+
+
+00CA6E08 | 57                       | push edi                                 |
+00CA6E09 | 8D8E 84020000            | lea ecx,dword ptr ds:[esi+284]           | ecx:NtUserPeekMessage+C
+00CA6E0F | E8 5CAA75FF              | call woool.dat.401870                    |
+00CA6E14 | 8B8E 70020000            | mov ecx,dword ptr ds:[esi+270]           | ecx:NtUserPeekMessage+C
+00CA6E1A | 6A 00                    | push 0                                   |
+00CA6E1C | 89AE A0020000            | mov dword ptr ds:[esi+2A0],ebp           |
+00CA6E22 | E8 79F48FFF              | call woool.dat.5A62A0                    |
+00CA6E27 | E9 CF000000              | jmp woool.dat.CA6EFB                     |
+00CA6E2C | 837F 18 10               | cmp dword ptr ds:[edi+18],10             | [edi+18]:_invalid_parameter+110
+00CA6E30 | 72 05                    | jb woool.dat.CA6E37                      |
+00CA6E32 | 8B47 04                  | mov eax,dword ptr ds:[edi+4]             |
+00CA6E35 | EB 03                    | jmp woool.dat.CA6E3A                     |
+00CA6E37 | 8D47 04                  | lea eax,dword ptr ds:[edi+4]             |
+00CA6E3A | 0FB657 28                | movzx edx,byte ptr ds:[edi+28]           |
+00CA6E3E | 8B0D 10FB3501            | mov ecx,dword ptr ds:[135FB10]           | ecx:NtUserPeekMessage+C
+00CA6E44 | 6A 00                    | push 0                                   | 0
+00CA6E46 | 52                       | push edx                                 | 0金币  1绑定金币 可能是买入是否绑定
+00CA6E47 | 50                       | push eax                                 | 物品名字
+00CA6E48 | 8B47 20                  | mov eax,dword ptr ds:[edi+20]            |
+00CA6E4B | 50                       | push eax                                 | 0x64（药）  0x32（书，地牢，随机）  0x1E(沙回，地牢包) 1（回城） 0xA（随机包，修复油）
+00CA6E4C | 55                       | push ebp                                 | npc ID
+00CA6E4D | E8 AE819EFF              | call woool.dat.68F000                    | 买药call 和买卷轴 买书
+00CA6E52 | E9 A4000000              | jmp woool.dat.CA6EFB                     |
+00CA6E57 | 83F8 03                  | cmp eax,3                                |
+00CA6E5A | 75 2F                    | jne woool.dat.CA6E8B                     |
+00CA6E5C | 57                       | push edi                                 |
+00CA6E5D | B9 E8D91001              | mov ecx,woool.dat.110D9E8                | ecx:NtUserPeekMessage+C
+00CA6E62 | E8 C969F0FF              | call woool.dat.BAD830                    |
+00CA6E67 | 8378 18 10               | cmp dword ptr ds:[eax+18],10             |
+00CA6E6B | 72 05                    | jb woool.dat.CA6E72                      |
+00CA6E6D | 8B40 04                  | mov eax,dword ptr ds:[eax+4]             |
+00CA6E70 | EB 03                    | jmp woool.dat.CA6E75                     |
+00CA6E72 | 83C0 04                  | add eax,4                                |
+00CA6E75 | 8B0D 10FB3501            | mov ecx,dword ptr ds:[135FB10]           | ecx:NtUserPeekMessage+C
+00CA6E7B | 50                       | push eax                                 |
+00CA6E7C | 55                       | push ebp                                 |
+00CA6E7D | E8 0E829EFF              | call woool.dat.68F090                    |
+00CA6E82 | C605 CDD91001 01         | mov byte ptr ds:[110D9CD],1              |
+00CA6E89 | EB 70                    | jmp woool.dat.CA6EFB                     |
+00CA6E8B | 83F8 04                  | cmp eax,4                                |
+00CA6E8E | 75 3A                    | jne woool.dat.CA6ECA                     |
+00CA6E90 | 57                       | push edi                                 | 物品索引 从0开
+00CA6E91 | B9 E8D91001              | mov ecx,woool.dat.110D9E8                | ecx:NtUserPeekMessage+C
+00CA6E96 | E8 9569F0FF              | call woool.dat.BAD830                    | 获取所买物品的 物品ID
+00CA6E9B | C605 28D31001 01         | mov byte ptr ds:[110D328],1              |
+00CA6EA2 | 8378 18 10               | cmp dword ptr ds:[eax+18],10             |
+00CA6EA6 | 72 05                    | jb woool.dat.CA6EAD                      |
+00CA6EA8 | 8B48 04                  | mov ecx,dword ptr ds:[eax+4]             | ecx:NtUserPeekMessage+C
+00CA6EAB | EB 03                    | jmp woool.dat.CA6EB0                     |
+00CA6EAD | 8D48 04                  | lea ecx,dword ptr ds:[eax+4]             | ecx:NtUserPeekMessage+C
+00CA6EB0 | 0FB650 28                | movzx edx,byte ptr ds:[eax+28]           |
+00CA6EB4 | 8B40 20                  | mov eax,dword ptr ds:[eax+20]            | 物品ID 上面CALL的 [eax+0x20]
+00CA6EB7 | 6A 00                    | push 0                                   |
+00CA6EB9 | 52                       | push edx                                 | 是否绑定
+00CA6EBA | 51                       | push ecx                                 | 物品名字
+00CA6EBB | 8B0D 10FB3501            | mov ecx,dword ptr ds:[135FB10]           | ecx:NtUserPeekMessage+C
+00CA6EC1 | 50                       | push eax                                 | ID
+00CA6EC2 | 55                       | push ebp                                 |
+00CA6EC3 | E8 38819EFF              | call woool.dat.68F000                    | 买物call  除了买药和卷轴之外
+00CA6EC8 | EB 31                    | jmp woool.dat.CA6EFB                     |
+00CA6ECA | 83F8 02                  | cmp eax,2                                |
+00CA6ECD | 75 2C                    | jne woool.dat.CA6EFB                     |
+00CA6ECF | 57                       | push edi                                 |
+
+
+
+0068F023 | 83C4 0C                  | add esp,C                                |
+0068F026 | 66:C746 04 F603          | mov word ptr ds:[esi+4],3F6              | esi+04:&"Actx "
+0068F02C | 8906                     | mov dword ptr ds:[esi],eax               |
+0068F02E | 894E 06                  | mov dword ptr ds:[esi+6],ecx             | ecx:NtUserPeekMessage+C
+0068F031 | 8856 0A                  | mov byte ptr ds:[esi+A],dl               | 组包
+0068F034 | 813D 0C790901 F0821E00   | cmp dword ptr ds:[109790C],1E82F0        |
+0068F03E | 72 0C                    | jb woool.dat.68F04C                      |
+0068F040 | 8B4424 1C                | mov eax,dword ptr ss:[esp+1C]            |
+0068F044 | 8946 0C                  | mov dword ptr ds:[esi+C],eax             |
+0068F047 | BB 10000000              | mov ebx,10                               |
+0068F04C | 8B4424 14                | mov eax,dword ptr ss:[esp+14]            |
+0068F050 | 57                       | push edi                                 |
+0068F051 | 8D3C1E                   | lea edi,dword ptr ds:[esi+ebx]           |
+0068F054 | 8BC8                     | mov ecx,eax                              | ecx:NtUserPeekMessage+C
+0068F056 | 2BF8                     | sub edi,eax                              |
+0068F058 | 8A11                     | mov dl,byte ptr ds:[ecx]                 | ecx:NtUserPeekMessage+C
+0068F05A | 88140F                   | mov byte ptr ds:[edi+ecx],dl             | edi+ecx*1:pSetupCreateTextLogSectionW+A7D72
+0068F05D | 83C1 01                  | add ecx,1                                | ecx:NtUserPeekMessage+C
+0068F060 | 84D2                     | test dl,dl                               |
+0068F062 | 75 F4                    | jne woool.dat.68F058                     |
+0068F064 | 8D50 01                  | lea edx,dword ptr ds:[eax+1]             |
+0068F067 | 5F                       | pop edi                                  |
+0068F068 | 8A08                     | mov cl,byte ptr ds:[eax]                 |
+0068F06A | 83C0 01                  | add eax,1                                |
+0068F06D | 84C9                     | test cl,cl                               |
+0068F06F | 75 F7                    | jne woool.dat.68F068                     |
+0068F071 | 8B0D 04FB3501            | mov ecx,dword ptr ds:[135FB04]           | ecx:NtUserPeekMessage+C
+0068F077 | 6A 00                    | push 0                                   |
+0068F079 | 6A 01                    | push 1                                   |
+0068F07B | 2BC2                     | sub eax,edx                              |
+0068F07D | 6A 01                    | push 1                                   |
+0068F07F | 03C3                     | add eax,ebx                              |
+0068F081 | 50                       | push eax                                 | 物品类别  0x18 衣服  0x1e毒药
+0068F082 | 56                       | push esi                                 | 封包
+0068F083 | 6A 00                    | push 0                                   |
+0068F085 | E8 26A3F6FF              | call woool.dat.5F93B0                    | 买药call 买物品call
+0068F08A | 5E                       | pop esi                                  |
+0068F08B | 5B                       | pop ebx                                  |
+0068F08C | C2 1400                  | ret 14                                   |
+0068F08F | CC                       | int3                                     |
+0068F090 | 56                       | push esi                                 |
+0068F091 | 57                       | push edi                                 | edi:&"瓞G"
