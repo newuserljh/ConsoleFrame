@@ -1,10 +1,10 @@
 #pragma once
-#include "bag.h"
-#include "role.h"
-#include "utils.h"
-#include "gamecall.h"
-#include <../luajit/src/lua.hpp>
-#include <LuaBridge/LuaBridge.h>
+#include "../GameData/bag.h"
+#include "../GameData/role.h"
+#include "../Common/utils.h"
+#include "../GameData/gamecall.h"
+#include "../luajit/src/lua.hpp"
+#include "LuaBridge/LuaBridge.h"
 #include <unordered_map>
 #include <queue>
 

@@ -27,5 +27,7 @@ public:
 
 private:
 	bool init();
+public:
+	virtual int ExitInstance();
 };
 void threadFunc();

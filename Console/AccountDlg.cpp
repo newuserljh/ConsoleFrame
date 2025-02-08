@@ -8,7 +8,7 @@
 #include <sstream>
 #include <thread>
 #include <windows.h>
-#include "utils.h"
+#include "../Common/utils.h"
 // CAccountDlg ¶Ô»°¿ò
 std::string GAME_DIR;
 

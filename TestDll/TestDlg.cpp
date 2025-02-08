@@ -7,19 +7,19 @@
 #include "afxdialogex.h"
 #include <thread>
 #include <mutex>
-#include "m_object.h"
-#include "skill.h"
-#include "bag.h"
-#include "team.h"
-#include "utils.h"
-#include "gamecall.h"
-#include "shareMemoryCli.h"
-#include "config.h"
+#include "../GameData/m_object.h"
+#include "../GameData/skill.h"
+#include "../GameData/bag.h"
+#include "../GameData/team.h"
+#include "../Common/utils.h"
+#include "../GameData/gamecall.h"
+#include "../Common/shareMemoryCli.h"
+#include "../GameData/config.h"
 #pragma comment(lib , "Common.lib")
 #pragma comment(lib ,"GameData.lib")
 
 //#include "HookAPI.h"
-#include "HookReg.h"
+#include "../Common/HookReg.h"
 // CTestDlg 对话框
 
 
@@ -1115,6 +1115,14 @@ void CTestDlg::OnBnClickedButton9()
 		std::string input_file = (std::string)shareCli.m_pSMAllData->currDir + "\\map\\map_data.lua";
 		m_luaInterface.load_and_store_map_data(L, input_file, map_names, transitions);
 
+		int i = 0;
+		std::cout << "Map Names:" << std::endl;
+		for (const auto& entry : map_names) {
+			std::cout <<++i<< "  " << entry.first << ": " << entry.second << std::endl;
+		}
+
+
+
 		// 查找路径
 		std::string start_name = "落霞岛";
 		std::string end_name = "尸王殿";
@@ -1134,15 +1142,21 @@ void CTestDlg::OnBnClickedButton9()
 			std::cerr << "未找到指定的地图名称" << std::endl;
 			return;
 		}
-		std::vector<std::string> path;
-		std::vector<std::pair<std::string, std::vector<Position>>> path_with_positions;
+		std::vector<std::string> path; // 存储路径
+		std::vector<std::pair<std::string, std::vector<Position>>> path_with_positions; // 存储路径和过图点坐标
+
 		if (m_luaInterface.find_path(map_names, transitions, start_name, end_name, path)) {
+			path_with_positions = m_luaInterface.get_positions_for_path(transitions, path);
 			output << "找到路径：" << std::endl;
 			path_with_positions = m_luaInterface.get_positions_for_path(transitions, path);
 			for (const auto& entry : path_with_positions) {
 				const std::string& id = entry.first;
 				const std::vector<Position>& positions = entry.second;
-				output << map_names.at(id) << " -> ";
+
+				// 获取地图名称
+				std::string map_name = map_names.count(id) ? map_names.at(id) : "未知地图";
+
+				output << "Map Name: " << map_name << ", Positions: ";
 				for (const auto& pos : positions) {
 					output << "(" << pos.x << ", " << pos.y << ") ";
 				}
