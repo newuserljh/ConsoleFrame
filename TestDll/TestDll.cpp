@@ -62,6 +62,19 @@ CTestDllApp theApp;
 
 BOOL CTestDllApp::InitInstance()
 {
+	if (AllocConsole())
+	{
+		// 重定向标准输入/输出到控制台
+		freopen("CONIN$", "r", stdin);
+		freopen("CONOUT$", "w", stdout);
+		freopen("CONOUT$", "w", stderr);
+
+		// 可选：设置控制台标题
+		SetConsoleTitle("Debug Console");
+
+		// 输出测试信息到控制台
+		std::cout << "Debug console initialized." << std::endl;
+	}
 	CWinApp::InitInstance();
 
 	return init();
@@ -229,4 +242,13 @@ void threadFunc()
 		DispatchMessage(&msg);
 	}
 	return;
+}
+
+
+int CTestDllApp::ExitInstance()
+{
+	// TODO: 在此添加专用代码和/或调用基类
+	  // 释放控制台
+	FreeConsole();
+	return CWinApp::ExitInstance();
 }

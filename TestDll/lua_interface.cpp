@@ -136,69 +136,125 @@ bool lua_interface::presskey(int vkcode)
 // 加载并检查已解析的文件
 void lua_interface::load_and_store_map_data(lua_State* L, const std::string& file_path, MapNames& map_names, Transitions& transitions) 
 {
-	int result = luaL_loadfile(L, file_path.c_str());
-	if(result != 0) {
-		std::cerr << "Lua error: " << lua_tostring(L, -1) << std::endl;
-		lua_pop(L, 1); // 移除错误消息
-		return;
-	}
+	// 加载 Lua 文件
+int result = luaL_loadfile(L, file_path.c_str());
+if (result != 0) {
+	std::cerr << "Lua error: " << lua_tostring(L, -1) << std::endl;
+	lua_pop(L, 1); // 移除错误消息
+	return;
+}
 
-	// 执行 Lua 文件
-	result = lua_pcall(L, 0, LUA_MULTRET, 0);
-	if (result != 0) {
-		std::cerr << "Lua error: " << lua_tostring(L, -1) << std::endl;
-		lua_pop(L, 1); // 移除错误消息
-		return;
-	}
+// 执行 Lua 文件
+result = lua_pcall(L, 0, LUA_MULTRET, 0);
+if (result != 0) {
+	std::cerr << "Lua error: " << lua_tostring(L, -1) << std::endl;
+	lua_pop(L, 1); // 移除错误消息
+	return;
+}
 
-	// 获取返回值（应该是一个表）
-	if (!lua_istable(L, -1)) {
-		std::cerr << "预期返回一个表" << std::endl;
-		return;
-	}
+// 获取返回值（应该是一个表）
+if (!lua_istable(L, -1)) {
+	std::cerr << "预期返回一个表" << std::endl;
+	return;
+}
 
-	lua_pushnil(L); // 第一个键
-	while (lua_next(L, -2) != 0) {
-		// 'key' 是在栈顶 (-1)，'value' 是在栈顶的下一个位置 (-2)
-		if (lua_type(L, -2) == LUA_TSTRING) {
-			const char* key = lua_tostring(L, -2);
-			if (std::string(key) == "map_names") {
-				lua_pushnil(L); // 第一个键
-				while (lua_next(L, -2) != 0) {
-					const char* map_id = lua_tostring(L, -2);
-					const char* map_name = lua_tostring(L, -1);
-					map_names[map_id] = map_name;
+// 遍历全局表查找 'map_names' 和 'transitions'
+lua_pushnil(L); // 第一个键
+while (lua_next(L, -2) != 0) {
+	// 'key' 是在栈顶 (-1)，'value' 是在栈顶的下一个位置 (-2)
+	if (lua_type(L, -2) == LUA_TSTRING) {
+		const char* key = lua_tostring(L, -2);
+		if (std::string(key) == "map_names") {
+			lua_pushnil(L); // 第一个键
+			while (lua_next(L, -2) != 0) {
+				if (lua_type(L, -2) != LUA_TSTRING || lua_type(L, -1) != LUA_TSTRING) {
+					std::cerr << "map_names 键或值不是字符串类型" << std::endl;
 					lua_pop(L, 1); // 移除 'value'，保留 'key' 以便继续迭代
+					continue;
 				}
-			}
-			else if (std::string(key) == "transitions") {
-				lua_pushnil(L); // 第一个键
-				while (lua_next(L, -2) != 0) {
-					const char* from_map = lua_tostring(L, -2);
-					TransitionMap transition_map;
-					lua_pushnil(L); // 第一个键
-					while (lua_next(L, -2) != 0) {
-						const char* to_map = lua_tostring(L, -2);
-						std::vector<Position> positions;
-						lua_pushnil(L); // 第一个键
-						while (lua_next(L, -2) != 0) {
-							Position pos;
-							pos.x = lua_tointeger(L, -2);
-							pos.y = lua_tointeger(L, -1);
-							positions.push_back(pos);
-							lua_pop(L, 1); // 移除 'value'，保留 'key' 以便继续迭代
-						}
-						transition_map[to_map] = positions;
-						lua_pop(L, 1); // 移除 'value'，保留 'key' 以便继续迭代
-					}
-					transitions[from_map] = transition_map;
-					lua_pop(L, 1); // 移除 'value'，保留 'key' 以便继续迭代
-				}
+				const char* map_id = lua_tostring(L, -2);
+				const char* map_name = lua_tostring(L, -1);
+				map_names[map_id] = map_name;
+
+				// 调试输出
+				std::cout << "Map ID: " << map_id << ", Map Name: " << map_name << std::endl;
+
+				lua_pop(L, 1); // 移除 'value'，保留 'key' 以便继续迭代
 			}
 		}
-		lua_pop(L, 1); // 移除 'value'，保留 'key' 以便继续迭代
+		else if (std::string(key) == "transitions") {
+			lua_pushnil(L); // 第一个键
+			while (lua_next(L, -2) != 0) {
+				if (lua_type(L, -2) != LUA_TSTRING || !lua_istable(L, -1)) {
+					std::cerr << "transitions 键不是字符串类型或值不是表类型" << std::endl;
+					lua_pop(L, 1); // 移除 'value'，保留 'key' 以便继续迭代
+					continue;
+				}
+				const char* from_map = lua_tostring(L, -2);
+				TransitionMap transition_map;
+
+				lua_pushnil(L); // 第一个键
+				while (lua_next(L, -2) != 0) {
+					if (lua_type(L, -2) != LUA_TSTRING || !lua_istable(L, -1)) {
+						std::cerr << "transitions 内部键不是字符串类型或值不是表类型" << std::endl;
+						lua_pop(L, 1); // 移除 'value'，保留 'key' 以便继续迭代
+						continue;
+					}
+					const char* to_map = lua_tostring(L, -2);
+					std::vector<Position> positions;
+
+					lua_pushnil(L); // 第一个键
+					while (lua_next(L, -2) != 0) {
+						if (!lua_istable(L, -1)) {
+							std::cerr << "positions 值不是表类型" << std::endl;
+							lua_pop(L, 1); // 移除 'value'，保留 'key' 以便继续迭代
+							continue;
+						}
+
+						Position pos;
+						lua_pushnil(L); // 第一个键
+						while (lua_next(L, -2) != 0) {
+							if (lua_type(L, -2) != LUA_TNUMBER || lua_type(L, -1) != LUA_TNUMBER) {
+								std::cerr << "positions 键或值不是数字类型" << std::endl;
+								lua_pop(L, 1); // 移除 'value'，保留 'key' 以便继续迭代
+								continue;
+							}
+							pos.x = static_cast<int>(lua_tointeger(L, -2));
+							pos.y = static_cast<int>(lua_tointeger(L, -1));
+							lua_pop(L, 1); // 移除 'value'，保留 'key' 以便继续迭代
+						}
+
+						positions.push_back(pos);
+
+						lua_pop(L, 1); // 移除 'value'，保留 'key' 以便继续迭代
+					}
+
+					transition_map[to_map] = positions;
+
+					// 调试输出
+					std::cout << "From map: " << from_map << std::endl;
+					std::cout << "  To map: " << to_map << std::endl;
+					std::cout << "    Positions: ";
+					for (const auto& pos : positions) {
+						std::cout << "(" << pos.x << ", " << pos.y << ") ";
+					}
+					std::cout << std::endl;
+
+					lua_pop(L, 1); // 移除 'value'，保留 'key' 以便继续迭代
+				}
+				transitions[from_map] = transition_map;
+
+				// 如果没有找到任何 'to_map'，输出提示信息
+				if (transition_map.empty()) {
+					std::cout << "Warning: No transitions found for From map: " << from_map << std::endl;
+				}
+				lua_pop(L, 1); // 移除 'value'，保留 'key' 以便继续迭代
+			}
+		}
 	}
+	lua_pop(L, 1); // 移除 'value'，保留 'key' 以便继续迭代
 }
+	}
 
 //找到跨图路径
 bool lua_interface::find_path(const MapNames& map_names, const Transitions& transitions, const std::string& start_name, const std::string& end_name, std::vector<std::string>& path) {
@@ -215,6 +271,14 @@ bool lua_interface::find_path(const MapNames& map_names, const Transitions& tran
 			end_id = pair.first;
 		}
 	}
+
+	if (start_id.empty() || end_id.empty()) {
+		std::cerr << "未找到指定的地图名称" << std::endl;
+		return false;
+	}
+
+	queue.push(start_id);
+	came_from[start_id] = "";
 
 	if (start_id.empty() || end_id.empty()) {
 		std::cerr << "未找到指定的地图名称" << std::endl;
@@ -262,8 +326,18 @@ std::vector<std::pair<std::string, std::vector<Position>>> lua_interface::get_po
 		const std::string& from_map = path[i];
 		const std::string& to_map = path[i + 1];
 
-		if (transitions.find(from_map) != transitions.end() && transitions.at(from_map).find(to_map) != transitions.at(from_map).end()) {
-			path_with_positions.push_back({ to_map, transitions.at(from_map).at(to_map) });
+		auto it_from = transitions.find(from_map);
+		if (it_from != transitions.end()) {
+			auto it_to = it_from->second.find(to_map);
+			if (it_to != it_from->second.end()) {
+				path_with_positions.push_back({ to_map, it_to->second });
+			}
+			else {
+				std::cerr << "未找到从 " << from_map << " 到 " << to_map << " 的过渡点" << std::endl;
+			}
+		}
+		else {
+			std::cerr << "未找到地图 " << from_map << " 的过渡信息" << std::endl;
 		}
 	}
 

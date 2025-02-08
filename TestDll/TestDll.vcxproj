@@ -122,6 +122,7 @@
     <ClInclude Include="TestDll.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram.cd" />
     <None Include="res\TestDll.rc2" />
     <None Include="TestDll.def" />
   </ItemGroup>
