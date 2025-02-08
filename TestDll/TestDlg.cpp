@@ -88,6 +88,7 @@ BEGIN_MESSAGE_MAP(CTestDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_GJ, &CTestDlg::OnBnClickedBtnGj)
 	ON_BN_CLICKED(IDC_BTN_RECNPC, &CTestDlg::OnBnClickedBtnRecnpc)
 	ON_BN_CLICKED(IDC_BTN_LUATST, &CTestDlg::OnBnClickedBtnLuatst)
+	ON_WM_ERASEBKGND()
 END_MESSAGE_MAP()
 
 // CTestDlg 消息处理程序
@@ -1095,6 +1096,8 @@ UINT __cdecl CTestDlg::threadPickup(LPVOID p)
 	return 0;
 }
 
+
+
 // TODO: 功能测试
 void CTestDlg::OnBnClickedButton9()
 {
@@ -1103,6 +1106,8 @@ void CTestDlg::OnBnClickedButton9()
 
 	// 获取周围怪物信息
 		CString s;
+
+
 		std::ostringstream output;
 		
 		MapNames map_names;
@@ -1129,10 +1134,11 @@ void CTestDlg::OnBnClickedButton9()
 			std::cerr << "未找到指定的地图名称" << std::endl;
 			return;
 		}
-
+		std::vector<std::string> path;
 		std::vector<std::pair<std::string, std::vector<Position>>> path_with_positions;
-		if (m_luaInterface.find_path(map_names, transitions, start_id, end_id, path_with_positions)) {
+		if (m_luaInterface.find_path(map_names, transitions, start_name, end_name, path)) {
 			output << "找到路径：" << std::endl;
+			path_with_positions = m_luaInterface.get_positions_for_path(transitions, path);
 			for (const auto& entry : path_with_positions) {
 				const std::string& id = entry.first;
 				const std::vector<Position>& positions = entry.second;
@@ -1422,3 +1428,13 @@ void CTestDlg::OnBnClickedBtnLuatst()
 		lua_pop(L, 1);
 	}
 }
+
+
+BOOL CTestDlg::OnEraseBkgnd(CDC* pDC)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+
+	return true;
+}
+
+

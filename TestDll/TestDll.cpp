@@ -110,15 +110,116 @@ DWORD GetMainThreadId(DWORD processId = 0)
 	return threadId;
 }
 
+//设置子窗口透明
+void SetTransparent(HWND hwnd, BYTE alpha)
+{
+	// 设置窗口为分层窗口
+	LONG_PTR exStyle = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
+	if (!(exStyle & WS_EX_LAYERED))
+	{
+		SetWindowLongPtr(hwnd, GWL_EXSTYLE, exStyle | WS_EX_LAYERED);
+	}
+
+	// 设置透明度
+	SetLayeredWindowAttributes(hwnd, 0, alpha, LWA_ALPHA);
+}
+
+// 该函数接收窗口类名和目标PID，并返回匹配的窗口句柄
+HWND FindWindowByClassAndPid(const TCHAR* className, DWORD targetPid) {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	// 使用FindWindow查找具有指定类名的第一个顶级窗口
+	HWND hwnd = FindWindow(className, NULL);
+
+	while (hwnd != NULL) {
+		DWORD pid;
+		// 获取该窗口对应的进程ID
+		GetWindowThreadProcessId(hwnd, &pid);
+
+		if (pid == targetPid) {
+			// 如果找到的窗口PID与目标PID匹配，则返回该窗口句柄
+			return hwnd;
+		}
+
+		// 查找下一个相同类名的窗口（如果存在）
+		hwnd = FindWindowEx(NULL, hwnd, className, NULL);
+	}
+
+	// 如果没有找到匹配的窗口，返回NULL
+	return NULL;
+}
+
+
+void EmbedIntoGameWindow(HWND dlgHwnd, HWND gameHwnd) {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	// Set the dialog as a child of the game's main window
+	if (!::SetParent(dlgHwnd, gameHwnd)) {
+		OutputDebugString("SetParent failed\n");
+		return;
+	}
+
+	// Modify the window style to remove popup and add child styles
+	LONG_PTR style = ::GetWindowLongPtr(dlgHwnd, GWL_STYLE);
+	style &= ~WS_POPUP; // Remove popup style
+	style |= WS_CHILD;  // Add child style
+	if (!::SetWindowLongPtr(dlgHwnd, GWL_STYLE, style)) {
+		OutputDebugString("SetWindowLong failed\n");
+		return;
+	}
+
+	 //Optionally modify extended window styles
+	LONG_PTR exStyle = ::GetWindowLongPtr(dlgHwnd, GWL_EXSTYLE);
+	exStyle &= ~(WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE);
+	if (!::SetWindowLongPtr(dlgHwnd, GWL_EXSTYLE, exStyle)) {
+		OutputDebugString("SetWindowLongEx failed\n");
+		return;
+	}
+
+	// Adjust the size and position of the dialog to fit within the game window
+	RECT rc, rc_child;
+	if (!::GetClientRect(gameHwnd, &rc)) {
+		OutputDebugString("GetClientRect failed\n");
+		return;
+	}
+
+	if (!::GetClientRect(dlgHwnd, &rc_child) ){
+		OutputDebugString("Child GetClientRect failed\n");
+		return;
+	}
+
+	if (!::MoveWindow(dlgHwnd, 0, 0, rc_child.right - rc_child.left, rc_child.bottom - rc_child.top, TRUE)) {
+		OutputDebugString("MoveWindow failed\n");
+		return;
+	}
+
+  // 设置透明度为 128 (半透明)
+	SetTransparent(dlgHwnd, 128);
+
+	OutputDebugString("Successfully embedded MFC dialog into game window\n");
+}
 //线程函数，用来创建函数窗口
 void threadFunc()
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	mhook = SetWindowsHookEx(WH_KEYBOARD, KeyBoardProc, 0, GetMainThreadId());
+	//mhook = SetWindowsHookEx(WH_KEYBOARD, KeyBoardProc, 0, GetMainThreadId());
 	if (pDlg == NULL)
 	{
 		pDlg = new CTestDlg;
-		pDlg->Create(IDD_DLGTEST);
+		if(!pDlg->Create(IDD_DLGTEST)) {
+			OutputDebugString("MFC dialog creation failed\n");
+			return;
+		}
+		pDlg->ShowWindow(SW_SHOW);
+		OutputDebugString("MFC dialog created successfully\n");
+
+		DWORD processId = GetCurrentProcessId();
+		HWND hGameWnd = FindWindowByClassAndPid("WOLIICLIENT",processId);
+		if (hGameWnd) {
+			EmbedIntoGameWindow(pDlg->m_hWnd, hGameWnd);
+		}
+		else {
+			OutputDebugString("Main window handle is invalid\n");
+		}
+	
 	}
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0))

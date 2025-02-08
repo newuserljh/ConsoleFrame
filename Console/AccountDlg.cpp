@@ -270,6 +270,7 @@ void CAccountDlg::log_inject(int i)
 	PROCESS_INFORMATION pi;
 	tools::getInstance()->exeload(gamePath, GAME_DIR,pi);
 	m_shareMemSer->m_pSMAllData->m_sm_data[i].ndPid = pi.dwProcessId;
+	Sleep(5000);
 	std::string dllPath  =std::string( m_shareMemSer->m_pSMAllData->currDir)+"TestDll.dll";
 	tools::getInstance()->eipinjectDll(tools::getInstance()->char2wchar(dllPath.c_str()),pi);
 }

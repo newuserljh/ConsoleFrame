@@ -97,4 +97,5 @@ public:
 	//≥…‘±
 public:
 	DWORD mPid;
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 };

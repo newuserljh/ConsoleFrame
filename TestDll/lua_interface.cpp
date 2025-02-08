@@ -201,40 +201,47 @@ void lua_interface::load_and_store_map_data(lua_State* L, const std::string& fil
 }
 
 //找到跨图路径
-bool lua_interface::find_path(const MapNames& map_names, const Transitions& transitions, const std::string& start, const std::string& end, 
-	std::vector<std::pair<std::string, std::vector<Position>>>& path_with_positions)
-{
+bool lua_interface::find_path(const MapNames& map_names, const Transitions& transitions, const std::string& start_name, const std::string& end_name, std::vector<std::string>& path) {
 	std::unordered_map<std::string, std::string> came_from;
 	std::queue<std::string> queue;
 
-	queue.push(start);
-	came_from[start] = "";
+	// 根据地图名称找到对应的ID
+	std::string start_id, end_id;
+	for (const auto& pair : map_names) {
+		if (pair.second == start_name) {
+			start_id = pair.first;
+		}
+		if (pair.second == end_name) {
+			end_id = pair.first;
+		}
+	}
+
+	if (start_id.empty() || end_id.empty()) {
+		std::cerr << "未找到指定的地图名称" << std::endl;
+		return false;
+	}
+
+	queue.push(start_id);
+	came_from[start_id] = "";
 
 	while (!queue.empty()) {
 		std::string current = queue.front();
 		queue.pop();
 
-		if (current == end) {
+		if (current == end_id) {
 			// 回溯路径
-			std::string node = end;
-			std::vector<std::pair<std::string, std::vector<Position>>> temp_path;
+			std::string node = end_id;
 			while (!node.empty()) {
-				auto it = transitions.find(node);
-				if (it != transitions.end() && !came_from[node].empty()) {
-					const std::string& prev_node = came_from[node];
-					temp_path.push_back({ node, it->second.at(prev_node) });
-				}
+				path.insert(path.begin(), node);
 				node = came_from[node];
 			}
-			std::reverse(temp_path.begin(), temp_path.end());
-			path_with_positions = temp_path;
 			return true;
 		}
 
 		auto it = transitions.find(current);
 		if (it != transitions.end()) {
-			for (auto transition_it = it->second.begin(); transition_it != it->second.end(); ++transition_it) {
-				const std::string& to_map = transition_it->first;
+			for (const auto& transition : it->second) {
+				const std::string& to_map = transition.first;
 				if (came_from.find(to_map) == came_from.end()) {
 					queue.push(to_map);
 					came_from[to_map] = current;
@@ -244,4 +251,21 @@ bool lua_interface::find_path(const MapNames& map_names, const Transitions& tran
 	}
 
 	return false;
+}
+
+
+//根据路径提取过图坐标
+std::vector<std::pair<std::string, std::vector<Position>>> lua_interface::get_positions_for_path(const Transitions& transitions, const std::vector<std::string>& path) {
+	std::vector<std::pair<std::string, std::vector<Position>>> path_with_positions;
+
+	for (size_t i = 0; i < path.size() - 1; ++i) {
+		const std::string& from_map = path[i];
+		const std::string& to_map = path[i + 1];
+
+		if (transitions.find(from_map) != transitions.end() && transitions.at(from_map).find(to_map) != transitions.at(from_map).end()) {
+			path_with_positions.push_back({ to_map, transitions.at(from_map).at(to_map) });
+		}
+	}
+
+	return path_with_positions;
 }
