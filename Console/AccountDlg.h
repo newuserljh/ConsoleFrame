@@ -1,6 +1,7 @@
 #pragma once
 #include "afxcmn.h"
 #include <string>
+#include <atomic>
 #include "../Common/SMstruct.h"
 #include "../Common/shareMemorySer.h"
 // CAccountDlg 对话框
@@ -24,9 +25,14 @@ protected:
 private:
 	bool initMem();
 	std::shared_ptr<shareMemorySer>m_shareMemSer;
-	void threadCallBack();
 	bool initAccount();
 	bool initGameDir();
+	std::atomic<bool> stopThread{ false };  // 用于通知线程停止
+	void threadCallBack();//刷新ListCtrl
+	CWinThread* m_pThread_login = nullptr; // 保存线程指针
+	static UINT ThreadLogin(LPVOID pParam);
+	std::string GAME_DIR; //保存游戏目录
+
 
 public:
 	CListCtrl m_listCtl;
@@ -43,4 +49,5 @@ public:
 	afx_msg void OnBnClickedButton3();
 	void log_inject(int i);
 	afx_msg void OnBnClickedBtnCsDir();
+	afx_msg void OnDestroy();
 };

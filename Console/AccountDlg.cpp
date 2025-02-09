@@ -10,7 +10,6 @@
 #include <windows.h>
 #include "../Common/utils.h"
 // CAccountDlg 对话框
-std::string GAME_DIR;
 
 IMPLEMENT_DYNAMIC(CAccountDlg, CDialogEx)
 
@@ -40,6 +39,7 @@ BEGIN_MESSAGE_MAP(CAccountDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON2, &CAccountDlg::OnBnClickedButton2)
 	ON_BN_CLICKED(IDC_BUTTON3, &CAccountDlg::OnBnClickedButton3)
 	ON_BN_CLICKED(IDC_BTN_CS_DIR, &CAccountDlg::OnBnClickedBtnCsDir)
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -86,8 +86,9 @@ BOOL CAccountDlg::OnInitDialog()
 		return FALSE;
 	initAccount();
 	initGameDir();
+	stopThread.store(false);  // 重置停止标志
 	auto tthread = std::thread(&CAccountDlg::threadCallBack, this);
-	tthread.detach();
+	tthread.detach(); //分离线程 后台运行 不会阻塞主线程
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 异常:  OCX 属性页应返回 FALSE
 }
@@ -196,12 +197,30 @@ bool CAccountDlg::initGameDir() //读取游戏目录
 	if(!tools::getInstance()->fileIsexist(GAME_DIR +"lua51.dll"))GAME_DIR.clear();
 	return true;
 }
-
+//登录账号线程 8秒登录一个 防止游戏资源加载错误
+ UINT CAccountDlg::ThreadLogin(LPVOID pParam)
+{
+	CAccountDlg* pThis = (CAccountDlg*)pParam;
+	if (pThis->GAME_DIR.empty()) {
+		AfxMessageBox(_T("请先选择目录，到传奇世界data目录"));
+		return 1;
+	}
+	for (int i = 0; i < MORE_OPEN_NUMBER; i++)
+	{
+		if (!pThis->m_listCtl.GetCheck(i))continue; //未选中
+		if ((pThis->m_shareMemSer->m_pSMAllData->m_sm_data[i].userName == "") || //账号空
+			(pThis->m_shareMemSer->m_pSMAllData->m_sm_data[i].passWord == "") || //密码空
+			(pThis->m_shareMemSer->m_pSMAllData->m_sm_data[i].ndPid != 0))continue;//已启动过
+		pThis->log_inject(i);
+		Sleep(8000);
+	}
+	return 0;
+}
 
 void CAccountDlg::threadCallBack()
 {
 	//刷新的线程回调函数
-	while (true)
+	while (!stopThread.load())// 如果收到停止信号，则提前退出循环
 	{
 		updateDate();
 		//TRACE("111\n");
@@ -247,18 +266,15 @@ void CAccountDlg::OnBnClickedButton2()
 // TODO:  开始脚本 判断当前复选框是否被选中，只登陆选中的
 void CAccountDlg::OnBnClickedButton3()
 {
-	if (GAME_DIR.empty())
-	{
-		AfxMessageBox("请先选择目录，到传奇世界data目录");
+	// 如果线程已经在运行，则返回
+	if (m_pThread_login != nullptr && m_pThread_login->m_hThread != NULL) {
+		AfxMessageBox("已有任务正在运行");
 		return;
 	}
-		for (int i = 0; i < MORE_OPEN_NUMBER; i++)
-	{		
-			if (!m_listCtl.GetCheck(i))continue; //未选中
-			if ((m_shareMemSer->m_pSMAllData->m_sm_data[i].userName=="")|| //账号空
-				(m_shareMemSer->m_pSMAllData->m_sm_data[i].passWord == "")|| //密码空
-				(m_shareMemSer->m_pSMAllData->m_sm_data[i].ndPid!=0))continue;//已启动过
-			log_inject(i);
+	// 启动login线程
+	m_pThread_login = AfxBeginThread(ThreadLogin, this, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
+	if (m_pThread_login != NULL) {
+		m_pThread_login->ResumeThread();
 	}
 	
 }
@@ -313,4 +329,16 @@ void CAccountDlg::OnBnClickedBtnCsDir()
 	}
 	else
 		AfxMessageBox("无效的目录，请重新选择");
+}
+
+
+void CAccountDlg::OnDestroy()
+{
+	stopThread.store(true);  // 设置刷新停止标志
+	// 等待线程结束
+	if (m_pThread_login != nullptr && m_pThread_login->m_hThread != NULL) {
+		WaitForSingleObject(m_pThread_login,INFINITE);
+		m_pThread_login = nullptr;
+	}
+	CDialogEx::OnDestroy();
 }
