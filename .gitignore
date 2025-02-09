@@ -19,6 +19,9 @@ mono_crash.*
 
 # Build results
 [Dd]ebug/
+	![Dd]ebug/cfg/**/*
+	![Dd]ebug/map/**/*
+	![Dd]ebug/script/**/*
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
@@ -354,11 +357,6 @@ MigrationBackup/
 /Console/cfg/gamedir.cfg
 
 
-!debug/cfg/**/*
-!Debug/cfg/**/*
-!debug/map/**/*
-!Debug/map/**/*
-!debug/script/**/*
-!Debug/script/**/*
+
 #我的排除项目
 [Dd]ebug/cfg/gamedir.cfg
