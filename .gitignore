@@ -354,9 +354,11 @@ MigrationBackup/
 /Console/cfg/gamedir.cfg
 
 
-![Dd]ebug/cfg/**/*
-![Dd]ebug/script/**/*
-![Dd]ebug/map/**/*
-![Dd]ebug/data/**/*
+!debug/cfg/**/*
+!Debug/cfg/**/*
+!debug/map/**/*
+!Debug/map/**/*
+!debug/script/**/*
+!Debug/script/**/*
 #我的排除项目
-/[Dd]ebug/cfg/gamedir.cfg
+[Dd]ebug/cfg/gamedir.cfg
