@@ -150,7 +150,7 @@ void CAccountDlg::OnBnClickedButton1() //添加账号
 	m_shareMemSer->m_pSMAllData->m_sm_data[index].userName = (std::string)m_userName.GetString();
 	m_shareMemSer->m_pSMAllData->m_sm_data[index].passWord = (std::string)m_password.GetString();
 	ss << m_shareMemSer->m_pSMAllData->m_sm_data[index].userName.c_str() << " " << m_shareMemSer->m_pSMAllData->m_sm_data[index].passWord.c_str();
-	tools::getInstance()->write2file("..\\Account.txt", ss.str());
+	tools::getInstance()->write2file(".\\cfg\\Account.txt", ss.str());
 }
 
 bool CAccountDlg::initMem() //初始化共享内存
@@ -172,7 +172,7 @@ bool CAccountDlg::initMem() //初始化共享内存
 
 bool CAccountDlg::initAccount() //读取账号
 {
-	std::vector<std::string> vecA=tools::getInstance()->ReadTxt("..\\Account.txt");
+	std::vector<std::string> vecA=tools::getInstance()->ReadTxt(".\\cfg\\Account.txt");
 	if (vecA.empty())return false;
 	for (size_t i=0;i<vecA.size();i++)
 	{
@@ -212,7 +212,7 @@ void CAccountDlg::threadCallBack()
 // TODO:  删除账号，是删除复选框选中的账号信息
 void CAccountDlg::OnBnClickedButton2()
 {
-	std::vector<std::string> vecA = tools::getInstance()->ReadTxt("..\\Account.txt");
+	std::vector<std::string> vecA = tools::getInstance()->ReadTxt(".\\cfg\\Account.txt");
 	if (vecA.empty())return;
 	for (auto i = 0; i < MORE_OPEN_NUMBER; i++)
 	{
@@ -234,13 +234,13 @@ void CAccountDlg::OnBnClickedButton2()
 	}
 	if (vecA.empty())
 	{
-		tools::getInstance()->write2file("..\\Account.txt", "", std::ios::out);
+		tools::getInstance()->write2file(".\\cfg\\Account.txt", "", std::ios::out);
 			return;
 	}
-	tools::getInstance()->write2file("..\\Account.txt", "", std::ios::out);
+	tools::getInstance()->write2file(".\\cfg\\Account.txt", "", std::ios::out);
 	for (size_t i=0;i<vecA.size();i++)
 	{	
-		tools::getInstance()->write2file("..\\Account.txt", vecA[i]);
+		tools::getInstance()->write2file(".\\cfg\\Account.txt", vecA[i]);
 	}
 }
 

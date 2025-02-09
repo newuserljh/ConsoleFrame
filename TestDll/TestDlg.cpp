@@ -294,7 +294,7 @@ bool CTestDlg:: initVariable()
 	tflag_pickup = true;
 	/*载入拾取物品*/
 	pick_goods_list.clear();
-	pick_goods_list = tools::getInstance()->ReadTxt(tools::getInstance()->getParentPath(shareCli.m_pSMAllData->currDir) + "拾取物品.txt");
+	pick_goods_list = tools::getInstance()->ReadTxt(std::string(shareCli.m_pSMAllData->currDir) + "\\cfg\\拾取物品.txt");
 	if (!pick_goods_list.size())return false;
 	/*设置技能*/
 	if (!Set_Skill())return false;
@@ -302,7 +302,7 @@ bool CTestDlg:: initVariable()
 	if (!Load_coordinate())return false;
 	/*载入攻击怪物列表*/
 	attack_monlist.clear();
-	attack_monlist = tools::getInstance()->ReadTxt(tools::getInstance()->getParentPath(shareCli.m_pSMAllData->currDir) + "逆魔大殿.txt");
+	attack_monlist = tools::getInstance()->ReadTxt(std::string(shareCli.m_pSMAllData->currDir) + "\\cfg\\逆魔大殿.txt");
 	if (!attack_monlist.size())return false;
 
 	return true;
@@ -790,7 +790,7 @@ bool CTestDlg::Set_Skill()
 bool CTestDlg::Load_coordinate()
 {
 	map_xy.clear();
-	std::vector<std::string> map_coordinate= tools::getInstance()->ReadTxt(tools::getInstance()->getParentPath(shareCli.m_pSMAllData->currDir) + "\\逆魔大殿1.txt");
+	std::vector<std::string> map_coordinate= tools::getInstance()->ReadTxt(std::string(shareCli.m_pSMAllData->currDir) + "\\cfg\\逆魔大殿1.txt");
 	if (!map_coordinate.size())return false;
 	for (size_t i = 0; i < map_coordinate.size(); i++)
 	{
@@ -813,7 +813,7 @@ bool CTestDlg::init_team()
 	m_team_check_id = 0;
 	pBtn = (CButton*)GetDlgItem(IDC_CHK_TEAM);  //获得组队复选框控件的句柄
 	team_list.clear();
-	team_list = tools::getInstance()->ReadTxt(tools::getInstance()->getParentPath(shareCli.m_pSMAllData->currDir) + "\\队伍人员.txt");
+	team_list = tools::getInstance()->ReadTxt(std::string(shareCli.m_pSMAllData->currDir )+ "\\cfg\\队伍人员.txt");
 	if (pBtn->GetCheck())
 	{
 		if (*r.m_roleproperty.Team_is_allow != 1)mfun.team_open_close(1);//允许组队
@@ -876,7 +876,7 @@ void  CTestDlg::RoleIsDeath(void)
 	r.init();
 	if (*r.m_roleproperty.Object.HP>0)return;
 	//保存正在执行的任务到 ./cfg/角色名字.cfg
-	std::string cfg_file_path = (std::string)shareCli.m_pSMAllData->currDir + "\\cfg";
+	std::string cfg_file_path = (std::string)shareCli.m_pSMAllData->currDir + "\\cfg\\";
 	cfg_file_path = cfg_file_path + r.m_roleproperty.Object.pName +".cfg";
 	tools::getInstance()->write2file(cfg_file_path, "当前任务", std::ios::out);
 
