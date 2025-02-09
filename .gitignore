@@ -6,7 +6,6 @@
 !debug/script/**/*
 !debug/map/**/*
 !debug/data/**/*
-
 #我的排除项目
 /debug/cfg/gamedir.cfg
 
