@@ -38,6 +38,14 @@ p_Role_ZDFB==[0x135fb30  ]+0xAD4 //中毒躲避
  p_Current_Map==[135fb30]+0x8299C8//所在地图 CHAR*
 p_Role_ZB==[[0x135fb30  ]+0xc48]+ i* 0x688 //身上装备 0衣服，1武器，2勋章，3项链，4头盔，5右手镯，6左手镯，7右戒指，8左戒指，9靴子，10腰带，11宝石，12护符，13盾牌，14魂珠,15 极品御兽天衣 ，16 紋佩 ，18 神龙背饰 ，19 面具 ，20 仙翼 
 
+p_Role_EXP=[0x135fb30  ]+0xA84//当前经验值 unsigned类型
+p_Role_EXP_MAX=[0x135fb30  ]+0xAA0//当前等级最大经验值 unsigned
+p_Role_YB_Bind=[0x135fb30  ]+0xC08//绑定元宝 Double类型
+p_Role_Gold=[0x135fb30  ]+0xC10//金币
+p_Role_GoldBind=[0x135fb30  ]+0xC14//绑定金币
+p_Role_YB=[0x135fb30  ]+0xBEC//元宝
+
+
 p_Role_Bag_Base==[0x135fb30  ]+0xc54 //背包基址，第一个格子指针
 p_Role_Bag_Size==[0x135fb30  ]+0xc58 //背包大小
 

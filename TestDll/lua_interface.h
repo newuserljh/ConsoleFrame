@@ -1,12 +1,28 @@
 #pragma once
 #include "../GameData/bag.h"
 #include "../GameData/role.h"
+#include "../GameData/m_object.h"
+#include "../GameData/skill.h"
+#include "../GameData/team.h"
 #include "../Common/utils.h"
 #include "../GameData/gamecall.h"
 #include "../luajit/src/lua.hpp"
+#include "../Common/shareMemoryCli.h"
 #include "LuaBridge/LuaBridge.h"
 #include <unordered_map>
 #include <queue>
+
+
+
+extern shareMemoryCli shareCli; 
+extern int shareindex; 
+extern role r; 
+extern role Promenade; 
+extern m_object m_obj; 
+extern skill m_skill; 
+extern bag r_bag; 
+extern gamecall mfun; 
+extern team m_team; 
 
 struct Position {
 	int x, y;
@@ -38,7 +54,13 @@ public:
 	bool find_path(const MapNames& map_names, const Transitions& transitions, const std::string& start_name, const std::string& end_name, std::vector<std::string>& path);
 	void load_and_store_map_data(lua_State* L, const std::string& file_path, MapNames& map_names, Transitions& transitions);
 	std::vector<std::pair<std::string, std::vector<Position>>> get_positions_for_path(const Transitions& transitions, const std::vector<std::string>& path);
+public:
+	//游戏功能封装
+	void applySJLP();//提交赏金令牌
+	bool buyMedicine(std::string med_name, BYTE num);//买药
+
 private:
+	DWORD getEviroNPCIdByName(std::string npcName);//通过名字获取NPCID
 
 };
 

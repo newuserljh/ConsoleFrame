@@ -63,6 +63,15 @@ struct ROLE_PROPERTY
 	//元神独有属性
 	DWORD*  Is_Promenade_Release; // [0x135fb34]+0x3D8        元神是否释放 1是 0否  +0xAA4也是
 	DWORD*  Promenade_Mode; // [0x135fb34]+0xA08        元神模式 0战斗 1跟随 2停止 可直接修改值改变模式
+
+	
+	DWORD* p_Role_EXP;// = [0x135fb30] + 0xA84//当前经验值 unsigned类型
+	DWORD* p_Role_EXP_MAX;// = [0x135fb30] + 0xAA0//当前等级最大经验值 unsigned
+	double* p_Role_YB_Bind;// = [0x135fb30] + 0xC08//绑定元宝 Double类型
+	DWORD* p_Role_Gold;// = [0x135fb30] + 0xC10//金币
+	DWORD* p_Role_GoldBind;// = [0x135fb30] + 0xC14//绑定金币
+	DWORD* p_Role_YB;// = [0x135fb30] + 0xBEC//元宝
+
 };
 
 

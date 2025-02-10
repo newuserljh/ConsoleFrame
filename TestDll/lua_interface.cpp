@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "lua_interface.h"
-
+#include "TestDlg.h"
 
 
 lua_interface::lua_interface()
@@ -342,4 +342,75 @@ std::vector<std::pair<std::string, std::vector<Position>>> lua_interface::get_po
 	}
 
 	return path_with_positions;
+}
+
+//通过名字获取玩家周围NPCID
+DWORD lua_interface::getEviroNPCIdByName(std::string npcName)
+{
+	if (!r.Get_Envionment(m_obj.p_pets, m_obj.p_npcs, m_obj.p_monster, m_obj.p_players))
+	{
+		std::cout << "遍历周围错误!!!" << std::endl;
+		return -1;
+	}
+
+	for (size_t i = 0; i < m_obj.p_npcs.size(); i++)
+	{
+		if (npcName.compare((char*)(m_obj.p_npcs[i]+0x10)) == 0) return *(DWORD*)(m_obj.p_npcs[i] + 8);  // 返回匹配的NPC的ID
+	}
+		return -1;
+}
+
+//封装游戏函数
+
+//提交赏金令牌
+void lua_interface::applySJLP()
+{
+	int num = r_bag.caclGoodsNumber("赏金令牌");
+	std::cout <<"赏金令牌的数量为：" << num << std::endl;
+	if (num > 0)
+	{
+		auto npcid = getEviroNPCIdByName("赏金猎人");
+		if (npcid == -1)return;
+		mfun.OpendNPC(npcid);
+		for (auto i = 0; i < num; ++i)
+		{
+			Sleep(50);
+			mfun.ChooseCmd("@givepai");
+			Sleep(50);
+			mfun.ChooseCmd("@main");
+		}
+	}
+}
+
+//买药  参数一：名字  参数二：数量 返回bool
+bool lua_interface::buyMedicine(std::string med_name,BYTE num)
+{
+	auto npcid = getEviroNPCIdByName("药店掌柜");
+	if (npcid == -1) return false;
+	if (mfun.OpendNPC(npcid))
+	{
+		Sleep(50);
+		if (*r.m_roleproperty.p_Role_GoldBind>100000) //使用绑定金币
+		{
+			if (!mfun.ChooseCmd("@bindbuy"))return false;
+			Sleep(100);
+			if(!mfun.buyGoods(med_name, npcid, 1, num))return false;
+			return true;
+		}
+		if (*r.m_roleproperty.p_Role_GoldBind > 100000) //使用金币
+		{
+			if (!mfun.ChooseCmd("@buy"))return false;
+			Sleep(100);
+			if (!mfun.buyGoods(med_name, npcid, 0,num))return false;
+			return true;
+		}
+		else
+		{
+			std::cout << "金币，绑定金币不足，购买失败！" << std::endl;
+			return false;
+		}
+	}
+	std::cout << "对话NPC错误，检查是否在NPC附近！！" << std::endl;
+
+	return true;
 }

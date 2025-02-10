@@ -158,99 +158,6 @@ void AppendText(CEdit &m_edit, CString strAdd)
 	m_edit.ReplaceSel(strAdd + L"\n");
 }
 
-// 遍历人物属性
-void CTestDlg::OnBnClickedButton1()
-{
-	if (!r.init())return;
-	CString s;
-	s.Format("%s\n", r.m_roleproperty.Object.pName);
-	AppendText(m_edit2,s);
-	char* sex = {};
-	char* job = {};
-	if (*r.m_roleproperty.Sex == 0)sex = "男";
-	else sex = "女";
-	if (*r.m_roleproperty.Job == 0)job = "战士";
-	else if (*r.m_roleproperty.Job == 1)job = "法师";
-	else job = "道士";
-	s.Format("职业:%s      等级:%d    性别:%s", job, *r.m_roleproperty.Level, sex);
-	AppendText(m_edit2, s);;
-	s.Format("HP:%d / %d", *r.m_roleproperty.Object.HP, *r.m_roleproperty.Object.HP_MAX);
-	AppendText(m_edit2, s);
-	s.Format("MP:%d / %d", *r.m_roleproperty.Object.MP, *r.m_roleproperty.Object.MP_MAX);
-	AppendText(m_edit2, s);
-	s.Format("当前地图:%s  坐标%d,%d", r.m_roleproperty.p_Current_Map, *r.m_roleproperty.Object.X, *r.m_roleproperty.Object.Y);
-	AppendText(m_edit2, s);
-	s.Format("背包大小:%d  背包负重%d / %d", *r.m_roleproperty.Bag_Size, *r.m_roleproperty.BAG_W, *r.m_roleproperty.BAG_W_MAX);
-	AppendText(m_edit2, s);
-	s.Format("ID:%x", *r.m_roleproperty.Object.ID);
-	AppendText(m_edit2, s);
-	for (auto i=0;i<21;i++)
-	{
-		if (!(*r.m_euip[i].ID))continue; 
-		s.Format("%d :%s 耐久:%d/%d",i, r.m_euip[i].pName, *(r.m_euip[i].Use_Num),*(r.m_euip[i].Use_Num_Max));
-		AppendText(m_edit2, s);
-	}
-
-	// 元神属性
-	if (*r.m_roleproperty.Is_has_Promenade==0)return;
-	Promenade.init_promenade();
-	if (*Promenade.m_roleproperty.Is_Promenade_Release==0) mfun.release_Promenade();
-	if (!Promenade.init_promenade())return;
-	s.Format("%s\n", Promenade.m_roleproperty.Object.pName);
-	AppendText(m_edit2, s);
-	if (*Promenade.m_roleproperty.Sex == 0)sex = "男";
-	else sex = "女";
-	if (*Promenade.m_roleproperty.Job == 0)job = "战士";
-	else if (*Promenade.m_roleproperty.Job == 1)job = "法师";
-	else job = "道士";
-	s.Format("职业:%s      等级:%d    性别:%s", job, *Promenade.m_roleproperty.Level, sex);
-	AppendText(m_edit2, s);;
-	s.Format("HP:%d / %d", *Promenade.m_roleproperty.Object.HP, *Promenade.m_roleproperty.Object.HP_MAX);
-	AppendText(m_edit2, s);
-	s.Format("MP:%d / %d", *Promenade.m_roleproperty.Object.MP, *Promenade.m_roleproperty.Object.MP_MAX);
-	AppendText(m_edit2, s);
-	s.Format("当前地图:%s  坐标%d,%d", Promenade.m_roleproperty.p_Current_Map, *Promenade.m_roleproperty.Object.X, *Promenade.m_roleproperty.Object.Y);
-	AppendText(m_edit2, s);
-	s.Format("背包大小:%d  背包负重%d / %d", *Promenade.m_roleproperty.Bag_Size, *Promenade.m_roleproperty.BAG_W, *Promenade.m_roleproperty.BAG_W_MAX);
-	AppendText(m_edit2, s);
-	s.Format("ID:%x", *Promenade.m_roleproperty.Object.ID);
-	AppendText(m_edit2, s);
-	for (auto i = 0; i < 21; i++)
-	{
-		if (!(*Promenade.m_euip[i].ID))continue;
-		s.Format("%d :%s 耐久:%d/%d", i, Promenade.m_euip[i].pName, *(Promenade.m_euip[i].Use_Num), *(Promenade.m_euip[i].Use_Num_Max));
-		AppendText(m_edit2, s);
-	}
-	Promenade.m_roleproperty.Object.Distance = mfun.caclDistance(*r.m_roleproperty.Object.X, *r.m_roleproperty.Object.Y, *Promenade.m_roleproperty.Object.X, *Promenade.m_roleproperty.Object.Y);
-	s.Format("距主体距离:%f", Promenade.m_roleproperty.Object.Distance);
-	AppendText(m_edit2, s);
-
-}
-//int
-//WSAAPI
-//MyWSARecv(
-//	_In_ SOCKET s,
-//	_In_reads_(dwBufferCount) __out_data_source(NETWORK) LPWSABUF lpBuffers,
-//	_In_ DWORD dwBufferCount,
-//	_Out_opt_ LPDWORD lpNumberOfBytesRecvd,
-//	_Inout_ LPDWORD lpFlags,
-//	_Inout_opt_ LPWSAOVERLAPPED lpOverlapped,
-//	_In_opt_ LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine
-//)
-//{
-//	
-//	rcvryAPI(WSARecv, rcvryCode);
-//   int ret= WSARecv(s, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpOverlapped, lpCompletionRoutine);
-//	int er=WSAGetLastError();
-//	if (er != 10035)
-//	{
-//		tools::getInstance()->message("错误:%d", er);
-//	}
-//
-//	hookAPI(WSARecv, MyWSARecv);
-//	return ret;
-//}
-
 
 BOOL CTestDlg::OnInitDialog()
 {
@@ -313,9 +220,7 @@ bool CTestDlg:: initVariable()
 }
 
 
-/*
-函数功能:自动回收物品，将军团物品回收为经验，逆魔物品回收为元宝
-*/
+//函数:自动回收物品，将军团物品回收为经验，逆魔物品回收为元宝
 void CTestDlg::AutoRecvGoods(void)
 {
 	/*回收经验*/
@@ -483,9 +388,7 @@ void CTestDlg::AutoRecvGoods(void)
 	}
 }
 
-/*
-函数功能:回城处理
-*/
+//函数:回城处理
 void CTestDlg::AutoReturnToCity()
 {
 	// 检查背包中是否有回城卷轴
@@ -520,6 +423,99 @@ void CTestDlg::AutoReturnToCity()
 		AfxMessageBox("背包中没有回城卷轴，请补充！");
 	}
 }
+
+// 遍历人物属性
+void CTestDlg::OnBnClickedButton1()
+{
+	if (!r.init())return;
+	CString s;
+	s.Format("%s\n", r.m_roleproperty.Object.pName);
+	AppendText(m_edit2, s);
+	char* sex = {};
+	char* job = {};
+	if (*r.m_roleproperty.Sex == 0)sex = "男";
+	else sex = "女";
+	if (*r.m_roleproperty.Job == 0)job = "战士";
+	else if (*r.m_roleproperty.Job == 1)job = "法师";
+	else job = "道士";
+	s.Format("职业:%s      等级:%d    性别:%s", job, *r.m_roleproperty.Level, sex);
+	AppendText(m_edit2, s);;
+	s.Format("HP:%d / %d", *r.m_roleproperty.Object.HP, *r.m_roleproperty.Object.HP_MAX);
+	AppendText(m_edit2, s);
+	s.Format("MP:%d / %d", *r.m_roleproperty.Object.MP, *r.m_roleproperty.Object.MP_MAX);
+	AppendText(m_edit2, s);
+	s.Format("当前地图:%s  坐标%d,%d", r.m_roleproperty.p_Current_Map, *r.m_roleproperty.Object.X, *r.m_roleproperty.Object.Y);
+	AppendText(m_edit2, s);
+	s.Format("背包大小:%d  背包负重%d / %d", *r.m_roleproperty.Bag_Size, *r.m_roleproperty.BAG_W, *r.m_roleproperty.BAG_W_MAX);
+	AppendText(m_edit2, s);
+	s.Format("ID:%x", *r.m_roleproperty.Object.ID);
+	AppendText(m_edit2, s);
+	for (auto i = 0; i < 21; i++)
+	{
+		if (!(*r.m_euip[i].ID))continue;
+		s.Format("%d :%s 耐久:%d/%d", i, r.m_euip[i].pName, *(r.m_euip[i].Use_Num), *(r.m_euip[i].Use_Num_Max));
+		AppendText(m_edit2, s);
+	}
+
+	// 元神属性
+	if (*r.m_roleproperty.Is_has_Promenade == 0)return;
+	Promenade.init_promenade();
+	if (*Promenade.m_roleproperty.Is_Promenade_Release == 0) mfun.release_Promenade();
+	if (!Promenade.init_promenade())return;
+	s.Format("%s\n", Promenade.m_roleproperty.Object.pName);
+	AppendText(m_edit2, s);
+	if (*Promenade.m_roleproperty.Sex == 0)sex = "男";
+	else sex = "女";
+	if (*Promenade.m_roleproperty.Job == 0)job = "战士";
+	else if (*Promenade.m_roleproperty.Job == 1)job = "法师";
+	else job = "道士";
+	s.Format("职业:%s      等级:%d    性别:%s", job, *Promenade.m_roleproperty.Level, sex);
+	AppendText(m_edit2, s);;
+	s.Format("HP:%d / %d", *Promenade.m_roleproperty.Object.HP, *Promenade.m_roleproperty.Object.HP_MAX);
+	AppendText(m_edit2, s);
+	s.Format("MP:%d / %d", *Promenade.m_roleproperty.Object.MP, *Promenade.m_roleproperty.Object.MP_MAX);
+	AppendText(m_edit2, s);
+	s.Format("当前地图:%s  坐标%d,%d", Promenade.m_roleproperty.p_Current_Map, *Promenade.m_roleproperty.Object.X, *Promenade.m_roleproperty.Object.Y);
+	AppendText(m_edit2, s);
+	s.Format("背包大小:%d  背包负重%d / %d", *Promenade.m_roleproperty.Bag_Size, *Promenade.m_roleproperty.BAG_W, *Promenade.m_roleproperty.BAG_W_MAX);
+	AppendText(m_edit2, s);
+	s.Format("ID:%x", *Promenade.m_roleproperty.Object.ID);
+	AppendText(m_edit2, s);
+	for (auto i = 0; i < 21; i++)
+	{
+		if (!(*Promenade.m_euip[i].ID))continue;
+		s.Format("%d :%s 耐久:%d/%d", i, Promenade.m_euip[i].pName, *(Promenade.m_euip[i].Use_Num), *(Promenade.m_euip[i].Use_Num_Max));
+		AppendText(m_edit2, s);
+	}
+	Promenade.m_roleproperty.Object.Distance = mfun.caclDistance(*r.m_roleproperty.Object.X, *r.m_roleproperty.Object.Y, *Promenade.m_roleproperty.Object.X, *Promenade.m_roleproperty.Object.Y);
+	s.Format("距主体距离:%f", Promenade.m_roleproperty.Object.Distance);
+	AppendText(m_edit2, s);
+
+}
+//int
+//WSAAPI
+//MyWSARecv(
+//	_In_ SOCKET s,
+//	_In_reads_(dwBufferCount) __out_data_source(NETWORK) LPWSABUF lpBuffers,
+//	_In_ DWORD dwBufferCount,
+//	_Out_opt_ LPDWORD lpNumberOfBytesRecvd,
+//	_Inout_ LPDWORD lpFlags,
+//	_Inout_opt_ LPWSAOVERLAPPED lpOverlapped,
+//	_In_opt_ LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine
+//)
+//{
+//	
+//	rcvryAPI(WSARecv, rcvryCode);
+//   int ret= WSARecv(s, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpOverlapped, lpCompletionRoutine);
+//	int er=WSAGetLastError();
+//	if (er != 10035)
+//	{
+//		tools::getInstance()->message("错误:%d", er);
+//	}
+//
+//	hookAPI(WSARecv, MyWSARecv);
+//	return ret;
+//}
 
 //  遍历周围对象 地面 怪物NPC
 void CTestDlg::OnBnClickedButton2()
@@ -999,6 +995,11 @@ UINT __cdecl CTestDlg::threadBagPocess(LPVOID p)
 				mfun.useGoods(r_bag.getGoodsIndex("20个绑定元宝"));
 				Sleep(200);
 			}
+			if (r_bag.caclGoodsNumber("声望令牌(一)") > 0)
+			{
+				mfun.useGoods(r_bag.getGoodsIndex("声望令牌(一)")>0);
+				Sleep(200);
+			}
 		if (r_bag.getBagSpace() < 10)
 		{
 			if (r_bag.caclGoodsNumber("强效太阳神水") > REMAIN_TAIYANG)
@@ -1094,70 +1095,72 @@ void CTestDlg::OnBnClickedButton9()
 
 	if (!r.init()) return;
 
+	m_luaInterface.buyMedicine("超级魔法药", 5);
+
+	//m_luaInterface.applySJLP();
+
 	// 获取周围怪物信息
-		CString s;
+		//CString s;
+		//std::ostringstream output;
+		//
+		//MapNames map_names;
+		//Transitions transitions;
+		//std::string input_file = (std::string)shareCli.m_pSMAllData->currDir + "\\map\\map_data.lua";
+		//m_luaInterface.load_and_store_map_data(L, input_file, map_names, transitions);
 
-
-		std::ostringstream output;
-		
-		MapNames map_names;
-		Transitions transitions;
-		std::string input_file = (std::string)shareCli.m_pSMAllData->currDir + "\\map\\map_data.lua";
-		m_luaInterface.load_and_store_map_data(L, input_file, map_names, transitions);
-
-		int i = 0;
-		std::cout << "Map Names:" << std::endl;
-		for (const auto& entry : map_names) {
-			std::cout <<++i<< "  " << entry.first << ": " << entry.second << std::endl;
-		}
+		//int i = 0;
+		//std::cout << "Map Names:" << std::endl;
+		//for (const auto& entry : map_names) {
+		//	std::cout <<++i<< "  " << entry.first << ": " << entry.second << std::endl;
+		//}
 
 
 
-		// 查找路径
-		std::string start_name = "落霞岛";
-		std::string end_name = "尸王殿";
+		//// 查找路径
+		//std::string start_name = "落霞岛";
+		//std::string end_name = "尸王殿";
 
-		std::string start_id, end_id;
-		for (const auto& pair : map_names) {
-			if (pair.second == start_name) {
-				start_id = pair.first;
-			}
-			if (pair.second == end_name) {
-				end_id = pair.first;
-			}
-		}
-		s.Format("%s  %s \t\n", start_id.c_str(),end_id.c_str());
-		AppendText(m_edit2, s);
-		if (start_id.empty() || end_id.empty()) {
-			std::cerr << "未找到指定的地图名称" << std::endl;
-			return;
-		}
-		std::vector<std::string> path; // 存储路径
-		std::vector<std::pair<std::string, std::vector<Position>>> path_with_positions; // 存储路径和过图点坐标
+		//std::string start_id, end_id;
+		//for (const auto& pair : map_names) {
+		//	if (pair.second == start_name) {
+		//		start_id = pair.first;
+		//	}
+		//	if (pair.second == end_name) {
+		//		end_id = pair.first;
+		//	}
+		//}
+		//s.Format("%s  %s \t\n", start_id.c_str(),end_id.c_str());
+		//AppendText(m_edit2, s);
+		//if (start_id.empty() || end_id.empty()) {
+		//	std::cerr << "未找到指定的地图名称" << std::endl;
+		//	return;
+		//}
+		//std::vector<std::string> path; // 存储路径
+		//std::vector<std::pair<std::string, std::vector<Position>>> path_with_positions; // 存储路径和过图点坐标
 
-		if (m_luaInterface.find_path(map_names, transitions, start_name, end_name, path)) {
-			path_with_positions = m_luaInterface.get_positions_for_path(transitions, path);
-			output << "找到路径：" << std::endl;
-			path_with_positions = m_luaInterface.get_positions_for_path(transitions, path);
-			for (const auto& entry : path_with_positions) {
-				const std::string& id = entry.first;
-				const std::vector<Position>& positions = entry.second;
+		//if (m_luaInterface.find_path(map_names, transitions, start_name, end_name, path)) {
+		//	path_with_positions = m_luaInterface.get_positions_for_path(transitions, path);
+		//	output << "找到路径：" << std::endl;
+		//	path_with_positions = m_luaInterface.get_positions_for_path(transitions, path);
+		//	for (const auto& entry : path_with_positions) {
+		//		const std::string& id = entry.first;
+		//		const std::vector<Position>& positions = entry.second;
 
-				// 获取地图名称
-				std::string map_name = map_names.count(id) ? map_names.at(id) : "未知地图";
+		//		// 获取地图名称
+		//		std::string map_name = map_names.count(id) ? map_names.at(id) : "未知地图";
 
-				output << "Map Name: " << map_name << ", Positions: ";
-				for (const auto& pos : positions) {
-					output << "(" << pos.x << ", " << pos.y << ") ";
-				}
-				output << std::endl;
-			}
-		}
-		else {
-			output << "未找到从 " << start_name << " 到 " << end_name << " 的路径\n";
-		}
-		s.Format("%s \t\n", output.str().c_str());
-		AppendText(m_edit2, s);
+		//		output << "Map Name: " << map_name << ", Positions: ";
+		//		for (const auto& pos : positions) {
+		//			output << "(" << pos.x << ", " << pos.y << ") ";
+		//		}
+		//		output << std::endl;
+		//	}
+		//}
+		//else {
+		//	output << "未找到从 " << start_name << " 到 " << end_name << " 的路径\n";
+		//}
+		//s.Format("%s \t\n", output.str().c_str());
+		//AppendText(m_edit2, s);
 
 	/*自动打怪 需要启动：①打怪线程优先级正常 ②遍历周围对象、地面并拾取线程 优先级中高 ③寻路线程、智能闪避 优先级最高
 	*
@@ -1365,7 +1368,7 @@ void CTestDlg::OnBnClickedBtnGj()
 	}
 }
 
-
+//录制NPC的hook函数
 _declspec(naked) void CallRecord()
 {
 	_asm pushad
@@ -1446,7 +1449,7 @@ BOOL CTestDlg::OnEraseBkgnd(CDC* pDC)
 	return true;
 }
 
-
+//处理包裹
 void CTestDlg::OnBnClickedBtnBagproc()
 {
 	// TODO: 在此添加控件通知处理程序代码

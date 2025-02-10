@@ -82,6 +82,13 @@ bool role::initialize_properties(DWORD baseAddress)
 		INIT_PROPERTY(baseAddress, 0x3D8, DWORD, Is_Promenade_Release);
 		INIT_PROPERTY(baseAddress, 0xA08, DWORD, Promenade_Mode);
 
+		INIT_PROPERTY(baseAddress, 0xA84, DWORD, p_Role_EXP);
+		INIT_PROPERTY(baseAddress, 0xAA0, DWORD, p_Role_EXP_MAX);
+		INIT_PROPERTY(baseAddress, 0xC08, double, p_Role_YB_Bind);
+		INIT_PROPERTY(baseAddress, 0xC10, DWORD, p_Role_Gold);
+		INIT_PROPERTY(baseAddress, 0xC14, DWORD, p_Role_GoldBind);
+		INIT_PROPERTY(baseAddress, 0xBEC, DWORD, p_Role_YB);
+
 		// ¼ì²é HP_MAX ÊÇ·ñÎª 0
 		if (!*m_roleproperty.Object.HP_MAX)
 		{
