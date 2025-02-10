@@ -7,6 +7,7 @@
 #define IDC_BUTTON3                     2002
 #define IDC_BUTTON4                     2003
 #define IDC_BUTTON5                     2004
+#define IDC_BTN_BAGPROC                 2004
 #define IDC_BUTTON6                     2005
 #define IDC_EDIT1                       2006
 #define IDC_BUTTON7                     2007

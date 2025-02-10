@@ -80,7 +80,6 @@ BEGIN_MESSAGE_MAP(CTestDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON2, &CTestDlg::OnBnClickedButton2)
 	ON_BN_CLICKED(IDC_BUTTON3, &CTestDlg::OnBnClickedButton3)
 	ON_BN_CLICKED(IDC_BUTTON8, &CTestDlg::OnBnClickedButton8)
-	ON_BN_CLICKED(IDC_BUTTON5, &CTestDlg::OnBnClickedButton5)
 	ON_BN_CLICKED(IDC_BUTTON9, &CTestDlg::OnBnClickedButton9)
 	ON_BN_CLICKED(IDC_BUTTON4, &CTestDlg::OnBnClickedButton4)
 	ON_BN_CLICKED(IDC_CHK_TEAM, &CTestDlg::OnBnClickedChkTeam)
@@ -89,6 +88,7 @@ BEGIN_MESSAGE_MAP(CTestDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_RECNPC, &CTestDlg::OnBnClickedBtnRecnpc)
 	ON_BN_CLICKED(IDC_BTN_LUATST, &CTestDlg::OnBnClickedBtnLuatst)
 	ON_WM_ERASEBKGND()
+	ON_BN_CLICKED(IDC_BTN_BAGPROC, &CTestDlg::OnBnClickedBtnBagproc)
 END_MESSAGE_MAP()
 
 // CTestDlg 消息处理程序
@@ -258,7 +258,12 @@ BOOL CTestDlg::OnInitDialog()
 	m_luaInterface.registerClasses();// 初始化 lua接口对象
 	L = m_luaInterface.getLuaState(); //初始化Lua状态
 
-	auto_avoid_mon = false; //初始化设置智能闪避关闭
+	//初始化 线程标志
+	tflag_attack = true;
+	tflag_goto = true;
+	tflag_pickup = true;
+	tflag_autoavoid = true;
+	tflag_processBag = true;
 
   //初始化共享内存,取得共享内存索引
 	if (!shareCli.openShareMemory())
@@ -289,9 +294,8 @@ bool CTestDlg:: initVariable()
 {
 	i_map = 0;
 	s_ID = -1;
-	tflag_attack = true;
-	tflag_goto = true;
-	tflag_pickup = true;
+
+	
 	/*载入拾取物品*/
 	pick_goods_list.clear();
 	pick_goods_list = tools::getInstance()->ReadTxt(std::string(shareCli.m_pSMAllData->currDir) + "\\cfg\\拾取物品.txt");
@@ -647,21 +651,6 @@ void CTestDlg::OnBnClickedButton8()
 
 }
 
-// TODO: 停止脚本
-void CTestDlg::OnBnClickedButton5()
-{
-	tflag_attack = false;
-	//tflag_goto= false;
-	tflag_pickup= false;
-	//线程开关置为假
-	//WaitForSingleObject(m_threadGoto, 100);
-	WaitForSingleObject(m_threadAttack, 60000);
-	WaitForSingleObject(m_threadPickup, 60000);
-}
-
-
-
-
 /*
 函数功能:选择打怪目标
 参数一:角色结构体
@@ -880,13 +869,14 @@ void  CTestDlg::RoleIsDeath(void)
 	cfg_file_path = cfg_file_path + r.m_roleproperty.Object.pName +".cfg";
 	tools::getInstance()->write2file(cfg_file_path, "当前任务", std::ios::out);
 
-		if (tflag_attack) //停止打怪 闪避 背包处理线程
+	if (tflag_attack) //停止打怪 闪避 背包处理线程
 	{
 		tflag_attack = false;
 		WaitForSingleObject(m_threadAttack, 60000);
 		WaitForSingleObject(m_threadBagProcess, 60000);
-		if (auto_avoid_mon)
+		if (tflag_autoavoid)
 		{
+			tflag_autoavoid = false;
 			WaitForSingleObject(m_threadAutoAvoid, 60000);
 		}
 		KillTimer(22222);
@@ -985,7 +975,7 @@ UINT __cdecl CTestDlg::threadBagPocess(LPVOID p)
 	CTestDlg* pDlg = (CTestDlg*)p;
 	s.Format("处理包裹线程开始\n ");
 	AppendText(pDlg->m_edit2, s);
-	while (pDlg->tflag_attack)
+	while (pDlg->tflag_processBag)
 	{
 			pDlg->AutoRecvGoods();
 			if (r_bag.caclGoodsNumber("1个绑定元宝") > 0) {
@@ -1035,7 +1025,7 @@ UINT __cdecl CTestDlg::threadAutoAvoidMon(LPVOID p)
 	CTestDlg* pDlg = (CTestDlg*)p;
 	s.Format("智能闪避线程开始\n ");
 	AppendText(pDlg->m_edit2, s);
-	while (pDlg->tflag_attack)
+	while (pDlg->tflag_autoavoid)
 	{
 		pDlg->AutoAvoidMonsters();
 		Sleep(2000);
@@ -1342,32 +1332,37 @@ void CTestDlg::OnTimer(UINT_PTR nIDEvent)
 void CTestDlg::OnBnClickedBtnGj()
 {
 	if (!r.init())return;
-	if (*r.m_roleproperty.Job > 0)auto_avoid_mon = true;//不是战士 开启智能闪避
-	r_bag.maxSize = *r.m_roleproperty.Bag_Size;
-	r_bag.bagBase = (DWORD)r.m_roleproperty.p_Bag_Base;
-	r_bag.init();
-    tflag_attack = !tflag_attack;
-	if (tflag_attack)
+	CButton* pButton = (CButton*)GetDlgItem(IDC_BTN_GJ);
+	if (m_threadAttack==NULL)
 	{
+		tflag_attack = true;
 		m_threadAttack = AfxBeginThread(threadAttack, (LPVOID)this);
-		m_threadBagProcess = AfxBeginThread(threadBagPocess, (LPVOID)this);
-		if (auto_avoid_mon)
+		tflag_autoavoid = (0!=*r.m_roleproperty.Job);// 不是战士时开启智能闪避
+		if (tflag_autoavoid&&(m_threadAutoAvoid==NULL))
 		{
 			// 设置智能闪避线程，用于自动躲避怪物
 			m_threadAutoAvoid=AfxBeginThread(threadAutoAvoidMon, (LPVOID)this);
 		}
 		SetTimer(22222, 5000, NULL);;	//设置定时器5s 检测角色是否死亡
+		if (pButton != nullptr)
+		{
+			pButton->SetWindowText(_T("停止挂机"));
+		}
 	}
 	else
 	{
+		tflag_attack = false;
 		WaitForSingleObject(m_threadAttack, 60000);
-		WaitForSingleObject(m_threadBagProcess, 60000);
+		m_threadAttack = NULL;
+		if (pButton != nullptr)	pButton->SetWindowText(_T("开始挂机"));
 		if (m_threadAutoAvoid !=NULL)
 		{
+			tflag_autoavoid = false;
 			WaitForSingleObject(m_threadAutoAvoid ,60000);
+			m_threadAutoAvoid = NULL;
 		}
 		KillTimer(22222);
-	}	
+	}
 }
 
 
@@ -1452,3 +1447,25 @@ BOOL CTestDlg::OnEraseBkgnd(CDC* pDC)
 }
 
 
+void CTestDlg::OnBnClickedBtnBagproc()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	if (!r.init())return;
+	r_bag.maxSize = *r.m_roleproperty.Bag_Size;
+	r_bag.bagBase = (DWORD)r.m_roleproperty.p_Bag_Base;
+	r_bag.init();
+	CButton* pButton = (CButton*)GetDlgItem(IDC_BTN_BAGPROC);
+	if (m_threadBagProcess==NULL)
+	{
+		tflag_processBag = true;
+		m_threadBagProcess = AfxBeginThread(threadBagPocess, (LPVOID)this);
+		if (pButton != nullptr)pButton->SetWindowText(_T("关整背包"));
+	}
+	else
+	{
+		tflag_processBag = false;
+		if (pButton != nullptr)pButton->SetWindowText(_T("开整背包"));
+		WaitForSingleObject(m_threadBagProcess, 60000);
+		m_threadBagProcess = NULL;
+	}
+}

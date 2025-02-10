@@ -30,7 +30,7 @@ private:
 	std::atomic<bool> stopThread{ false };  // 用于通知线程停止
 	void threadCallBack();//刷新ListCtrl
 	CWinThread* m_pThread_login = nullptr; // 保存线程指针
-	static UINT ThreadLogin(LPVOID pParam);
+	static UINT __cdecl ThreadLogin(LPVOID pParam);
 	std::string GAME_DIR; //保存游戏目录
 
 

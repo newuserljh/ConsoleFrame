@@ -30,7 +30,6 @@ public:
 	afx_msg void OnBnClickedButton2();
 	afx_msg void OnBnClickedButton3();
 	afx_msg void OnBnClickedButton8();
-	afx_msg void OnBnClickedButton5();
 	afx_msg void OnBnClickedButton9();
 	afx_msg void OnBnClickedButton4();
 	virtual BOOL OnInitDialog();
@@ -59,6 +58,7 @@ public:
 	bool tflag_pickup;
 	static UINT __cdecl threadPickup(LPVOID lparam);
 
+	bool tflag_processBag;
 	CWinThread* m_threadBagProcess;
 	static UINT __cdecl CTestDlg::threadBagPocess(LPVOID lparam);
 
@@ -71,7 +71,7 @@ public:
 	void  RoleIsDeath(void);//死亡处理
 
 	//智能闪避变量
-	bool auto_avoid_mon;
+	bool tflag_autoavoid;
 	CWinThread* m_threadAutoAvoid;
 	static UINT __cdecl threadAutoAvoidMon(LPVOID p);
 
@@ -84,7 +84,6 @@ public:
 	
 	
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
-	afx_msg void OnBnClickedButton10();
 	afx_msg void OnBnClickedBtnGj();
 	afx_msg void OnBnClickedBtnRecnpc();
 
@@ -98,4 +97,5 @@ public:
 public:
 	DWORD mPid;
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+	afx_msg void OnBnClickedBtnBagproc();
 };

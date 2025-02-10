@@ -198,7 +198,7 @@ bool CAccountDlg::initGameDir() //读取游戏目录
 	return true;
 }
 //登录账号线程 8秒登录一个 防止游戏资源加载错误
- UINT CAccountDlg::ThreadLogin(LPVOID pParam)
+UINT __cdecl CAccountDlg::ThreadLogin(LPVOID pParam)
 {
 	CAccountDlg* pThis = (CAccountDlg*)pParam;
 	if (pThis->GAME_DIR.empty()) {
