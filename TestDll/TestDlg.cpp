@@ -1095,7 +1095,7 @@ void CTestDlg::OnBnClickedButton9()
 
 	if (!r.init()) return;
 
-	m_luaInterface.buyMedicine("超级魔法药", 5);
+	//m_luaInterface.buyMedicine("超级魔法药", 5);
 
 	//m_luaInterface.applySJLP();
 
