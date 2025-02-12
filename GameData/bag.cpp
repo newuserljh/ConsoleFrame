@@ -26,7 +26,7 @@ bool bag::init()
 			m_bag[i].WD_low = (BYTE*)(bagBase + i * 0x688 + 0x1a);
 			m_bag[i].WD_high = (BYTE*)(bagBase + i * 0x688 + 0x1b);
 			m_bag[i].MD_low = (BYTE*)(bagBase + i * 0x688 + 0x1c);
-			m_bag[i].WD_high = (BYTE*)(bagBase + i * 0x688 + 0x1d);
+			m_bag[i].MD_high = (BYTE*)(bagBase + i * 0x688 + 0x1d);
 			m_bag[i].PA_low = (BYTE*)(bagBase + i * 0x688 + 0x1e);
 			m_bag[i].PA_high = (BYTE*)(bagBase + i * 0x688 + 0x1f);
 			m_bag[i].Magic_low = (BYTE*)(bagBase + i * 0x688 + 0x20);

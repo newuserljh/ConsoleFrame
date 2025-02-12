@@ -226,3 +226,54 @@
 0068F08F | CC                       | int3                                     |
 0068F090 | 56                       | push esi                                 |
 0068F091 | 57                       | push edi                                 | edi:&"瓞G"
+
+
+00CA5BC5 | 0F84 CB010000            | je woool.dat.CA5D96                      |
+00CA5BCB | 85FF                     | test edi,edi                             |
+00CA5BCD | 0F84 C3010000            | je woool.dat.CA5D96                      |
+00CA5BD3 | E8 B8D487FF              | call woool.dat.523090                    |
+00CA5BD8 | 8985 70020000            | mov dword ptr ss:[ebp+270],eax           |
+00CA5BDE | 8B85 68020000            | mov eax,dword ptr ss:[ebp+268]           |
+00CA5BE4 | 83C0 FF                  | add eax,FFFFFFFF                         |
+00CA5BE7 | 83F8 0A                  | cmp eax,A                                | 0A:'\n'
+00CA5BEA | 0F87 A6010000            | ja woool.dat.CA5D96                      |
+00CA5BF0 | FF2485 C05DCA00          | jmp dword ptr ds:[eax*4+CA5DC0]          |
+00CA5BF7 | B9 30D31001              | mov ecx,woool.dat.110D330                |
+00CA5BFC | E8 3FD67AFF              | call woool.dat.453240                    |
+00CA5C01 | 8B0D 10FB3501            | mov ecx,dword ptr ds:[135FB10]           | ecx
+00CA5C07 | 50                       | push eax                                 | 物品名字 
+00CA5C08 | 56                       | push esi                                 | 物品ID
+00CA5C09 | 57                       | push edi                                 | NPCID
+00CA5C0A | E8 01939EFF              | call woool.dat.68EF10                    | 卖物品call 卖完需要小退一下
+00CA5C0F | 5F                       | pop edi                                  |
+00CA5C10 | 5E                       | pop esi                                  |
+00CA5C11 | B0 01                    | mov al,1                                 |
+00CA5C13 | 5D                       | pop ebp                                  |
+00CA5C14 | C2 0C00                  | ret C                                    |
+
+
+00CA5C19 | B9 30D31001              | mov ecx,woool.dat.110D330                | 110D330:"\f强效太阳神水"
+00CA5C1E | E8 1DD67AFF              | call woool.dat.453240                    |
+00CA5C23 | 8B0D 10FB3501            | mov ecx,dword ptr ds:[135FB10]           |
+00CA5C29 | 50                       | push eax                                 | eax:"强效太阳神水"
+00CA5C2A | 56                       | push esi                                 |
+00CA5C2B | 57                       | push edi                                 |
+00CA5C2C | E8 4F939EFF              | call woool.dat.68EF80                    |
+00CA5C31 | 5F                       | pop edi                                  |
+00CA5C32 | 5E                       | pop esi                                  |
+00CA5C33 | C605 CFD91001 01         | mov byte ptr ds:[110D9CF],1              |
+00CA5C3A | B0 01                    | mov al,1                                 |
+00CA5C3C | 5D                       | pop ebp                                  |
+00CA5C3D | C2 0C00                  | ret C                                    |
+00CA5C40 | 6A 00                    | push 0                                   | 0
+00CA5C42 | B9 30D31001              | mov ecx,woool.dat.110D330                | 110D330:"\f强效太阳神水"
+00CA5C47 | E8 F4D57AFF              | call woool.dat.453240                    |
+00CA5C4C | 8B0D 10FB3501            | mov ecx,dword ptr ds:[135FB10]           |
+00CA5C52 | 50                       | push eax                                 | 物品名字
+00CA5C53 | 56                       | push esi                                 | 物品id
+00CA5C54 | 57                       | push edi                                 | npcid
+00CA5C55 | E8 B6919EFF              | call woool.dat.68EE10                    | 存物品 需要小退
+00CA5C5A | 5F                       | pop edi                                  |
+00CA5C5B | 5E                       | pop esi                                  |
+00CA5C5C | B0 01                    | mov al,1                                 |
+00CA5C5E | 5D                       | pop ebp                                  |

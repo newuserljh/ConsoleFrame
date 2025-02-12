@@ -65,7 +65,7 @@ public:
 	/*组队设置*/
 	CButton* pBtn;//队伍复选框
 	std::vector<std::string> team_list;
-	void  MakeTeam(CTestDlg* p);
+	void  MakeTeam();
 	int m_team_check_id;
 
 	void  RoleIsDeath(void);//死亡处理
@@ -89,10 +89,10 @@ public:
 
 
 protected:
-	lua_interface m_luaInterface; // 添加 lua_interface 成员变量
+
 public:
 	afx_msg void OnBnClickedBtnLuatst();
-
+	lua_interface m_luaInterface; // 添加 lua_interface 成员变量
 	//成员
 public:
 	DWORD mPid;

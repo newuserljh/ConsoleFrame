@@ -621,3 +621,38 @@ std::string tools::GetCurrDir()
 
 	 return true;
  }
+
+
+ // 解析配置文件并返回一个 map，其中键是列表名，值是列表内容
+ std::unordered_map<std::string, std::unordered_map<std::string, std::string>> tools::parseIniFile(const std::string& filename)
+ {
+	 std::ifstream file(filename);
+	 if (!file.is_open()) {
+		 throw std::runtime_error("Could not open file: " + filename);
+	 }
+	 std::unordered_map<std::string, std::unordered_map<std::string, std::string>> config;
+	 std::string line;
+	 std::string currentSection;
+
+	 while (std::getline(file, line)) {
+		 // Trim whitespace
+		 line.erase(0, line.find_first_not_of(" \t"));
+		 line.erase(line.find_last_not_of(" \t") + 1);
+
+		 if (line.empty() || line[0] == ';') continue; // Skip empty lines and comments
+
+		 if (line[0] == '[' && line[line.size() - 1] == ']') {
+			 // Section header
+			 currentSection = line.substr(1, line.size() - 2);
+		 }
+		 else {
+			 size_t delimiterPos = line.find('=');
+			 if (delimiterPos != std::string::npos) {
+				 std::string key = line.substr(0, delimiterPos);
+				 std::string value = line.substr(delimiterPos + 1);
+				 config[currentSection][key] = value;
+			 }
+		 }
+	 }
+	 return config;
+ }

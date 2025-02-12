@@ -966,3 +966,68 @@ bool gamecall::buyGoods(std::string& goodsName,DWORD npcId,DWORD isBind,unsigned
 	}
 	return true;
 }
+
+
+/*
+函数功能:卖物品
+参数一:物品名字
+参数二:NPC——ID
+参数三:物品ID
+返回值：bool
+*/
+bool gamecall::sellGoods(std::string& goodsName, DWORD npcId, DWORD goodsId)
+{
+	const char* name = goodsName.c_str();
+
+			try
+			{
+				_asm
+				{
+					pushad
+					push name
+					push goodsId
+					push npcId
+					mov ecx, dword ptr ds : [CALL_ECX]
+					mov edx, CALL_SELL_GOODS
+					call edx
+					popad
+				}
+			}
+			catch (...)
+			{
+				return false;
+			}
+}
+
+
+/*
+函数功能:存物品
+参数一:物品名字
+参数二:NPC——ID
+参数三:物品ID
+返回值：bool
+*/
+bool gamecall::storeGoods(std::string& goodsName, DWORD npcId, DWORD goodsId)
+{
+	const char* name = goodsName.c_str();
+
+	try
+	{
+		_asm
+		{
+			pushad
+			push 0
+			push name
+			push goodsId
+			push npcId
+			mov ecx, dword ptr ds : [CALL_ECX]
+			mov edx, CALL_STORE_GOODS
+			call edx
+			popad
+		}
+	}
+	catch (...)
+	{
+		return false;
+	}
+}

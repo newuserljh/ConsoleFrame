@@ -40,6 +40,9 @@ team m_team;
 std::mutex team_mutex;  // 队伍文件变量互斥 
 
 
+std::vector<std::string>  StoreVec, SellWeaponVec, SellClothesVec, SellJewelryVec;//分别存储 存仓物品 卖武器 衣服 首饰 名字
+std::map<std::string, DWORD>SellMedicineVec;//存储 卖药品 的名字 和剩余数量
+
 _declspec(naked) void CallTest()
 {
 	_asm pushad
@@ -97,38 +100,54 @@ END_MESSAGE_MAP()
 void threadLogin()
 {
 	int i = 0;//尝试登录次数
+	DWORD npid = GetCurrentProcessId();
 	do
 	{
 		shareCli.m_pSMAllData->m_sm_data[shareindex].cscript = "登录中...";
-		Sleep(10000);
-		mfun.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
+		Sleep(5000);
+		mfun.presskey(npid,VK_RETURN);
 		Sleep(100);
 		mfun.loginGame(shareCli.m_pSMAllData->m_sm_data[shareindex].userName.c_str(), shareCli.m_pSMAllData->m_sm_data[shareindex].passWord.c_str());
 		Sleep(1000);
-		mfun.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
+		mfun.presskey(npid);
 		Sleep(1000);
-		mfun.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
+		mfun.presskey(npid);
 		Sleep(1000);
-		mfun.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
+		mfun.presskey(npid);
 		Sleep(1000);
-		mfun.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
+		mfun.presskey(npid);
 		Sleep(1000);
-		mfun.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
+		mfun.presskey(npid);
 		Sleep(1000);
-		mfun.presskey(shareCli.m_pSMAllData->m_sm_data[shareindex].ndPid);
+		mfun.presskey(npid);
 		Sleep(1000);
 		i++;
 	} while ((!r.init()) && i < 10);
-	if (!r.init())
+	if (!r.init()) //包括了 角色和角色装备的初始化
 	{
 		shareCli.m_pSMAllData->m_sm_data[shareindex].cscript = "登陆失败,正在结束程序";
 		shareCli.m_pSMAllData->m_sm_data[shareindex].server_alive = false;
 	}
 	else 
 	{
+
 		shareCli.m_pSMAllData->m_sm_data[shareindex].cscript = "登陆完成";
 		shareCli.m_pSMAllData->m_sm_data[shareindex].roleName = std::string(r.m_roleproperty.Object.pName);
-		pDlg->init_team();
+		
+		//登陆成功 初始化
+		pDlg->SetTimer(22222, 5000, NULL);	//设置定时器5s 检测角色是否死亡
+		//初始化背包  技能 队伍
+		r_bag.maxSize = *r.m_roleproperty.Bag_Size;
+		r_bag.bagBase = (DWORD)r.m_roleproperty.p_Bag_Base;
+		r_bag.init();
+		m_skill.skillBase = (DWORD)r.m_roleproperty.p_Skill_Base;
+		m_skill.init();
+		m_team.team_Base = r.m_roleproperty.Team_pointer;
+		pDlg->init_team(); //包含了组队的定时器 SetTimer(11111, 30000, NULL)
+
+		std::string usercfgpath = (std::string)shareCli.m_pSMAllData->currDir + "\\cfg\\" + r.m_roleproperty.Object.pName;
+		CreateDirectory(usercfgpath.c_str(), NULL);// 创建 角色名 文件夹（存放角色的配置
+		pDlg->m_luaInterface.parseMyConfig(StoreVec, SellWeaponVec, SellClothesVec, SellJewelryVec, SellMedicineVec);
 	}
 	return;
 }
@@ -189,6 +208,8 @@ BOOL CTestDlg::OnInitDialog()
 
 	//登录成功之后设置 启动通讯线程,定时验证存活消息
 	CloseHandle(::CreateThread(NULL, NULL, LPTHREAD_START_ROUTINE(threadAlive), NULL, NULL, NULL));
+
+
 
 	//hookAPI(WSARecv, MyWSARecv);
 
@@ -520,7 +541,7 @@ void CTestDlg::OnBnClickedButton1()
 //  遍历周围对象 地面 怪物NPC
 void CTestDlg::OnBnClickedButton2()
 {
-	if (!r.init())return;
+	r.init();
 	CString s;
 	if (!r.Get_Envionment(m_obj.p_pets, m_obj.p_npcs, m_obj.p_monster, m_obj.p_players))
 	{
@@ -598,10 +619,9 @@ void CTestDlg::OnBnClickedButton2()
 // TODO: 技能遍历
 void CTestDlg::OnBnClickedButton3()
 {
-	if (!r.init())return;
-	CString s;
-	m_skill.m_skillList.clear();
+	r.init();
 	m_skill.skillBase = (DWORD)r.m_roleproperty.p_Skill_Base;
+	CString s;
 	if (!m_skill.init())
 	{
 		s.Format("遍历技能错误：\n");
@@ -647,13 +667,8 @@ void CTestDlg::OnBnClickedButton8()
 
 }
 
-/*
-函数功能:选择打怪目标
-参数一:角色结构体
-参数二:攻击怪物列表
-返回值：选中怪物对象指针
-*/
-MONSTER_PROPERTY Choose_Moster(CTestDlg* pDlg, std::vector<std::string>& vec)
+//函数功能:选择打怪目标 参数:攻击怪物列表 返回值：选中怪物对象指针
+MONSTER_PROPERTY Choose_Moster( std::vector<std::string>& vec)
 {
 	MONSTER_PROPERTY ret;
 	if(*r.m_roleproperty.p_Target_ID == 0)
@@ -678,17 +693,11 @@ MONSTER_PROPERTY Choose_Moster(CTestDlg* pDlg, std::vector<std::string>& vec)
 	return ret;
 }
 
-/*
-函数功能:自动打怪
-参数一:角色结构体
-参数二:攻击怪物列表
-参数三:使用技能ID
-返回值：true为已经打死怪物，fasle为位置错误（或者600次没打死怪物）
-*/
-bool Auto_Attack(CTestDlg* pDlg, std::vector<std::string>& vec, DWORD s_ID)
+//函数功能:自动打怪 //参数1:攻击怪物列表 //参数2:使用技能ID// 返回值：true为已经打死怪物，fasle为错误（或者600次没打死怪物）
+bool Auto_Attack( std::vector<std::string>& vec, DWORD s_ID)
 {
 	*r.m_roleproperty.p_Target_ID = 0;
-	MONSTER_PROPERTY att_mon = Choose_Moster(pDlg, vec);
+	MONSTER_PROPERTY att_mon = Choose_Moster(vec);
 	if (nullptr == att_mon.ID)return false;
 	unsigned i = 0;/*记录攻击次数*/
 	while( (*att_mon.HP> 0) && (0 != *r.m_roleproperty.p_Target_ID) && (i < 600))
@@ -718,11 +727,7 @@ bool Auto_Attack(CTestDlg* pDlg, std::vector<std::string>& vec, DWORD s_ID)
 	return true;
 }
 
-/*
-函数功能:设置打怪技能
-参数一:角色结构体
-返回值：选中怪物对象指针
-*/
+//函数功能:设置打怪技能
 bool CTestDlg::Set_Skill()
 {
 	/*技能设置*/
@@ -767,11 +772,7 @@ bool CTestDlg::Set_Skill()
 }
 
 
-/*
-函数功能:载入寻路打怪坐标
-参数一:角色结构体
-返回值：选中怪物对象指针
-*/
+//函数功能:载入寻路打怪坐标
 bool CTestDlg::Load_coordinate()
 {
 	map_xy.clear();
@@ -787,11 +788,7 @@ bool CTestDlg::Load_coordinate()
 	return true;
 }
 
-/*
-函数功能:初始化组队Timer
-参数一:角色结构体
-返回值：选中怪物对象指针
-*/
+//函数功能:初始化组队Timer 和 队伍人员
 bool CTestDlg::init_team()
 {
 	m_team.init();
@@ -807,22 +804,16 @@ bool CTestDlg::init_team()
 	return true;
 }
 
-/*
-函数功能:读取组队文件并组队
-参数一:角色结构体
-返回值：选中怪物对象指针
-*/
-//void  TimerProc(HWND hWnd, UINT uMsg, UINT uID, DWORD dwTimew)
 
-/*组队函数*/
-void  CTestDlg::MakeTeam(CTestDlg* pDlg)
-{		
+/*组队函数：读取组队文件并组队*/
+void  CTestDlg::MakeTeam()
+{	
 	m_team.init();
-	if (pDlg->team_list.size()<2)return;
-	if (pDlg->team_list.size() == m_team.m_team_list.size())return;//组队完毕
+	if (team_list.size()<2)return;
+	if (team_list.size() == m_team.m_team_list.size())return;//组队完毕
 	if (strcmp(pDlg->team_list[0].c_str(),r.m_roleproperty.Object.pName)==0)//我是队长
 	{
-		for (size_t i = 1; i < pDlg->team_list.size(); i++)
+		for (size_t i = 1; i < team_list.size(); i++)
 		{
 			size_t temp = i;
 			for (size_t j = 0; j < m_team.m_team_list.size(); j++)
@@ -833,7 +824,7 @@ void  CTestDlg::MakeTeam(CTestDlg* pDlg)
 					break;
 				}			
 			}
-			if (temp==i) mfun.maketeam(pDlg->team_list[i]);
+			if (temp==i) mfun.maketeam(team_list[i]);
 		}
 	}
 	else //我是队员
@@ -841,7 +832,7 @@ void  CTestDlg::MakeTeam(CTestDlg* pDlg)
 		if (shareCli.m_pSMAllData->team_info == 0)
 		{
 			pBtn->SetCheck(0);
-			pDlg->OnBnClickedChkTeam();
+			OnBnClickedChkTeam();
 			return;
 		}
 		for (size_t j = 0; j < m_team.m_team_list.size(); j++)
@@ -851,7 +842,7 @@ void  CTestDlg::MakeTeam(CTestDlg* pDlg)
 				return;
 			}
 		}
-	  mfun.allowteam(pDlg->team_list[0]);//同意组队
+	  mfun.allowteam(team_list[0]);//同意组队
 	}
 }
 
@@ -885,6 +876,7 @@ void  CTestDlg::RoleIsDeath(void)
 	mfun.presskey(GetCurrentProcessId());
 	if (*r.m_roleproperty.Object.HP > 0)
 	{
+		SetTimer(22222, 5000, NULL);	//设置定时器5s 检测角色是否死亡
 		auto curr_tast = tools::getInstance()->ReadTxt(cfg_file_path);
 		//继续执行保存的任务
 
@@ -898,12 +890,12 @@ void  CTestDlg::RoleIsDeath(void)
 	mfun.presskey(GetCurrentProcessId());
 	if (*r.m_roleproperty.Object.HP > 0)
 	{
+		SetTimer(22222, 5000, NULL);	//设置定时器5s 检测角色是否死亡
 		auto curr_tast = tools::getInstance()->ReadTxt(cfg_file_path);
 		//继续执行保存的任务
 
 		return;
 	}
-
 	shareCli.m_pSMAllData->m_sm_data[shareindex].server_alive = false;//由控制台大退
 }
 
@@ -1092,9 +1084,12 @@ UINT __cdecl CTestDlg::threadPickup(LPVOID p)
 // TODO: 功能测试
 void CTestDlg::OnBnClickedButton9()
 {
-
-	if (!r.init()) return;
-
+	r_bag.maxSize = *r.m_roleproperty.Bag_Size;
+	r_bag.bagBase = (DWORD)r.m_roleproperty.p_Bag_Base;
+	r_bag.init();
+	m_skill.skillBase = (DWORD)r.m_roleproperty.p_Skill_Base;
+	m_skill.init();
+	m_team.team_Base = r.m_roleproperty.Team_pointer;
 	//m_luaInterface.buyMedicine("超级魔法药", 5);
 
 	//m_luaInterface.applySJLP();
@@ -1207,7 +1202,6 @@ void CTestDlg::OnBnClickedButton4()
 {
 	r.init();
 	m_team.team_Base = r.m_roleproperty.Team_pointer;
-	m_team.m_team_list.clear();
 	m_team.init();
 	CString s;
 	s.Format("%p \n", m_team.team_Base);
@@ -1318,7 +1312,7 @@ void CTestDlg::OnTimer(UINT_PTR nIDEvent)
 	switch (nIDEvent)
 	{
 	case 11111:
-		MakeTeam(this);
+		MakeTeam();
 		break;
 	case 22222:
 		RoleIsDeath();
@@ -1334,19 +1328,28 @@ void CTestDlg::OnTimer(UINT_PTR nIDEvent)
 // TODO: 使用内置自动打怪挂机
 void CTestDlg::OnBnClickedBtnGj()
 {
-	if (!r.init())return;
+	r.init();
+	r_bag.maxSize = *r.m_roleproperty.Bag_Size;
+	r_bag.bagBase = (DWORD)r.m_roleproperty.p_Bag_Base;
+	r_bag.init();
+	m_skill.skillBase = (DWORD)r.m_roleproperty.p_Skill_Base;
+	m_skill.init();
+	m_team.team_Base = r.m_roleproperty.Team_pointer;
 	CButton* pButton = (CButton*)GetDlgItem(IDC_BTN_GJ);
 	if (m_threadAttack==NULL)
 	{
 		tflag_attack = true;
 		m_threadAttack = AfxBeginThread(threadAttack, (LPVOID)this);
-		tflag_autoavoid = (0!=*r.m_roleproperty.Job);// 不是战士时开启智能闪避
+		if (*r.m_roleproperty.Job != 0)
+		{
+			tflag_autoavoid = true;
+		}// 不是战士时开启智能闪避
+		else tflag_autoavoid = false;
 		if (tflag_autoavoid&&(m_threadAutoAvoid==NULL))
 		{
 			// 设置智能闪避线程，用于自动躲避怪物
 			m_threadAutoAvoid=AfxBeginThread(threadAutoAvoidMon, (LPVOID)this);
 		}
-		SetTimer(22222, 5000, NULL);;	//设置定时器5s 检测角色是否死亡
 		if (pButton != nullptr)
 		{
 			pButton->SetWindowText(_T("停止挂机"));
@@ -1364,7 +1367,6 @@ void CTestDlg::OnBnClickedBtnGj()
 			WaitForSingleObject(m_threadAutoAvoid ,60000);
 			m_threadAutoAvoid = NULL;
 		}
-		KillTimer(22222);
 	}
 }
 
@@ -1453,10 +1455,6 @@ BOOL CTestDlg::OnEraseBkgnd(CDC* pDC)
 void CTestDlg::OnBnClickedBtnBagproc()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	if (!r.init())return;
-	r_bag.maxSize = *r.m_roleproperty.Bag_Size;
-	r_bag.bagBase = (DWORD)r.m_roleproperty.p_Bag_Base;
-	r_bag.init();
 	CButton* pButton = (CButton*)GetDlgItem(IDC_BTN_BAGPROC);
 	if (m_threadBagProcess==NULL)
 	{

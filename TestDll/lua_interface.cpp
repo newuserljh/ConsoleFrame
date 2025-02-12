@@ -414,3 +414,182 @@ bool lua_interface::buyMedicine(std::string med_name,BYTE num)
 
 	return true;
 }
+
+//保存物品 参数:待存物品的指针容器
+bool lua_interface::storeGoods(std::vector <DWORD*>& p_vec_store)
+{
+	auto npcid = getEviroNPCIdByName("仓库保管员");
+	if (npcid == -1) return false;
+	if (mfun.OpendNPC(npcid))
+	{
+		Sleep(50);
+		if (!mfun.ChooseCmd("@storage"))return false;
+		Sleep(50);
+		DWORD goodsId;
+		std::string name;
+		for (unsigned i = 0; i < p_vec_store.size(); ++i)
+		{
+			Sleep(50);
+			goodsId = *(DWORD*)((DWORD)p_vec_store[i] + 0x2c);
+			name = std::string((char*)((DWORD)p_vec_store[i] + 1));
+			if (!mfun.storeGoods(name, npcid, goodsId))return false;
+		}
+		return true;
+	}
+	std::cout << "对话NPC错误，检查是否在NPC附近！！" << std::endl;
+	return false;
+}
+
+//卖药 参数:待卖物品的指针容器
+bool lua_interface::sellMedicine(std::vector <DWORD*> & med_sell)
+{
+	auto npcid = getEviroNPCIdByName("药店掌柜");
+	if (npcid == -1) return false;
+	if (mfun.OpendNPC(npcid))
+	{
+		Sleep(50);
+		if (!mfun.ChooseCmd("@sell"))return false;
+		Sleep(50);
+		DWORD goodsId;
+		std::string name;
+		for (unsigned i=0; i<med_sell.size();++i)
+		{
+			Sleep(50);
+			goodsId = *(DWORD*)((DWORD)med_sell[i] + 0x2c);
+			name= std::string((char*)((DWORD)med_sell[i] +1));
+			if (!mfun.sellGoods(name, npcid,goodsId))return false;
+		}
+		return true;
+	}
+	std::cout << "对话NPC错误，检查是否在NPC附近！！" << std::endl;
+	return false;
+}
+
+//卖衣服
+bool  lua_interface::sellClothes(std::vector <DWORD*>& clo_sell)
+{
+	auto npcid = getEviroNPCIdByName("服装店掌柜");
+	if (npcid == -1) return false;
+	if (mfun.OpendNPC(npcid))
+	{
+		Sleep(50);
+		if (!mfun.ChooseCmd("@sell"))return false;
+		Sleep(50);
+		DWORD goodsId;
+		std::string name;
+		for (unsigned i = 0; i < clo_sell.size(); ++i)
+		{
+			Sleep(50);
+			goodsId = *(DWORD*)((DWORD)clo_sell[i] + 0x2c);
+			name = std::string((char*)((DWORD)clo_sell[i] + 1));
+			if (!mfun.sellGoods(name, npcid, goodsId))return false;
+		}
+		return true;
+	}
+	std::cout << "对话NPC错误，检查是否在NPC附近！！" << std::endl;
+	return false;
+}
+
+//卖首饰
+bool  lua_interface::sellJewelry(std::vector <DWORD*>& je_sell)
+{
+	auto npcid = getEviroNPCIdByName("首饰店掌柜");
+	if (npcid == -1) return false;
+	if (mfun.OpendNPC(npcid))
+	{
+		Sleep(50);
+		if (!mfun.ChooseCmd("@sell"))return false;
+		Sleep(50);
+		DWORD goodsId;
+		std::string name;
+		for (unsigned i = 0; i < je_sell.size(); ++i)
+		{
+			Sleep(50);
+			goodsId = *(DWORD*)((DWORD)je_sell[i] + 0x2c);
+			name = std::string((char*)((DWORD)je_sell[i] + 1));
+			if (!mfun.sellGoods(name, npcid, goodsId))return false;
+		}
+		return true;
+	}
+	std::cout << "对话NPC错误，检查是否在NPC附近！！" << std::endl;
+	return false;
+}
+
+//函数功能:获取待存物品 待卖武器 衣服 首饰  药品的指针容器 std::vector<DWORD*>
+void  lua_interface::getStoreAndSell_Pointer_vec()
+{
+	r.init();
+	r_bag.init();
+	for (auto i=0;i<r_bag.maxSize;++i)
+	{
+		if (r_bag.m_bag[i].ID != 0)
+		{
+
+		}
+	}
+
+
+}
+
+//解析读取到配置文件到各自列表
+void lua_interface::parseMyConfig(std::vector<std::string>& store, std::vector<std::string>& weapon, std::vector<std::string>& clothes,
+	std::vector<std::string>& jewelry, std::map<std::string, DWORD>& medicine)
+{
+	if (!r.init())return;
+	store.clear();
+	weapon.clear();
+	clothes.clear();
+	jewelry.clear();
+	medicine.clear();
+	std::string  cfgpath = r.m_roleproperty.Object.pName;
+	cfgpath = std::string(shareCli.m_pSMAllData->currDir) + "\\" + cfgpath + "\\" + "storeANDsell.cfg";
+	auto data = tools::getInstance()->parseIniFile(cfgpath);
+	for (const auto& section : data)
+	{
+		if (section.first == std::string("仓库"))
+		{
+			for (const auto& kv : section.second)
+			{
+				store.push_back(kv.first);
+			}
+		}
+		if (section.first == std::string("衣服"))
+		{
+			for (const auto& kv : section.second)
+			{
+				clothes.push_back(kv.first);
+			}
+		}
+		else if (section.first == std::string("首饰"))
+		{
+			for (const auto& kv : section.second)
+			{
+				jewelry.push_back(kv.first);
+			}
+		}
+		else if (section.first == std::string("武器"))
+		{
+			for (const auto& kv : section.second)
+			{
+				weapon.push_back(kv.first);
+			}
+		}
+		else if (section.first == std::string("药品"))
+		{
+			for (const auto& kv : section.second) {
+				try {
+					DWORD value = std::stoul(kv.second);
+					medicine[kv.first] = value;
+				}
+				catch (const std::invalid_argument& e) {
+					std::cerr << "Invalid argument: " << e.what() << std::endl;
+				}
+				catch (const std::out_of_range& e) {
+					std::cerr << "Out of range: " << e.what() << std::endl;
+				}
+			}
+		}
+	}
+
+
+}

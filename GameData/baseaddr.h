@@ -44,6 +44,8 @@
 #define CALL_IMMDIA_REBIRTH 0x00E306D0 //立即复活call
 #define CALL_GET_BUY_GOODS_ID 0x00BAD830 //获取买物品的物品ID
 #define CALL_BUY_GOODS 0x0068F000 //获取买物品的物品ID
+#define CALL_SELL_GOODS 0x68EF10 //卖物品 卖完小退
+#define CALL_STORE_GOODS 0x68EF10 //存物品 存完小退
 
 
 #define P_CURRENT_NPC_DLG 0x110d9d4 //当前对话NPC ID指针 ,跟选择对话call的EDX指针一样
