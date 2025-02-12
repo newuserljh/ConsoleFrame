@@ -146,4 +146,3 @@ int bag::getBagSpace()
 	return space;
 }
 
-

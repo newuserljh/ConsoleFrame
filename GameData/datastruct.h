@@ -108,6 +108,11 @@ struct GOODS_PROPERTY
 	DWORD* ID;//+ 2c
 	WORD* Use_Num;//+ 30            耐久 / 使用次数
 	WORD* Use_Num_Max;// + 32    最大耐久 / 使用次数
+
+	//自加属性
+	DWORD goods_type; //1 武器 2首饰 3衣服 4药品 5其他
+	DWORD howProcess; //物品处理方式 0待定（未定义） 1存仓 2卖掉 3立即使用 4卖剩
+	DWORD remainNumbers; //卖剩下多少 当howProcess=4时再计算此项
 };
 
 //物品对象

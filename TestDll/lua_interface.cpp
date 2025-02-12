@@ -541,8 +541,8 @@ void lua_interface::parseMyConfig(std::vector<std::string>& store, std::vector<s
 	clothes.clear();
 	jewelry.clear();
 	medicine.clear();
-	std::string  cfgpath = r.m_roleproperty.Object.pName;
-	cfgpath = std::string(shareCli.m_pSMAllData->currDir) + "\\" + cfgpath + "\\" + "storeANDsell.cfg";
+	std::string  cfgpath;
+	cfgpath = std::string(shareCli.m_pSMAllData->currDir) + "\\cfg\\" + r.m_roleproperty.Object.pName + "\\" + "storeANDsell.cfg";
 	auto data = tools::getInstance()->parseIniFile(cfgpath);
 	for (const auto& section : data)
 	{
@@ -592,4 +592,20 @@ void lua_interface::parseMyConfig(std::vector<std::string>& store, std::vector<s
 	}
 
 
+}
+
+//初始话背包的物品处理方式列表
+std::vector<std::string>  bag::StoreVec, bag::SellWeaponVec, bag::SellClothesVec, bag::SellJewelryVec;//分别存储 存仓物品 卖武器 衣服 首饰 名字
+std::map<std::string, DWORD> bag::SellMedicineVec;//存储 卖药品 的名字 和剩余数量
+bool bag::initGoodsProcWayList()
+{
+	static bool initialized = false;
+	if (!initialized) {
+
+		lua_interface l;
+		l.parseMyConfig(StoreVec, SellWeaponVec, SellClothesVec, SellJewelryVec, SellMedicineVec);
+		initialized = true;
+		return true;
+	}
+	else return false;
 }

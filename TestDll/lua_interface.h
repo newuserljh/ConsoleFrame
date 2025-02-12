@@ -24,14 +24,6 @@ extern bag r_bag;
 extern gamecall mfun; 
 extern team m_team; 
 
-
-// 声明外部变量
-extern std::vector<std::string> StoreVec;           // 存仓物品名字
-extern std::vector<std::string> SellWeaponVec;      // 卖武器名字
-extern std::vector<std::string> SellClothesVec;     // 卖衣服名字
-extern std::vector<std::string> SellJewelryVec;     // 卖首饰名字
-extern std::map<std::string, DWORD> SellMedicineVec;// 卖药品的名字和剩余数量
-
 struct Position {
 	int x, y;
 };

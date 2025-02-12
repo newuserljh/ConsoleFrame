@@ -40,9 +40,6 @@ team m_team;
 std::mutex team_mutex;  // 队伍文件变量互斥 
 
 
-std::vector<std::string>  StoreVec, SellWeaponVec, SellClothesVec, SellJewelryVec;//分别存储 存仓物品 卖武器 衣服 首饰 名字
-std::map<std::string, DWORD>SellMedicineVec;//存储 卖药品 的名字 和剩余数量
-
 _declspec(naked) void CallTest()
 {
 	_asm pushad
@@ -147,7 +144,7 @@ void threadLogin()
 
 		std::string usercfgpath = (std::string)shareCli.m_pSMAllData->currDir + "\\cfg\\" + r.m_roleproperty.Object.pName;
 		CreateDirectory(usercfgpath.c_str(), NULL);// 创建 角色名 文件夹（存放角色的配置
-		pDlg->m_luaInterface.parseMyConfig(StoreVec, SellWeaponVec, SellClothesVec, SellJewelryVec, SellMedicineVec);
+		bag::initGoodsProcWayList();
 	}
 	return;
 }
@@ -1092,6 +1089,23 @@ void CTestDlg::OnBnClickedButton9()
 	m_team.team_Base = r.m_roleproperty.Team_pointer;
 	//m_luaInterface.buyMedicine("超级魔法药", 5);
 
+	 //m_luaInterface.parseMyConfig(StoreVec, SellWeaponVec, SellClothesVec, SellJewelryVec, SellMedicineVec);
+	 //std::cout << "21312sfsaf" << std::endl;
+	for (const auto kv : r_bag.StoreVec) {
+		std::cout << kv << std::endl;
+	}
+	for (const auto kv : r_bag.SellClothesVec) {
+		std::cout << kv << std::endl;
+	}
+	for (const auto kv : r_bag.SellWeaponVec) {
+		std::cout << kv << std::endl;
+	}
+	for (const auto kv : r_bag.SellJewelryVec) {
+		std::cout << kv << std::endl;
+	}
+	for (const auto kv : r_bag.SellMedicineVec) {
+		std::cout << kv.first<<"=" <<kv.second<< std::endl;
+	}
 	//m_luaInterface.applySJLP();
 
 	// 获取周围怪物信息
