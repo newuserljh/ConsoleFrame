@@ -22,9 +22,9 @@ mono_crash.*
 
 [Dd]ebug/**/
 [Dd]ebug/*
-!/[Dd]ebug/cfg/
-!/[Dd]ebug/map/
-!/[Dd]ebug/script/
+!/[Dd]ebug/cfg/**/*
+!/[Dd]ebug/map/**/*
+!/[Dd]ebug/script/**/*
 /Console/[Dd]ebug/
 /GameData/[Dd]ebug/
 /Common/[Dd]ebug/
