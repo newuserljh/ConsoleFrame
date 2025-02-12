@@ -23,6 +23,7 @@ mono_crash.*
 [Dd]ebug/**/
 [Dd]ebug/*
 !/[Dd]ebug/cfg/
+!/[Dd]ebug/cfg/诗风/
 !/[Dd]ebug/map/
 !/[Dd]ebug/script/
 /Console/[Dd]ebug/
