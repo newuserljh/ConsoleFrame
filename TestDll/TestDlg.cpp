@@ -134,9 +134,8 @@ void threadLogin()
 		//登陆成功 初始化
 		pDlg->SetTimer(22222, 5000, NULL);	//设置定时器5s 检测角色是否死亡
 		//初始化背包  技能 队伍
-		r_bag.maxSize = *r.m_roleproperty.Bag_Size;
-		r_bag.bagBase = (DWORD)r.m_roleproperty.p_Bag_Base;
-		r_bag.init();
+
+
 		m_skill.skillBase = (DWORD)r.m_roleproperty.p_Skill_Base;
 		m_skill.init();
 		m_team.team_Base = r.m_roleproperty.Team_pointer;
@@ -145,6 +144,9 @@ void threadLogin()
 		std::string usercfgpath = (std::string)shareCli.m_pSMAllData->currDir + "\\cfg\\" + r.m_roleproperty.Object.pName;
 		CreateDirectory(usercfgpath.c_str(), NULL);// 创建 角色名 文件夹（存放角色的配置
 		bag::initGoodsProcWayList();
+		r_bag.maxSize = *r.m_roleproperty.Bag_Size;
+		r_bag.bagBase = (DWORD)r.m_roleproperty.p_Bag_Base;
+		r_bag.init();
 	}
 	return;
 }
@@ -656,8 +658,15 @@ void CTestDlg::OnBnClickedButton8()
 	{
 		if (*(r_bag.m_bag[i].ID))
 		{
-			s.Format("第%d格:%s   ID: %x\n", i, r_bag.m_bag[i].pName, *r_bag.m_bag[i].ID);
+
+			s.Format("第%d格:%s   ID: %x 处理方式:%d", i, r_bag.m_bag[i].pName, *r_bag.m_bag[i].ID, r_bag.m_bag[i].howProcess);
 			AppendText(m_edit2, s);
+			if (r_bag.m_bag[i].howProcess==4)
+			{
+				s.Format("%d个\n", r_bag.m_bag[i].remainNumbers);
+			}
+			s.Format("\n");
+			AppendText(m_edit2, s);		
 		}
 	}
 
