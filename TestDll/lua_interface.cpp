@@ -515,95 +515,63 @@ bool  lua_interface::sellJewelry(std::vector <DWORD*>& je_sell)
 	return false;
 }
 
-//函数功能:获取待存物品 待卖武器 衣服 首饰  药品的指针容器 std::vector<DWORD*>
-void  lua_interface::getStoreAndSell_Pointer_vec()
-{
-	r.init();
-	r_bag.init();
-	for (auto i=0;i<r_bag.maxSize;++i)
-	{
-		if (r_bag.m_bag[i].ID != 0)
-		{
 
-		}
-	}
-
-
-}
-
-//解析读取到配置文件到各自列表
-void lua_interface::parseMyConfig(std::vector<std::string>& store, std::vector<std::string>& weapon, std::vector<std::string>& clothes,
-	std::vector<std::string>& jewelry, std::map<std::string, DWORD>& medicine)
-{
-	if (!r.init())return;
-	store.clear();
-	weapon.clear();
-	clothes.clear();
-	jewelry.clear();
-	medicine.clear();
-	std::string  cfgpath;
-	cfgpath = std::string(shareCli.m_pSMAllData->currDir) + "\\cfg\\" + r.m_roleproperty.Object.pName + "\\" + "storeANDsell.cfg";
-	auto data = tools::getInstance()->parseIniFile(cfgpath);
-	for (const auto& section : data)
-	{
-		if (section.first == std::string("仓库"))
-		{
-			for (const auto& kv : section.second)
-			{
-				store.push_back(kv.first);
-			}
-		}
-		if (section.first == std::string("衣服"))
-		{
-			for (const auto& kv : section.second)
-			{
-				clothes.push_back(kv.first);
-			}
-		}
-		else if (section.first == std::string("首饰"))
-		{
-			for (const auto& kv : section.second)
-			{
-				jewelry.push_back(kv.first);
-			}
-		}
-		else if (section.first == std::string("武器"))
-		{
-			for (const auto& kv : section.second)
-			{
-				weapon.push_back(kv.first);
-			}
-		}
-		else if (section.first == std::string("药品"))
-		{
-			for (const auto& kv : section.second) {
-				try {
-					DWORD value = std::stoul(kv.second);
-					medicine[kv.first] = value;
-				}
-				catch (const std::invalid_argument& e) {
-					std::cerr << "Invalid argument: " << e.what() << std::endl;
-				}
-				catch (const std::out_of_range& e) {
-					std::cerr << "Out of range: " << e.what() << std::endl;
-				}
-			}
-		}
-	}
-
-
-}
-
-//初始话背包的物品处理方式列表
+//初始话背包类bag的物品处理方式列表
 std::vector<std::string>  bag::StoreVec, bag::SellWeaponVec, bag::SellClothesVec, bag::SellJewelryVec;//分别存储 存仓物品 卖武器 衣服 首饰 名字
 std::map<std::string, DWORD> bag::SellMedicineVec;//存储 卖药品 的名字 和剩余数量
 bool bag::initGoodsProcWayList()
 {
 	static bool initialized = false;
 	if (!initialized) {
+		std::string cfgpath = std::string(shareCli.m_pSMAllData->currDir) + "\\cfg\\" + r.m_roleproperty.Object.pName + "\\" + "storeANDsell.cfg";
+		auto data = tools::getInstance()->parseIniFile(cfgpath);
+		for (const auto& section : data)
+		{
+			if (section.first == std::string("仓库"))
+			{
+				for (const auto& kv : section.second)
+				{
+					StoreVec.push_back(kv.first);
+				}
+			}
+			if (section.first == std::string("衣服"))
+			{
+				for (const auto& kv : section.second)
+				{
+					SellClothesVec.push_back(kv.first);
+				}
+			}
+			else if (section.first == std::string("首饰"))
+			{
+				for (const auto& kv : section.second)
+				{
+					SellJewelryVec.push_back(kv.first);
+				}
+			}
+			else if (section.first == std::string("武器"))
+			{
+				for (const auto& kv : section.second)
+				{
+					SellWeaponVec.push_back(kv.first);
+				}
+			}
+			else if (section.first == std::string("药品"))
+			{
+				for (const auto& kv : section.second) {
+					try {
+						DWORD value = std::stoul(kv.second);
+						SellMedicineVec[kv.first] = value;
+					}
+					catch (const std::invalid_argument& e) {
+						std::cerr << "Invalid argument: " << e.what() << std::endl;
+					}
+					catch (const std::out_of_range& e) {
+						std::cerr << "Out of range: " << e.what() << std::endl;
+					}
+				}
+			}
 
-		lua_interface l;
-		l.parseMyConfig(StoreVec, SellWeaponVec, SellClothesVec, SellJewelryVec, SellMedicineVec);
+		}
 		initialized = true;
 		return true;
 	}
