@@ -141,7 +141,7 @@ void threadLogin()
 		m_team.team_Base = r.m_roleproperty.Team_pointer;
 		pDlg->init_team(); //包含了组队的定时器 SetTimer(11111, 30000, NULL)
 
-		std::string usercfgpath = (std::string)shareCli.m_pSMAllData->currDir + "\\cfg\\" + r.m_roleproperty.Object.pName;
+		std::string usercfgpath = (std::string)shareCli.m_pSMAllData->currDir + "cfg\\" + r.m_roleproperty.Object.pName;
 		CreateDirectory(usercfgpath.c_str(), NULL);// 创建 角色名 文件夹（存放角色的配置
 		bag::initGoodsProcWayList();
 		r_bag.maxSize = *r.m_roleproperty.Bag_Size;
@@ -197,7 +197,7 @@ BOOL CTestDlg::OnInitDialog()
 	}
 	shareindex = shareCli.getIndexByPID(GetCurrentProcessId());
 
-	std::string cfgtpath = (std::string)shareCli.m_pSMAllData->currDir + "\\cfg";
+	std::string cfgtpath = (std::string)shareCli.m_pSMAllData->currDir + "cfg";
 	CreateDirectory(cfgtpath.c_str(), NULL);// 创建 cfg 文件夹（如果不存在）
 
 	//HOOK连接服务器失败代码
@@ -225,7 +225,7 @@ bool CTestDlg:: initVariable()
 	
 	/*载入拾取物品*/
 	pick_goods_list.clear();
-	pick_goods_list = tools::getInstance()->ReadTxt(std::string(shareCli.m_pSMAllData->currDir) + "\\cfg\\拾取物品.txt");
+	pick_goods_list = tools::getInstance()->ReadTxt(std::string(shareCli.m_pSMAllData->currDir) + "cfg\\拾取物品.txt");
 	if (!pick_goods_list.size())return false;
 	/*设置技能*/
 	if (!Set_Skill())return false;
@@ -233,7 +233,7 @@ bool CTestDlg:: initVariable()
 	if (!Load_coordinate())return false;
 	/*载入攻击怪物列表*/
 	attack_monlist.clear();
-	attack_monlist = tools::getInstance()->ReadTxt(std::string(shareCli.m_pSMAllData->currDir) + "\\cfg\\逆魔大殿.txt");
+	attack_monlist = tools::getInstance()->ReadTxt(std::string(shareCli.m_pSMAllData->currDir) + "cfg\\逆魔大殿.txt");
 	if (!attack_monlist.size())return false;
 
 	return true;
@@ -782,7 +782,7 @@ bool CTestDlg::Set_Skill()
 bool CTestDlg::Load_coordinate()
 {
 	map_xy.clear();
-	std::vector<std::string> map_coordinate= tools::getInstance()->ReadTxt(std::string(shareCli.m_pSMAllData->currDir) + "\\cfg\\逆魔大殿1.txt");
+	std::vector<std::string> map_coordinate= tools::getInstance()->ReadTxt(std::string(shareCli.m_pSMAllData->currDir) + "cfg\\逆魔大殿1.txt");
 	if (!map_coordinate.size())return false;
 	for (size_t i = 0; i < map_coordinate.size(); i++)
 	{
@@ -801,7 +801,7 @@ bool CTestDlg::init_team()
 	m_team_check_id = 0;
 	pBtn = (CButton*)GetDlgItem(IDC_CHK_TEAM);  //获得组队复选框控件的句柄
 	team_list.clear();
-	team_list = tools::getInstance()->ReadTxt(std::string(shareCli.m_pSMAllData->currDir )+ "\\cfg\\队伍人员.txt");
+	team_list = tools::getInstance()->ReadTxt(std::string(shareCli.m_pSMAllData->currDir )+ "cfg\\队伍人员.txt");
 	if (pBtn->GetCheck())
 	{
 		if (*r.m_roleproperty.Team_is_allow != 1)mfun.team_open_close(1);//允许组队
@@ -858,7 +858,7 @@ void  CTestDlg::RoleIsDeath(void)
 	r.init();
 	if (*r.m_roleproperty.Object.HP>0)return;
 	//保存正在执行的任务到 ./cfg/角色名字.cfg
-	std::string cfg_file_path = (std::string)shareCli.m_pSMAllData->currDir + "\\cfg\\";
+	std::string cfg_file_path = (std::string)shareCli.m_pSMAllData->currDir + "cfg\\";
 	cfg_file_path = cfg_file_path + r.m_roleproperty.Object.pName +".cfg";
 	tools::getInstance()->write2file(cfg_file_path, "当前任务", std::ios::out);
 
@@ -1097,25 +1097,75 @@ void CTestDlg::OnBnClickedButton9()
 	m_skill.init();
 	m_team.team_Base = r.m_roleproperty.Team_pointer;
 	//m_luaInterface.buyMedicine("超级魔法药", 5);
-
+	std::cout << std::string(shareCli.m_pSMAllData->currDir) << std::endl;
+	std::string cfgpath = std::string(shareCli.m_pSMAllData->currDir) + "cfg\\" + r.m_roleproperty.Object.pName + "\\" + "storeANDsell.ini";
+	std::cout << cfgpath << std::endl;
+	auto data = tools::getInstance()->parseIniFile(cfgpath);
+	if (data.empty())std::cerr << "OpenFile error！！" << std::endl;
+	for (const auto& section : data)
+	{
+		if (section.first == std::string("仓库"))
+		{
+			for (const auto& kv : section.second)
+			{
+				std::cout << kv.first << std::endl;
+			}
+		}
+		else if (section.first == std::string("衣服"))
+		{
+			for (const auto& kv : section.second)
+			{
+				std::cout << kv.first << std::endl;
+			}
+		}
+		else if (section.first == std::string("首饰"))
+		{
+			for (const auto& kv : section.second)
+			{
+				std::cout << kv.first << std::endl;
+			}
+		}
+		else if (section.first == std::string("武器"))
+		{
+			for (const auto& kv : section.second)
+			{
+				std::cout << kv.first << std::endl;
+			}
+		}
+		else if (section.first == std::string("药品"))
+		{
+			for (const auto& kv : section.second) {
+				try {
+					DWORD value = std::stoul(kv.second);
+					std::cout << kv.first << std::endl;
+				}
+				catch (const std::invalid_argument& e) {
+					std::cerr << "Invalid argument: " << e.what() << std::endl;
+				}
+				catch (const std::out_of_range& e) {
+					std::cerr << "Out of range: " << e.what() << std::endl;
+				}
+			}
+		}
+	}
 	 //m_luaInterface.parseMyConfig(StoreVec, SellWeaponVec, SellClothesVec, SellJewelryVec, SellMedicineVec);
 	 //std::cout << "21312sfsaf" << std::endl;
-	for (const auto kv : r_bag.StoreVec) {
-		std::cout << kv << std::endl;
-	}
-	for (const auto kv : r_bag.SellClothesVec) {
-		std::cout << kv << std::endl;
-	}
-	for (const auto kv : r_bag.SellWeaponVec) {
-		std::cout << kv << std::endl;
-	}
-	for (const auto kv : r_bag.SellJewelryVec) {
-		std::cout << kv << std::endl;
-	}
-	for (const auto kv : r_bag.SellMedicineVec) {
-		std::cout << kv.first<<"=" <<kv.second<< std::endl;
-	}
-	//m_luaInterface.applySJLP();
+	//for (const auto kv : r_bag.StoreVec) {
+	//	std::cout << kv << std::endl;
+	//}
+	//for (const auto kv : r_bag.SellClothesVec) {
+	//	std::cout << kv << std::endl;
+	//}
+	//for (const auto kv : r_bag.SellWeaponVec) {
+	//	std::cout << kv << std::endl;
+	//}
+	//for (const auto kv : r_bag.SellJewelryVec) {
+	//	std::cout << kv << std::endl;
+	//}
+	//for (const auto kv : r_bag.SellMedicineVec) {
+	//	std::cout << kv.first<<"=" <<kv.second<< std::endl;
+	//}
+	////m_luaInterface.applySJLP();
 
 	// 获取周围怪物信息
 		//CString s;
@@ -1404,7 +1454,7 @@ _declspec(naked) void CallRecord()
 	const char* data;
 	dir = shareCli.m_pSMAllData->currDir;
 	strcpy_s(path, dir);
-	data = "\\script\\";
+	data = "script\\";
 	strcat_s(path, data);
 	roleName = r.m_roleproperty.Object.pName;
 	strcat_s(path, roleName);
@@ -1424,7 +1474,7 @@ void CTestDlg::OnBnClickedBtnRecnpc()
 	CString s;
 	if (rec_flag)
 	{
-		std::string scriptpath = (std::string)shareCli.m_pSMAllData->currDir + "\\script";
+		std::string scriptpath = (std::string)shareCli.m_pSMAllData->currDir + "script";
 		CreateDirectory(scriptpath.c_str(), NULL);// 创建 script 文件夹（如果不存在）
 		if (hook_npc_cmd.hookReg(0xCAC543, 10, &CallRecord))
 		{
@@ -1457,7 +1507,7 @@ void CTestDlg::OnBnClickedBtnRecnpc()
 void CTestDlg::OnBnClickedBtnLuatst()
 {
 	// 执行 lua 脚本 .\\script\\test.lua
-	std::string scriptpath = (std::string)shareCli.m_pSMAllData->currDir + "\\script\\test.lua";
+	std::string scriptpath = (std::string)shareCli.m_pSMAllData->currDir + "script\\test.lua";
 	if (luaL_dofile(L, scriptpath.c_str()) != LUA_OK)
 	{
 		const char* error = lua_tostring(L, -1);

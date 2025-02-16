@@ -523,8 +523,9 @@ bool bag::initGoodsProcWayList()
 {
 	static bool initialized = false;
 	if (!initialized) {
-		std::string cfgpath = std::string(shareCli.m_pSMAllData->currDir) + "\\cfg\\" + r.m_roleproperty.Object.pName + "\\" + "storeANDsell.cfg";
+		std::string cfgpath = std::string(shareCli.m_pSMAllData->currDir) + "cfg\\" + r.m_roleproperty.Object.pName + "\\" + "storeANDsell.ini";
 		auto data = tools::getInstance()->parseIniFile(cfgpath);
+		if (data.empty())std::cerr << "OpenFile error£¡£¡" << std::endl;
 		for (const auto& section : data)
 		{
 			if (section.first == std::string("²Ö¿â"))
@@ -532,13 +533,15 @@ bool bag::initGoodsProcWayList()
 				for (const auto& kv : section.second)
 				{
 					StoreVec.push_back(kv.first);
+					std::cout << kv.first << std::endl;
 				}
 			}
-			if (section.first == std::string("ÒÂ·þ"))
+			else if (section.first == std::string("ÒÂ·þ"))
 			{
 				for (const auto& kv : section.second)
 				{
 					SellClothesVec.push_back(kv.first);
+					std::cout << kv.first << std::endl;
 				}
 			}
 			else if (section.first == std::string("Ê×ÊÎ"))
@@ -546,6 +549,7 @@ bool bag::initGoodsProcWayList()
 				for (const auto& kv : section.second)
 				{
 					SellJewelryVec.push_back(kv.first);
+					std::cout << kv.first << std::endl;
 				}
 			}
 			else if (section.first == std::string("ÎäÆ÷"))
@@ -553,6 +557,7 @@ bool bag::initGoodsProcWayList()
 				for (const auto& kv : section.second)
 				{
 					SellWeaponVec.push_back(kv.first);
+					std::cout << kv.first << std::endl;
 				}
 			}
 			else if (section.first == std::string("Ò©Æ·"))
@@ -561,6 +566,7 @@ bool bag::initGoodsProcWayList()
 					try {
 						DWORD value = std::stoul(kv.second);
 						SellMedicineVec[kv.first] = value;
+						std::cout << kv.first << std::endl;
 					}
 					catch (const std::invalid_argument& e) {
 						std::cerr << "Invalid argument: " << e.what() << std::endl;
