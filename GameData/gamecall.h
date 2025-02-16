@@ -42,8 +42,8 @@ public:
 	bool small_exit(void);
 	DWORD  get_buy_goods_ID(DWORD goods_index=0);
 	bool buyGoods(std::string& goodsName, DWORD npcId,DWORD isBind=0, unsigned number=1);
-	bool sellGoods(std::string &goodsname, DWORD npcId, DWORD goodsId);
-	bool storeGoods(std::string& goodsname, DWORD npcId, DWORD goodsId);
+	bool sellGoods(std::string &goodsname, DWORD goodsId, DWORD npcId);
+	bool storeGoods(std::string& goodsname, DWORD goodsId, DWORD npcId);
 
 private:
 	static bool comp(const MONSTER_PROPERTY& a, const MONSTER_PROPERTY& b);

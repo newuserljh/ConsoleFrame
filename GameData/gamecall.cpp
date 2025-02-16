@@ -971,11 +971,11 @@ bool gamecall::buyGoods(std::string& goodsName,DWORD npcId,DWORD isBind,unsigned
 /*
 函数功能:卖物品
 参数一:物品名字
-参数二:NPC——ID
-参数三:物品ID
+参数二:物品ID
+参数三:NPC——ID
 返回值：bool
 */
-bool gamecall::sellGoods(std::string& goodsName, DWORD npcId, DWORD goodsId)
+bool gamecall::sellGoods(std::string& goodsName, DWORD goodsId, DWORD npcId)
 {
 	const char* name = goodsName.c_str();
 
@@ -1003,11 +1003,11 @@ bool gamecall::sellGoods(std::string& goodsName, DWORD npcId, DWORD goodsId)
 /*
 函数功能:存物品
 参数一:物品名字
-参数二:NPC——ID
-参数三:物品ID
+参数二:物品ID
+参数三:NPC——ID
 返回值：bool
 */
-bool gamecall::storeGoods(std::string& goodsName, DWORD npcId, DWORD goodsId)
+bool gamecall::storeGoods(std::string& goodsName, DWORD goodsId, DWORD npcId)
 {
 	const char* name = goodsName.c_str();
 

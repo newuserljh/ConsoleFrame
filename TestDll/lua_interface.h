@@ -59,11 +59,12 @@ public:
 public:
 	//游戏功能封装
 	void applySJLP();//提交赏金令牌
-	bool storeGoods(std::vector <DWORD*>& p_vec_store);//保存物品
+	bool storeGoods(std::vector <DWORD>& bag_index_store);//保存物品
 	bool buyMedicine(std::string med_name, BYTE num);//买药
-	bool sellMedicine(std::vector<DWORD*>& med_sell);//卖药
-	bool sellClothes(std::vector <DWORD*>& clo_sell);//卖衣服
-	bool sellJewelry(std::vector <DWORD*>& je_sell);//卖首饰
+	bool sellMedicine(std::vector<DWORD>& bag_index_med_sell);//卖药
+	bool sellClothes(std::vector <DWORD>& bag_index_clo_sell);//卖衣服
+	bool sellJewelry(std::vector <DWORD>& bag_index_je_sell);//卖首饰
+	bool sellWeapon(std::vector <DWORD>& bag_index_wp_sell);//卖武器
 private:
 	DWORD getEviroNPCIdByName(std::string npcName);//通过名字获取NPCID
 };

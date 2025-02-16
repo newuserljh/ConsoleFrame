@@ -1102,74 +1102,14 @@ void CTestDlg::OnBnClickedButton9()
 	m_skill.init();
 	m_team.team_Base = r.m_roleproperty.Team_pointer;
 	//m_luaInterface.buyMedicine("超级魔法药", 5);
-	std::cout << std::string(shareCli.m_pSMAllData->currDir) << std::endl;
-	std::string cfgpath = std::string(shareCli.m_pSMAllData->currDir) + "cfg\\" + r.m_roleproperty.Object.pName + "\\" + "storeANDsell.ini";
-	std::cout << cfgpath << std::endl;
-	auto data = tools::getInstance()->parseIniFile(cfgpath);
-	if (data.empty())std::cerr << "OpenFile error！！" << std::endl;
-	for (const auto& section : data)
-	{
-		if (section.first == std::string("仓库"))
-		{
-			for (const auto& kv : section.second)
-			{
-				std::cout << kv.first << std::endl;
-			}
-		}
-		else if (section.first == std::string("衣服"))
-		{
-			for (const auto& kv : section.second)
-			{
-				std::cout << kv.first << std::endl;
-			}
-		}
-		else if (section.first == std::string("首饰"))
-		{
-			for (const auto& kv : section.second)
-			{
-				std::cout << kv.first << std::endl;
-			}
-		}
-		else if (section.first == std::string("武器"))
-		{
-			for (const auto& kv : section.second)
-			{
-				std::cout << kv.first << std::endl;
-			}
-		}
-		else if (section.first == std::string("药品"))
-		{
-			for (const auto& kv : section.second) {
-				try {
-					DWORD value = std::stoul(kv.second);
-					std::cout << kv.first << std::endl;
-				}
-				catch (const std::invalid_argument& e) {
-					std::cerr << "Invalid argument: " << e.what() << std::endl;
-				}
-				catch (const std::out_of_range& e) {
-					std::cerr << "Out of range: " << e.what() << std::endl;
-				}
-			}
-		}
-	}
-	 //m_luaInterface.parseMyConfig(StoreVec, SellWeaponVec, SellClothesVec, SellJewelryVec, SellMedicineVec);
-	 //std::cout << "21312sfsaf" << std::endl;
-	//for (const auto kv : r_bag.StoreVec) {
-	//	std::cout << kv << std::endl;
-	//}
-	//for (const auto kv : r_bag.SellClothesVec) {
-	//	std::cout << kv << std::endl;
-	//}
-	//for (const auto kv : r_bag.SellWeaponVec) {
-	//	std::cout << kv << std::endl;
-	//}
-	//for (const auto kv : r_bag.SellJewelryVec) {
-	//	std::cout << kv << std::endl;
-	//}
-	//for (const auto kv : r_bag.SellMedicineVec) {
-	//	std::cout << kv.first<<"=" <<kv.second<< std::endl;
-	//}
+
+	r_bag.getGoodsProcessIndex();
+	m_luaInterface.sellMedicine(r_bag.index_vec_sell_medci);
+
+
+
+
+
 	////m_luaInterface.applySJLP();
 
 	// 获取周围怪物信息

@@ -415,8 +415,8 @@ bool lua_interface::buyMedicine(std::string med_name,BYTE num)
 	return true;
 }
 
-//保存物品 参数:待存物品的指针容器
-bool lua_interface::storeGoods(std::vector <DWORD*>& p_vec_store)
+//保存物品 参数:待存物品的背包索引容器
+bool lua_interface::storeGoods(std::vector <DWORD>& bag_index_store)
 {
 	auto npcid = getEviroNPCIdByName("仓库保管员");
 	if (npcid == -1) return false;
@@ -425,14 +425,16 @@ bool lua_interface::storeGoods(std::vector <DWORD*>& p_vec_store)
 		Sleep(50);
 		if (!mfun.ChooseCmd("@storage"))return false;
 		Sleep(50);
-		DWORD goodsId;
-		std::string name;
-		for (unsigned i = 0; i < p_vec_store.size(); ++i)
+		for (unsigned i = 0; i < bag_index_store.size(); ++i)
 		{
 			Sleep(50);
-			goodsId = *(DWORD*)((DWORD)p_vec_store[i] + 0x2c);
-			name = std::string((char*)((DWORD)p_vec_store[i] + 1));
-			if (!mfun.storeGoods(name, npcid, goodsId))return false;
+			if (!mfun.storeGoods(std::string(r_bag.m_bag[bag_index_store[i]].pName), *r_bag.m_bag[bag_index_store[i]].ID, npcid)) {
+				memset((DWORD*)r_bag.m_bag[bag_index_store[i]].Name_Length, 0, 0x688);
+			}
+			else
+			{
+				return false;
+			}
 		}
 		return true;
 	}
@@ -440,33 +442,72 @@ bool lua_interface::storeGoods(std::vector <DWORD*>& p_vec_store)
 	return false;
 }
 
-//卖药 参数:待卖物品的指针容器
-bool lua_interface::sellMedicine(std::vector <DWORD*> & med_sell)
+//卖药 参数:待卖物品的背包索引容器
+bool lua_interface::sellMedicine(std::vector<DWORD>& bag_index_med_sell)
 {
+	// 获取药店掌柜的NPC ID
 	auto npcid = getEviroNPCIdByName("药店掌柜");
-	if (npcid == -1) return false;
-	if (mfun.OpendNPC(npcid))
+	if (npcid == -1) {
+		std::cerr << "无法找到药店掌柜 NPC" << std::endl;
+		return false;
+	}
+
+	// 打开NPC对话框
+	if (!mfun.OpendNPC(npcid)) {
+		std::cerr << "打开 NPC 对话框失败" << std::endl;
+		return false;
+	}
+
+	Sleep(50);
+
+	// 选择卖药选项
+	if (!mfun.ChooseCmd("@sell")) {
+		std::cerr << "选择卖药选项失败" << std::endl;
+		return false;
+	}
+
+	Sleep(50);
+
+	// 处理待卖物品列表
+	for (unsigned i = 0; i < bag_index_med_sell.size(); ++i)
 	{
 		Sleep(50);
-		if (!mfun.ChooseCmd("@sell"))return false;
-		Sleep(50);
-		DWORD goodsId;
-		std::string name;
-		for (unsigned i=0; i<med_sell.size();++i)
+
+		const auto& item = r_bag.m_bag[bag_index_med_sell[i]];
+		if (!mfun.sellGoods(std::string(item.pName), *item.ID, npcid)) {
+			std::cerr << "出售药品 " << item.pName << " 失败" << std::endl;
+			return false;
+		}
+		else {
+			// 成功卖出后，清空相关字段
+			memset((DWORD*)item.Name_Length, 0, 0x688);
+		}
+	}
+
+	Sleep(50);
+
+	// 处理剩余药品的卖出操作
+	for (const auto& kv : r_bag.m_bag)
+	{
+		if (kv.howProcess == 4 && kv.goods_type == 4 && kv.remainNumbers < r_bag.caclGoodsNumber(kv.pName))
 		{
 			Sleep(50);
-			goodsId = *(DWORD*)((DWORD)med_sell[i] + 0x2c);
-			name= std::string((char*)((DWORD)med_sell[i] +1));
-			if (!mfun.sellGoods(name, npcid,goodsId))return false;
+			if (!mfun.sellGoods(std::string(kv.pName), *kv.ID,npcid)) {
+				std::cerr << "出售剩余药品 " << kv.pName << " 失败" << std::endl;
+				return false;
+			}
+			else {
+				// 成功卖出后，清空相关字段
+				memset((DWORD*)kv.Name_Length, 0, 0x688);
+			}
 		}
-		return true;
 	}
-	std::cout << "对话NPC错误，检查是否在NPC附近！！" << std::endl;
-	return false;
+
+	return true;
 }
 
-//卖衣服
-bool  lua_interface::sellClothes(std::vector <DWORD*>& clo_sell)
+//卖衣服 待卖物品的背包索引容器
+bool  lua_interface::sellClothes(std::vector <DWORD>& bag_index_clo_sell)
 {
 	auto npcid = getEviroNPCIdByName("服装店掌柜");
 	if (npcid == -1) return false;
@@ -475,14 +516,17 @@ bool  lua_interface::sellClothes(std::vector <DWORD*>& clo_sell)
 		Sleep(50);
 		if (!mfun.ChooseCmd("@sell"))return false;
 		Sleep(50);
-		DWORD goodsId;
-		std::string name;
-		for (unsigned i = 0; i < clo_sell.size(); ++i)
+		for (unsigned i = 0; i < bag_index_clo_sell.size(); ++i)
 		{
 			Sleep(50);
-			goodsId = *(DWORD*)((DWORD)clo_sell[i] + 0x2c);
-			name = std::string((char*)((DWORD)clo_sell[i] + 1));
-			if (!mfun.sellGoods(name, npcid, goodsId))return false;
+
+			if (mfun.sellGoods(std::string(r_bag.m_bag[bag_index_clo_sell[i]].pName), *r_bag.m_bag[bag_index_clo_sell[i]].ID, npcid)) {
+				memset((DWORD*)r_bag.m_bag[bag_index_clo_sell[i]].Name_Length, 0, 0x688);
+			}
+			else
+			{
+				return false;
+			}
 		}
 		return true;
 	}
@@ -490,8 +534,8 @@ bool  lua_interface::sellClothes(std::vector <DWORD*>& clo_sell)
 	return false;
 }
 
-//卖首饰
-bool  lua_interface::sellJewelry(std::vector <DWORD*>& je_sell)
+//卖首饰 待卖物品的背包索引容器
+bool  lua_interface::sellJewelry(std::vector <DWORD>& bag_index_je_sell)
 {
 	auto npcid = getEviroNPCIdByName("首饰店掌柜");
 	if (npcid == -1) return false;
@@ -500,14 +544,18 @@ bool  lua_interface::sellJewelry(std::vector <DWORD*>& je_sell)
 		Sleep(50);
 		if (!mfun.ChooseCmd("@sell"))return false;
 		Sleep(50);
-		DWORD goodsId;
-		std::string name;
-		for (unsigned i = 0; i < je_sell.size(); ++i)
+		for (unsigned i = 0; i < bag_index_je_sell.size(); ++i)
 		{
 			Sleep(50);
-			goodsId = *(DWORD*)((DWORD)je_sell[i] + 0x2c);
-			name = std::string((char*)((DWORD)je_sell[i] + 1));
-			if (!mfun.sellGoods(name, npcid, goodsId))return false;
+
+			if (mfun.sellGoods(std::string(r_bag.m_bag[bag_index_je_sell[i]].pName), *r_bag.m_bag[bag_index_je_sell[i]].ID, npcid))
+			{
+				memset((DWORD*)r_bag.m_bag[bag_index_je_sell[i]].Name_Length, 0, 0x688);
+			}
+			else
+			{
+				return false;
+			}
 		}
 		return true;
 	}
@@ -515,6 +563,34 @@ bool  lua_interface::sellJewelry(std::vector <DWORD*>& je_sell)
 	return false;
 }
 
+//卖武器 待卖物品的背包索引容器
+bool  lua_interface::sellWeapon(std::vector <DWORD>& bag_index_wp_sell)
+{
+	auto npcid = getEviroNPCIdByName("铁匠");
+	if (npcid == -1) return false;
+	if (mfun.OpendNPC(npcid))
+	{
+		Sleep(100);
+		if (!mfun.ChooseCmd("@sell"))return false;
+		Sleep(100);
+		for (unsigned i = 0; i < bag_index_wp_sell.size(); ++i)
+		{
+			Sleep(100);
+
+			if (mfun.sellGoods(std::string(r_bag.m_bag[bag_index_wp_sell[i]].pName), *r_bag.m_bag[bag_index_wp_sell[i]].ID, npcid))
+			{
+				memset((DWORD*)r_bag.m_bag[bag_index_wp_sell[i]].Name_Length, 0, 0x688);
+			}
+			else
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	std::cout << "对话NPC错误，检查是否在NPC附近！！" << std::endl;
+	return false;
+}
 
 //初始话背包类bag的物品处理方式列表
 std::vector<std::string>  bag::StoreVec, bag::SellWeaponVec, bag::SellClothesVec, bag::SellJewelryVec;//分别存储 存仓物品 卖武器 衣服 首饰 名字

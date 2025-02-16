@@ -22,6 +22,7 @@ bool bag::init()
 	{
 		for (size_t i = 0; i < maxSize; i++)
 		{
+			m_bag[i].Name_Length = (BYTE*)(bagBase + i * 0x688);
 			m_bag[i].pName = (char*)(bagBase + i * 0x688 + 1);
 			m_bag[i].WD_low = (BYTE*)(bagBase + i * 0x688 + 0x1a);
 			m_bag[i].WD_high = (BYTE*)(bagBase + i * 0x688 + 0x1b);
@@ -42,13 +43,26 @@ bool bag::init()
 			if (*m_bag[i].ID!=0)
 			{
 				if (std::find(StoreVec.begin(), StoreVec.end(), std::string(m_bag[i].pName)) != StoreVec.end())m_bag[i].howProcess = 1;
-				else if (std::find(SellWeaponVec.begin(), SellWeaponVec.end(), std::string(m_bag[i].pName)) != SellWeaponVec.end())m_bag[i].howProcess = 2;
-				else if (std::find(SellClothesVec.begin(), SellClothesVec.end(), std::string(m_bag[i].pName)) != SellClothesVec.end())m_bag[i].howProcess = 2;
-				else if (std::find(SellJewelryVec.begin(), SellJewelryVec.end(), std::string(m_bag[i].pName)) != SellJewelryVec.end())m_bag[i].howProcess = 2;
+				else if (std::find(SellWeaponVec.begin(), SellWeaponVec.end(), std::string(m_bag[i].pName)) != SellWeaponVec.end())
+				{
+					m_bag[i].howProcess = 2;
+					m_bag[i].goods_type = 1;
+				}
+				else if (std::find(SellClothesVec.begin(), SellClothesVec.end(), std::string(m_bag[i].pName)) != SellClothesVec.end())
+				{
+					m_bag[i].howProcess = 2;
+					m_bag[i].goods_type = 3;
+				}
+				else if (std::find(SellJewelryVec.begin(), SellJewelryVec.end(), std::string(m_bag[i].pName)) != SellJewelryVec.end())
+				{
+					m_bag[i].howProcess = 2;
+					m_bag[i].goods_type =2 ;
+				}
 				else if (SellMedicineVec.count(std::string(m_bag[i].pName)) > 0)
 				{
 					auto it= SellMedicineVec.find(std::string(m_bag[i].pName));
 					m_bag[i].howProcess = 4;
+					m_bag[i].goods_type = 4;
 					m_bag[i].remainNumbers = it->second;
 				}
 				else
@@ -58,10 +72,6 @@ bool bag::init()
 			}
 
 		}
-	
-
-
-
 	}
 	catch (...)
 	{
@@ -169,3 +179,42 @@ int bag::getBagSpace()
 	return space;
 }
 
+
+void  bag::getGoodsProcessIndex()
+{
+	// 清空各个容器
+	index_vec_store.clear();
+	index_vec_sell_weapon.clear();
+	index_vec_sell_cloth.clear();
+	index_vec_sell_jewel.clear();
+	index_vec_sell_medci.clear();
+    for (size_t i = 0; i < maxSize; i++)
+    {
+        if (m_bag[i].ID)
+        {
+            if (m_bag[i].howProcess == 1)
+            {
+				index_vec_store.push_back(i);
+            }
+            else if (m_bag[i].howProcess == 2&& m_bag[i].goods_type == 1)
+            {
+				index_vec_sell_weapon.push_back(i);
+            }
+            else if (m_bag[i].howProcess == 2 && m_bag[i].goods_type == 3)
+            {
+				index_vec_sell_cloth.push_back(i);
+            }
+			else if (m_bag[i].howProcess == 2 && m_bag[i].goods_type == 2)
+			{
+				index_vec_sell_jewel.push_back(i);
+			}
+			else if (m_bag[i].howProcess == 2 && m_bag[i].goods_type == 4)
+			{
+				index_vec_sell_medci.push_back(i);
+			}
+        }
+    }
+
+
+
+}

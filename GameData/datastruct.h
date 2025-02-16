@@ -91,7 +91,7 @@ struct GOODS_PROPERTY
 {
 	GOODS_PROPERTY();
 	~GOODS_PROPERTY();
-	BYTE Name_Length;// + 0
+	BYTE* Name_Length;// + 0
 	char* pName;//+ 1
 	BYTE*  WD_low;//+ 1a / /物理防御下  /幸运武器
 	BYTE* WD_high;// + 1b 物理防御上  /命中武器
@@ -113,6 +113,7 @@ struct GOODS_PROPERTY
 	DWORD goods_type; //1 武器 2首饰 3衣服 4药品 5其他
 	DWORD howProcess; //物品处理方式 5待定（未定义） 1存仓 2卖掉 3立即使用 4卖剩
 	DWORD remainNumbers; //卖剩下多少 当howProcess=4时再计算此项
+
 };
 
 //物品对象
