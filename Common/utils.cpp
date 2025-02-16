@@ -656,3 +656,20 @@ std::string tools::GetCurrDir()
 	 }
 	 return config;
  }
+
+ void tools::copyFile(const std::string& srcPath, const std::string& destPath) {
+	 std::ifstream src(srcPath, std::ios::binary);
+	 std::ofstream dest(destPath, std::ios::binary);
+
+	 if (!src) {
+		 std::cerr << "无法打开源文件: " << srcPath << std::endl;
+		 return;
+	 }
+	 if (!dest) {
+		 std::cerr << "无法创建目标文件: " << destPath << std::endl;
+		 return;
+	 }
+
+	 // 使用缓冲区进行高效复制
+	 dest << src.rdbuf();
+ }

@@ -12,6 +12,7 @@
 #include <sstream>
 #include <Psapi.h>
 #include <fstream>
+#include <iostream>
 #include <ctime>
 #include <string>
 #include <thread>
@@ -57,6 +58,7 @@ public:
 	bool eipinjectDll(WCHAR* dllname, PROCESS_INFORMATION pi);
 	static bool exeload(const std::string& filename, const std::string& excutedirectory, PROCESS_INFORMATION& pi);
 	std::unordered_map<std::string, std::unordered_map<std::string, std::string>> parseIniFile(const std::string& filename);
+	void copyFile(const std::string& srcPath, const std::string& destPath);
 public:
 	tools();
 	tools(const tools&);

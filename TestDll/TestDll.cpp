@@ -75,6 +75,8 @@ BOOL CTestDllApp::InitInstance()
 		SetConsoleTitle("Debug Console");
 
 		// 输出测试信息到控制台
+		std::cerr << "Debug console error." << std::endl;
+		// 输出测试信息到控制台
 		std::cout << "Debug console initialized." << std::endl;
 	}
 #else
