@@ -39,6 +39,8 @@ team m_team;
 
 std::mutex team_mutex;  // 队伍文件变量互斥 
 
+MapNames map_names; //地图名称映射
+Transitions transitions; //地图转换
 
 _declspec(naked) void CallTest()
 {
@@ -188,6 +190,7 @@ BOOL CTestDlg::OnInitDialog()
 	m_luaInterface.registerClasses();// 初始化 lua接口对象
 	L = m_luaInterface.getLuaState(); //初始化Lua状态
 
+
 	//初始化 线程标志
 	tflag_attack = true;
 	tflag_goto = true;
@@ -201,6 +204,10 @@ BOOL CTestDlg::OnInitDialog()
 		tools::getInstance()->message("打开共享内存失败\n");
 	}
 	shareindex = shareCli.getIndexByPID(GetCurrentProcessId());
+
+	//载入地图数据到内存
+	std::string input_file = (std::string)shareCli.m_pSMAllData->currDir + "map\\map_data.lua";
+	m_luaInterface.load_and_store_map_data(L, input_file);
 
 	std::string cfgtpath = (std::string)shareCli.m_pSMAllData->currDir + "cfg";
 	CreateDirectory(cfgtpath.c_str(), NULL);// 创建 cfg 文件夹（如果不存在）
@@ -1102,117 +1109,45 @@ void CTestDlg::OnBnClickedButton9()
 	m_skill.init();
 	m_team.team_Base = r.m_roleproperty.Team_pointer;
 	//m_luaInterface.buyMedicine("超级魔法药", 5);
-
-	r_bag.getGoodsProcessIndex();
-	m_luaInterface.sellMedicine(r_bag.index_vec_sell_medci);
-
-
-
-
-
+	//r_bag.getGoodsProcessIndex();
+	//m_luaInterface.sellMedicine(r_bag.index_vec_sell_medci);
 	////m_luaInterface.applySJLP();
 
-	// 获取周围怪物信息
-		//CString s;
-		//std::ostringstream output;
-		//
-		//MapNames map_names;
-		//Transitions transitions;
-		//std::string input_file = (std::string)shareCli.m_pSMAllData->currDir + "\\map\\map_data.lua";
-		//m_luaInterface.load_and_store_map_data(L, input_file, map_names, transitions);
+	 //获取周围怪物信息
+	CString s;
 
-		//int i = 0;
-		//std::cout << "Map Names:" << std::endl;
-		//for (const auto& entry : map_names) {
-		//	std::cout <<++i<< "  " << entry.first << ": " << entry.second << std::endl;
-		//}
+	//// 查找路径
+	//std::string start_name = "落霞岛";
+	//std::string end_name = "尸王殿";
+	//auto  path_with_positions=m_luaInterface.find_path_with_positions(start_name, end_name);
+	//if(!path_with_positions.empty())
+	//{
+	//	for (const auto& entry : path_with_positions) 
+	//	{
+	//		const std::string& id = entry.first;
+	//		const std::vector<Position>& positions = entry.second;
 
+	//		// 获取地图名称
+	//		std::string map_name = map_names.count(id) ? map_names.at(id) : "未知地图";
 
+	//		std::cout << "Map Name: " << map_name << ", Positions: ";
+	//		for (const auto& pos : positions) {
+	//			std::cout << "(" << pos.x << ", " << pos.y << ") ";
+	//		}
+	//		std::cout << std::endl;
+	//	}
+	//}
+	//else {
+	//	std::cout << "未找到从 " << start_name << " 到 " << end_name << " 的路径\n";
+	//}
 
-		//// 查找路径
-		//std::string start_name = "落霞岛";
-		//std::string end_name = "尸王殿";
+/*自动打怪 需要启动：①打怪线程优先级正常 ②遍历周围对象、地面并拾取线程 优先级中高 ③寻路线程、智能闪避 优先级最高
+*
+*          ****选怪
+*自动打怪***   打怪：判断打死
+*          ****继续打怪
+* */
 
-		//std::string start_id, end_id;
-		//for (const auto& pair : map_names) {
-		//	if (pair.second == start_name) {
-		//		start_id = pair.first;
-		//	}
-		//	if (pair.second == end_name) {
-		//		end_id = pair.first;
-		//	}
-		//}
-		//s.Format("%s  %s \t\n", start_id.c_str(),end_id.c_str());
-		//AppendText(m_edit2, s);
-		//if (start_id.empty() || end_id.empty()) {
-		//	std::cerr << "未找到指定的地图名称" << std::endl;
-		//	return;
-		//}
-		//std::vector<std::string> path; // 存储路径
-		//std::vector<std::pair<std::string, std::vector<Position>>> path_with_positions; // 存储路径和过图点坐标
-
-		//if (m_luaInterface.find_path(map_names, transitions, start_name, end_name, path)) {
-		//	path_with_positions = m_luaInterface.get_positions_for_path(transitions, path);
-		//	output << "找到路径：" << std::endl;
-		//	path_with_positions = m_luaInterface.get_positions_for_path(transitions, path);
-		//	for (const auto& entry : path_with_positions) {
-		//		const std::string& id = entry.first;
-		//		const std::vector<Position>& positions = entry.second;
-
-		//		// 获取地图名称
-		//		std::string map_name = map_names.count(id) ? map_names.at(id) : "未知地图";
-
-		//		output << "Map Name: " << map_name << ", Positions: ";
-		//		for (const auto& pos : positions) {
-		//			output << "(" << pos.x << ", " << pos.y << ") ";
-		//		}
-		//		output << std::endl;
-		//	}
-		//}
-		//else {
-		//	output << "未找到从 " << start_name << " 到 " << end_name << " 的路径\n";
-		//}
-		//s.Format("%s \t\n", output.str().c_str());
-		//AppendText(m_edit2, s);
-
-	/*自动打怪 需要启动：①打怪线程优先级正常 ②遍历周围对象、地面并拾取线程 优先级中高 ③寻路线程、智能闪避 优先级最高
-	*
-	*          ****选怪
-	*自动打怪***   打怪：判断打死
-	*          ****继续打怪
-	* */
-	//r.init();
-	//r.Get_Envionment(m_obj.pOb_list);
-	//r.Get_Ground(m_obj.pGr_list);
-	//m_obj.init();
-	//r_bag.maxSize = *r.m_roleproperty.Bag_Size;
-	//r_bag.bagBase = (DWORD)r.m_roleproperty.p_Bag_Base;
-	//m_skill.skillBase = (DWORD)r.m_roleproperty.p_Skill_Base;
-	//r_bag.init();
-	//m_skill.init();
-
-	//initVariable();
-	////CString s;
-	////std::vector<GROUND_GOODS> need2pick_list = mfun.sort_groud_goods(r, pick_goods_list);
-	////for (auto i=0;i< need2pick_list.size();i++)
-	////{
-	////	s.Format("%s %d/%d  %f", need2pick_list[i].pName, *need2pick_list[i].X, *need2pick_list[i].Y, need2pick_list[i].Distance);
-	////	AppendText(m_edit2, s);
-	////}
-
-	////if (need2pick_list.size())
-	////{
-	////	GROUND_GOODS pick_temp = need2pick_list[0];
-	////	s.Format("%s %d/%d  %f", pick_temp.pName, *pick_temp.X, *pick_temp.Y, pick_temp.Distance);
-	////	AppendText(m_edit2, s);
-	////	mfun.CurrentMapMove(*pick_temp.X, *pick_temp.Y);
-	////	Sleep(2000);
-	////	//mfun.pickupGoods(*pick_temp.X, *pick_temp.Y);
-	////}
-	////m_threadGoto=AfxBeginThread(threadGoto, (LPVOID)this, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
-	//m_threadAttack= AfxBeginThread(threadAttack, (LPVOID)this);
-	//m_threadPickup= AfxBeginThread(threadPickup, (LPVOID)this, THREAD_PRIORITY_ABOVE_NORMAL);
-		
 }
 
 // 队伍遍历+任务遍历

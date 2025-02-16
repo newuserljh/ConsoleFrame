@@ -24,6 +24,8 @@ extern bag r_bag;
 extern gamecall mfun; 
 extern team m_team; 
 
+
+
 struct Position {
 	int x, y;
 };
@@ -31,6 +33,9 @@ struct Position {
 using TransitionMap = std::unordered_map<std::string, std::vector<Position>>;
 using MapNames = std::unordered_map<std::string, std::string>;
 using Transitions = std::unordered_map<std::string, TransitionMap>;
+
+extern MapNames map_names; //地图名称映射
+extern Transitions transitions; //地图转换
 
 class lua_interface
 {
@@ -51,9 +56,8 @@ private:
 public:
 	//导出本类函数
 	bool presskey(int vkcode);
-	bool find_path(const MapNames& map_names, const Transitions& transitions, const std::string& start_name, const std::string& end_name, std::vector<std::string>& path);
-	void load_and_store_map_data(lua_State* L, const std::string& file_path, MapNames& map_names, Transitions& transitions);
-	std::vector<std::pair<std::string, std::vector<Position>>> get_positions_for_path(const Transitions& transitions, const std::vector<std::string>& path);
+	void load_and_store_map_data(lua_State* L, const std::string& file_path);
+	std::vector<std::pair<std::string, std::vector<Position>>> find_path_with_positions(const std::string& start_name, const std::string& end_name);
 
 
 public:
@@ -67,5 +71,6 @@ public:
 	bool sellWeapon(std::vector <DWORD>& bag_index_wp_sell);//卖武器
 private:
 	DWORD getEviroNPCIdByName(std::string npcName);//通过名字获取NPCID
+	bool find_path(const std::string& start_name, const std::string& end_name, std::vector<std::string>& path);//获取不带坐标的路径
 };
 
