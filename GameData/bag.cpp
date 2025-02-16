@@ -38,7 +38,30 @@ bool bag::init()
 			m_bag[i].ID = (DWORD*)(bagBase + i * 0x688 + 0x2c);
 			m_bag[i].Use_Num = (WORD*)(bagBase + i * 0x688 + 0x30);
 			m_bag[i].Use_Num_Max = (WORD*)(bagBase + i * 0x688 + 0x32);
+
+			if (*m_bag[i].ID!=0)
+			{
+				if (std::find(StoreVec.begin(), StoreVec.end(), std::string(m_bag[i].pName)) != StoreVec.end())m_bag[i].howProcess = 1;
+				else if (std::find(SellWeaponVec.begin(), SellWeaponVec.end(), std::string(m_bag[i].pName)) != SellWeaponVec.end())m_bag[i].howProcess = 2;
+				else if (std::find(SellClothesVec.begin(), SellClothesVec.end(), std::string(m_bag[i].pName)) != SellClothesVec.end())m_bag[i].howProcess = 2;
+				else if (std::find(SellJewelryVec.begin(), SellJewelryVec.end(), std::string(m_bag[i].pName)) != SellJewelryVec.end())m_bag[i].howProcess = 2;
+				else if (SellMedicineVec.count(std::string(m_bag[i].pName)) > 0)
+				{
+					auto it= SellMedicineVec.find(std::string(m_bag[i].pName));
+					m_bag[i].howProcess = 4;
+					m_bag[i].remainNumbers = it->second;
+				}
+				else
+				{
+					m_bag[i].howProcess = 5;
+				}
+			}
+
 		}
+	
+
+
+
 	}
 	catch (...)
 	{
@@ -145,5 +168,4 @@ int bag::getBagSpace()
 	}
 	return space;
 }
-
 

@@ -24,14 +24,6 @@ extern bag r_bag;
 extern gamecall mfun; 
 extern team m_team; 
 
-
-// 声明外部变量
-extern std::vector<std::string> StoreVec;           // 存仓物品名字
-extern std::vector<std::string> SellWeaponVec;      // 卖武器名字
-extern std::vector<std::string> SellClothesVec;     // 卖衣服名字
-extern std::vector<std::string> SellJewelryVec;     // 卖首饰名字
-extern std::map<std::string, DWORD> SellMedicineVec;// 卖药品的名字和剩余数量
-
 struct Position {
 	int x, y;
 };
@@ -74,19 +66,5 @@ public:
 	bool sellJewelry(std::vector <DWORD*>& je_sell);//卖首饰
 private:
 	DWORD getEviroNPCIdByName(std::string npcName);//通过名字获取NPCID
-
-
-
-public:
-	void parseMyConfig(std::vector<std::string>& store, std::vector<std::string>& weapon, std::vector<std::string>& clothes,
-		std::vector<std::string>& jewelry, std::map<std::string, DWORD>& medicine);//解析读取到配置文件到各自列表
-
-private:
-	void  getStoreAndSell_Pointer_vec();//获取待存物品 待卖衣服 首饰 武器 药品的指针容器 std::vector<DWORD*>
-	std::vector<DWORD*> pStoreVec; //
-	std::vector<DWORD*> pSellWeaponVec;
-	std::vector<DWORD*> pSellClothesVec;
-	std::vector<DWORD*> pSellJewelryVec;
-	std::vector<DWORD*> pMedicineVec;
 };
 
