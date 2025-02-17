@@ -854,7 +854,7 @@ DWORD  gamecall::get_buy_goods_ID(DWORD goods_index)
 参数四:买入物品数量,为空的话买1个
 返回值：bool
 */
-bool gamecall::buyGoods(std::string& goodsName,DWORD npcId,DWORD isBind,unsigned number)
+bool gamecall::buyGoods(const std::string& goodsName,DWORD npcId,DWORD isBind,unsigned number)
 {
 	/*  std::vector<std::string> drug = {"强效太阳神水", "太阳神水", "金创药(小量)", "金创药(中量)","金创药(大量)", "魔法药(小量)", "魔法药(中量)", "魔法药(大量)",
 		"金创药（小）包", "金创药（中）包", "魔法药（小）包", "魔法药（中）包", "超级金创药", "超级魔法药", "特级金创药", "特级魔法药", "特级金创药包", "特级魔法药包" ,
@@ -975,7 +975,7 @@ bool gamecall::buyGoods(std::string& goodsName,DWORD npcId,DWORD isBind,unsigned
 参数三:NPC——ID
 返回值：bool
 */
-bool gamecall::sellGoods(std::string& goodsName, DWORD goodsId, DWORD npcId)
+bool gamecall::sellGoods(const std::string& goodsName, DWORD goodsId, DWORD npcId)
 {
 	const char* name = goodsName.c_str();
 
@@ -1007,7 +1007,7 @@ bool gamecall::sellGoods(std::string& goodsName, DWORD goodsId, DWORD npcId)
 参数三:NPC——ID
 返回值：bool
 */
-bool gamecall::storeGoods(std::string& goodsName, DWORD goodsId, DWORD npcId)
+bool gamecall::storeGoods(const std::string& goodsName, DWORD goodsId, DWORD npcId)
 {
 	const char* name = goodsName.c_str();
 

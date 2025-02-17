@@ -8,6 +8,8 @@ lua_interface::lua_interface()
 {
 	L = luaL_newstate();
 	luaL_openlibs(L);
+	lua_pushcfunction(L, &lua_print);  // 替换 Lua 的 print 函数
+	lua_setglobal(L, "print");
 	registerClasses();
 
 }
@@ -124,12 +126,23 @@ lua_State* lua_interface::getLuaState() const
 	return L;
 }
 
+//重定向lua的print函数
+int lua_interface::lua_print(lua_State* L) {
+	int nargs = lua_gettop(L); // 获取参数数量
+	for (int i = 1; i <= nargs; ++i) {
+		if (lua_isstring(L, i)) {
+			std::cout << lua_tostring(L, i) << "\t"; // 输出到C++的std::cout
+		}
+	}
+	std::cout << std::endl;
+	return 0;
+}
+
 //封装presskey
 bool lua_interface::presskey(int vkcode)
 {
 	return m_gcall.presskey(::GetCurrentProcessId(),vkcode);
 }
-
 
 
 
@@ -281,14 +294,6 @@ bool lua_interface::find_path(const std::string& start_name, const std::string& 
 	queue.push(start_id);
 	came_from[start_id] = "";
 
-	if (start_id.empty() || end_id.empty()) {
-		std::cerr << "未找到指定的地图名称" << std::endl;
-		return false;
-	}
-
-	queue.push(start_id);
-	came_from[start_id] = "";
-
 	while (!queue.empty()) {
 		std::string current = queue.front();
 		queue.pop();
@@ -317,7 +322,6 @@ bool lua_interface::find_path(const std::string& start_name, const std::string& 
 
 	return false;
 }
-
 
 //找到跨图路径和过图坐标
 std::vector<std::pair<std::string, std::vector<Position>>> lua_interface::find_path_with_positions(const std::string& start_name, const std::string& end_name)
@@ -367,6 +371,45 @@ DWORD lua_interface::getEviroNPCIdByName(std::string npcName)
 		return -1;
 }
 
+// 通用 NPC 交互函数
+bool lua_interface::interactWithNPC(const std::string& npcName, const std::string& command, const std::function<bool(int)>& action) {
+	auto npcId = getEviroNPCIdByName(npcName);
+	if (npcId == -1) {
+		std::cerr << "无法找到 NPC: " << npcName << std::endl;
+		return false;
+	}
+
+	if (!mfun.OpendNPC(npcId)) {
+		std::cerr << "打开 NPC 对话框失败: " << npcName << std::endl;
+		return false;
+	}
+
+	Sleep(50);
+
+	if (!mfun.ChooseCmd(command.c_str())) {
+		std::cerr << "选择命令失败: " << command << std::endl;
+		return false;
+	}
+
+	Sleep(50);
+
+	return action(npcId);
+}
+
+// 通用卖物品函数
+bool lua_interface::sellItems(const std::vector<DWORD>& bagIndexSell, int npcId) {
+	for (auto index : bagIndexSell) {
+		const auto& item = r_bag.m_bag[index];
+		if (!mfun.sellGoods(std::string(item.pName), *item.ID, npcId)) {
+			std::cerr << "出售物品失败: " << item.pName << std::endl;
+			return false;
+		}
+		memset((DWORD*)item.Name_Length, 0, 0x688); // 清空相关字段
+		Sleep(50);
+	}
+	return true;
+}
+
 /*封装游戏函数------------------------------------------------------------------------------------------------*/
 
 //提交赏金令牌
@@ -390,213 +433,94 @@ void lua_interface::applySJLP()
 }
 
 //买药  参数一：名字  参数二：数量 返回bool
-bool lua_interface::buyMedicine(std::string med_name,BYTE num)
-{
-	auto npcid = getEviroNPCIdByName("药店掌柜");
-	if (npcid == -1) return false;
-	if (mfun.OpendNPC(npcid))
-	{
-		Sleep(50);
-		if (*r.m_roleproperty.p_Role_GoldBind>100000) //使用绑定金币
-		{
-			if (!mfun.ChooseCmd("@bindbuy"))return false;
-			Sleep(100);
-			if(!mfun.buyGoods(med_name, npcid, 1, num))return false;
+bool lua_interface::buyMedicine(const std::string& medName, BYTE num) {
+	return interactWithNPC("药店掌柜", "@bindbuy", [&](int npcId) {
+		if (*r.m_roleproperty.p_Role_GoldBind > 100000) { // 使用绑定金币
+			if (!mfun.buyGoods(medName, npcId, 1, num)) {
+				std::cerr << "购买药品失败: " << medName << std::endl;
+				return false;
+			}
 			return true;
 		}
-		if (*r.m_roleproperty.p_Role_GoldBind > 100000) //使用金币
-		{
-			if (!mfun.ChooseCmd("@buy"))return false;
-			Sleep(100);
-			if (!mfun.buyGoods(med_name, npcid, 0,num))return false;
+		else if (*r.m_roleproperty.p_Role_Gold > 100000) { // 使用金币
+			if (!mfun.buyGoods(medName, npcId, 0, num)) {
+				std::cerr << "购买药品失败: " << medName << std::endl;
+				return false;
+			}
 			return true;
 		}
-		else
-		{
-			std::cout << "金币，绑定金币不足，购买失败！" << std::endl;
+		else {
+			std::cerr << "金币和绑定金币不足，购买失败: " << medName << std::endl;
 			return false;
 		}
-	}
-	std::cout << "对话NPC错误，检查是否在NPC附近！！" << std::endl;
-
-	return true;
+		});
 }
 
 //保存物品 参数:待存物品的背包索引容器
-bool lua_interface::storeGoods(std::vector <DWORD>& bag_index_store)
-{
-	auto npcid = getEviroNPCIdByName("仓库保管员");
-	if (npcid == -1) return false;
-	if (mfun.OpendNPC(npcid))
-	{
-		Sleep(50);
-		if (!mfun.ChooseCmd("@storage"))return false;
-		Sleep(50);
-		for (unsigned i = 0; i < bag_index_store.size(); ++i)
-		{
-			Sleep(50);
-			if (!mfun.storeGoods(std::string(r_bag.m_bag[bag_index_store[i]].pName), *r_bag.m_bag[bag_index_store[i]].ID, npcid)) {
-				memset((DWORD*)r_bag.m_bag[bag_index_store[i]].Name_Length, 0, 0x688);
-			}
-			else
-			{
+bool lua_interface::storeGoods(const std::vector<DWORD>& bagIndexStore) {
+	return interactWithNPC("仓库保管员", "@storage", [&](int npcId) {
+		for (auto index : bagIndexStore) {
+			const auto& item = r_bag.m_bag[index];
+			if (!mfun.storeGoods(std::string(item.pName), *item.ID, npcId)) {
+				std::cerr << "保存物品失败: " << item.pName << std::endl;
 				return false;
 			}
+			memset((DWORD*)item.Name_Length, 0, 0x688); // 清空相关字段
+			Sleep(50);
 		}
 		return true;
-	}
-	std::cout << "对话NPC错误，检查是否在NPC附近！！" << std::endl;
-	return false;
+		});
 }
 
 //卖药 参数:待卖物品的背包索引容器
-bool lua_interface::sellMedicine(std::vector<DWORD>& bag_index_med_sell)
-{
-	// 获取药店掌柜的NPC ID
-	auto npcid = getEviroNPCIdByName("药店掌柜");
-	if (npcid == -1) {
-		std::cerr << "无法找到药店掌柜 NPC" << std::endl;
-		return false;
-	}
-
-	// 打开NPC对话框
-	if (!mfun.OpendNPC(npcid)) {
-		std::cerr << "打开 NPC 对话框失败" << std::endl;
-		return false;
-	}
-
-	Sleep(50);
-
-	// 选择卖药选项
-	if (!mfun.ChooseCmd("@sell")) {
-		std::cerr << "选择卖药选项失败" << std::endl;
-		return false;
-	}
-
-	Sleep(50);
-
-	// 处理待卖物品列表
-	for (unsigned i = 0; i < bag_index_med_sell.size(); ++i)
-	{
-		Sleep(50);
-
-		const auto& item = r_bag.m_bag[bag_index_med_sell[i]];
-		if (!mfun.sellGoods(std::string(item.pName), *item.ID, npcid)) {
-			std::cerr << "出售药品 " << item.pName << " 失败" << std::endl;
-			return false;
-		}
-		else {
-			// 成功卖出后，清空相关字段
-			memset((DWORD*)item.Name_Length, 0, 0x688);
-		}
-	}
-
-	Sleep(50);
-
-	// 处理剩余药品的卖出操作
-	for (const auto& kv : r_bag.m_bag)
-	{
-		if (kv.howProcess == 4 && kv.goods_type == 4 && kv.remainNumbers < r_bag.caclGoodsNumber(kv.pName))
-		{
-			Sleep(50);
-			if (!mfun.sellGoods(std::string(kv.pName), *kv.ID,npcid)) {
-				std::cerr << "出售剩余药品 " << kv.pName << " 失败" << std::endl;
+bool lua_interface::sellMedicine(const std::vector<DWORD>& bagIndexMedSell) {
+	return interactWithNPC("药店掌柜", "@sell", [&](int npcId) {
+		for (auto index : bagIndexMedSell) {
+			const auto& item = r_bag.m_bag[index];
+			if (!mfun.sellGoods(std::string(item.pName), *item.ID, npcId)) {
+				std::cerr << "出售药品失败: " << item.pName << std::endl;
 				return false;
 			}
-			else {
-				// 成功卖出后，清空相关字段
-				memset((DWORD*)kv.Name_Length, 0, 0x688);
+			memset((DWORD*)item.Name_Length, 0, 0x688); // 清空相关字段
+			Sleep(50);
+		}
+
+		// 处理剩余药品
+		for (const auto& kv : r_bag.m_bag) {
+			if (kv.howProcess == 4 && kv.goods_type == 4 && kv.remainNumbers < (DWORD)r_bag.caclGoodsNumber(kv.pName)) {
+				if (!mfun.sellGoods(std::string(kv.pName), *kv.ID, npcId)) {
+					std::cerr << "出售剩余药品失败: " << kv.pName << std::endl;
+					return false;
+				}
+				memset((DWORD*)kv.Name_Length, 0, 0x688); // 清空相关字段
+				Sleep(50);
 			}
 		}
-	}
-
-	return true;
+		return true;
+		});
 }
 
 //卖衣服 待卖物品的背包索引容器
-bool  lua_interface::sellClothes(std::vector <DWORD>& bag_index_clo_sell)
-{
-	auto npcid = getEviroNPCIdByName("服装店掌柜");
-	if (npcid == -1) return false;
-	if (mfun.OpendNPC(npcid))
-	{
-		Sleep(50);
-		if (!mfun.ChooseCmd("@sell"))return false;
-		Sleep(50);
-		for (unsigned i = 0; i < bag_index_clo_sell.size(); ++i)
-		{
-			Sleep(50);
-
-			if (mfun.sellGoods(std::string(r_bag.m_bag[bag_index_clo_sell[i]].pName), *r_bag.m_bag[bag_index_clo_sell[i]].ID, npcid)) {
-				memset((DWORD*)r_bag.m_bag[bag_index_clo_sell[i]].Name_Length, 0, 0x688);
-			}
-			else
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-	std::cout << "对话NPC错误，检查是否在NPC附近！！" << std::endl;
-	return false;
+bool lua_interface::sellClothes(const std::vector<DWORD>& bagIndexCloSell) {
+	return interactWithNPC("服装店掌柜", "@sell", [&](int npcId) {
+		return sellItems(bagIndexCloSell, npcId);
+		});
 }
+
 
 //卖首饰 待卖物品的背包索引容器
-bool  lua_interface::sellJewelry(std::vector <DWORD>& bag_index_je_sell)
-{
-	auto npcid = getEviroNPCIdByName("首饰店掌柜");
-	if (npcid == -1) return false;
-	if (mfun.OpendNPC(npcid))
-	{
-		Sleep(50);
-		if (!mfun.ChooseCmd("@sell"))return false;
-		Sleep(50);
-		for (unsigned i = 0; i < bag_index_je_sell.size(); ++i)
-		{
-			Sleep(50);
-
-			if (mfun.sellGoods(std::string(r_bag.m_bag[bag_index_je_sell[i]].pName), *r_bag.m_bag[bag_index_je_sell[i]].ID, npcid))
-			{
-				memset((DWORD*)r_bag.m_bag[bag_index_je_sell[i]].Name_Length, 0, 0x688);
-			}
-			else
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-	std::cout << "对话NPC错误，检查是否在NPC附近！！" << std::endl;
-	return false;
+bool lua_interface::sellJewelry(const std::vector<DWORD>& bagIndexJeSell) {
+	return interactWithNPC("首饰店掌柜", "@sell", [&](int npcId) {
+		return sellItems(bagIndexJeSell, npcId);
+		});
 }
 
-//卖武器 待卖物品的背包索引容器
-bool  lua_interface::sellWeapon(std::vector <DWORD>& bag_index_wp_sell)
-{
-	auto npcid = getEviroNPCIdByName("铁匠");
-	if (npcid == -1) return false;
-	if (mfun.OpendNPC(npcid))
-	{
-		Sleep(100);
-		if (!mfun.ChooseCmd("@sell"))return false;
-		Sleep(100);
-		for (unsigned i = 0; i < bag_index_wp_sell.size(); ++i)
-		{
-			Sleep(100);
 
-			if (mfun.sellGoods(std::string(r_bag.m_bag[bag_index_wp_sell[i]].pName), *r_bag.m_bag[bag_index_wp_sell[i]].ID, npcid))
-			{
-				memset((DWORD*)r_bag.m_bag[bag_index_wp_sell[i]].Name_Length, 0, 0x688);
-			}
-			else
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-	std::cout << "对话NPC错误，检查是否在NPC附近！！" << std::endl;
-	return false;
+//卖武器 待卖物品的背包索引容器
+bool lua_interface::sellWeapon(const std::vector<DWORD>& bagIndexWpSell) {
+	return interactWithNPC("铁匠", "@sell", [&](int npcId) {
+		return sellItems(bagIndexWpSell, npcId);
+		});
 }
 
 //解析storeANDsell.ini 解析需要存仓和卖出的物品名字列表
@@ -661,4 +585,73 @@ bool bag::initGoodsProcWayList()
 		return true;
 	}
 	else return false;
+}
+
+//追加存储NPC 信息到Lua文件中
+void lua_interface::saveNPCsToLua(const std::vector<NPC>& npcs, const std::string& filePath) {
+	std::ofstream outputFile(filePath, std::ios::app); // 使用追加模式
+	if (outputFile.is_open()) {
+		std::map<std::string, std::unordered_map<NPC, bool, NPCHash>> mapNPCs;
+
+		// 将 NPC 按地图分组并去重
+		for (const auto& npc : npcs) {
+			mapNPCs[npc.mapName][npc] = true;
+		}
+
+		// 检查文件是否为空，如果为空则写入表头
+		outputFile.seekp(0, std::ios::end);
+		bool isEmpty = (outputFile.tellp() == 0);
+		if (isEmpty) {
+			outputFile << "npcs = {\n";
+		}
+
+		for (const auto& mapEntry : mapNPCs) {
+			const std::string& mapName = mapEntry.first;
+			const std::unordered_map<NPC, bool, NPCHash>& mapNPCList = mapEntry.second;
+
+			// 检查该地图是否已经存在
+			outputFile.seekp(0, std::ios::end);
+			bool mapExists = false;
+			std::string line;
+			std::ifstream checkFile(filePath);
+			if (checkFile.is_open()) {
+				while (std::getline(checkFile, line)) {
+					if (line.find("[\"" + mapName + "\"]") != std::string::npos) {
+						mapExists = true;
+						break;
+					}
+				}
+				checkFile.close();
+			}
+
+			if (!mapExists) {
+				outputFile << "    [\"" << mapName << "\"] = {\n";
+			}
+
+			for (const auto& npcEntry : mapNPCList) {
+				const NPC& npc = npcEntry.first;
+
+				// 检查该 NPC 是否已经存在
+				if (existingNPCs[mapName].find(npc) == existingNPCs[mapName].end()) {
+					outputFile << "        [\"" << npc.npcName << "\"] = { x = " << npc.x << ", y = " << npc.y << " },\n";
+					existingNPCs[mapName][npc] = true;
+				}
+			}
+
+			if (!mapExists) {
+				outputFile << "    },\n";
+			}
+		}
+
+		// 如果文件为空，写入表尾
+		if (isEmpty) {
+			outputFile << "}\n";
+		}
+
+		outputFile.close();
+		std::cout << "NPCs saved to " << filePath << std::endl;
+	}
+	else {
+		std::cerr << "Unable to open file " << filePath << std::endl;
+	}
 }

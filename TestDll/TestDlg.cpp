@@ -1102,19 +1102,25 @@ UINT __cdecl CTestDlg::threadPickup(LPVOID p)
 // TODO: 功能测试
 void CTestDlg::OnBnClickedButton9()
 {
+	r.init();
 	r_bag.maxSize = *r.m_roleproperty.Bag_Size;
 	r_bag.bagBase = (DWORD)r.m_roleproperty.p_Bag_Base;
 	r_bag.init();
 	m_skill.skillBase = (DWORD)r.m_roleproperty.p_Skill_Base;
 	m_skill.init();
 	m_team.team_Base = r.m_roleproperty.Team_pointer;
+	CString s;
+
+
+
+
+
 	//m_luaInterface.buyMedicine("超级魔法药", 5);
 	//r_bag.getGoodsProcessIndex();
 	//m_luaInterface.sellMedicine(r_bag.index_vec_sell_medci);
 	////m_luaInterface.applySJLP();
 
 	 //获取周围怪物信息
-	CString s;
 
 	//// 查找路径
 	//std::string start_name = "落霞岛";
@@ -1126,10 +1132,8 @@ void CTestDlg::OnBnClickedButton9()
 	//	{
 	//		const std::string& id = entry.first;
 	//		const std::vector<Position>& positions = entry.second;
-
 	//		// 获取地图名称
 	//		std::string map_name = map_names.count(id) ? map_names.at(id) : "未知地图";
-
 	//		std::cout << "Map Name: " << map_name << ", Positions: ";
 	//		for (const auto& pos : positions) {
 	//			std::cout << "(" << pos.x << ", " << pos.y << ") ";
