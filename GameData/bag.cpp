@@ -188,6 +188,7 @@ void  bag::getGoodsProcessIndex()
 	index_vec_sell_cloth.clear();
 	index_vec_sell_jewel.clear();
 	index_vec_sell_medci.clear();
+	this->init();
     for (size_t i = 0; i < maxSize; i++)
     {
         if (m_bag[i].ID)

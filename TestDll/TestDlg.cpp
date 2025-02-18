@@ -150,7 +150,7 @@ void threadLogin()
 			std::string defaultpath = (std::string)shareCli.m_pSMAllData->currDir + "cfg\\default\\storeANDsell.ini" ;
 			tools::getInstance()->copyFile(defaultpath, usercfgpath + "\\storeANDsell.ini");
 		}
-		bag::initGoodsProcWayList();
+		bag::initGoodsProcWayList(); // 初始化 存储和出售物品的配置
 		r_bag.maxSize = *r.m_roleproperty.Bag_Size;
 		r_bag.bagBase = (DWORD)r.m_roleproperty.p_Bag_Base;
 		r_bag.init();

@@ -3,46 +3,16 @@
 #include "TestDlg.h"
 
 
-lua_interface::lua_interface()
-	: m_tools(*tools::getInstance())// 初始化单例类的引用
-{
-	L = luaL_newstate();
-	luaL_openlibs(L);
-	lua_pushcfunction(L, &lua_print);  // 替换 Lua 的 print 函数
-	lua_setglobal(L, "print");
-	registerClasses();
-
-}
-
-lua_interface::~lua_interface()
-{
-	lua_close(L);
-}
-
 void lua_interface::registerClasses()
 {
 	using namespace luabridge;
 
 	// 类导出到lua
-	getGlobalNamespace(L)
-		.beginClass<role>("role") //role类
-		.addConstructor<void(*)()>()
-		.addFunction("init", &role::init)
-		.addFunction("init_equip", &role::init_equip)
-		.addFunction("init_promenade", &role::init_promenade)
-		.addFunction("Get_Envionment", &role::Get_Envionment)
-		.addFunction("Get_Ground", &role::Get_Ground)
-		.endClass()
-
+	getGlobalNamespace(L.get())
 		.beginClass<bag>("bag") //bag类
 		.addConstructor<void(*)()>()
 		.addFunction("init", &bag::init)
-		.addFunction("caclGoodsNumber", &bag::caclGoodsNumber)
-		.addFunction("getGoodsIndex", &bag::getGoodsIndex)
 		.addFunction("ifHasPoison", &bag::ifHasPoison)
-		.addFunction("caclMpGoodsNumer", &bag::caclMpGoodsNumer)
-		.addFunction("caclHpGoodsNumer", &bag::caclHpGoodsNumer)
-		.addFunction("getBagSpace", &bag::getBagSpace)
 		.endClass()
 
 		.beginClass<tools>("tools")//tools类
@@ -76,55 +46,61 @@ void lua_interface::registerClasses()
 
 		.beginClass<gamecall>("gamecall") //gamecall类
 		.addConstructor<void(*)()>()
-		.addFunction("loginGame", &gamecall::loginGame)
-		.addFunction("useGoods", &gamecall::useGoods)
-		.addFunction("useSkillTo", &gamecall::useSkillTo)
-		.addFunction("CurrentMapMove", &gamecall::CurrentMapMove)
 		.addFunction("OpendNPC", &gamecall::OpendNPC)
 		.addFunction("ChooseCmd", &gamecall::ChooseCmd)
 		.addFunction("pickupGoods", &gamecall::pickupGoods)
-		.addFunction("Run_or_Step_To", &gamecall::Run_or_Step_To)
-		.addFunction("GetHwndByPid", &gamecall::GetHwndByPid)
-		.addFunction("caclDistance", &gamecall::caclDistance)
-		.addFunction("sort_aroud_monster", &gamecall::sort_aroud_monster)
-		.addFunction("sort_groud_goods", &gamecall::sort_groud_goods)
-		.addFunction("splitXY", &gamecall::splitXY)
 		.addFunction("team_open_close", &gamecall::team_open_close)
 		.addFunction("maketeam", &gamecall::maketeam)
 		.addFunction("allowteam", &gamecall::allowteam)
-		.addFunction("release_Promenade", &gamecall::release_Promenade)
-		.addFunction("start_end_AutoAttack", &gamecall::start_end_AutoAttack)
 		.addFunction("OpenRecovry", &gamecall::OpenRecovry)
 		.addFunction("RecovryGoods", &gamecall::RecovryGoods)
 		.addFunction("RecovryGoods_To_Exp", &gamecall::RecovryGoods_To_Exp)
 		.addFunction("RecovryGoods_To_Gold", &gamecall::RecovryGoods_To_Gold)
-		.addFunction("小退", &gamecall::small_exit)
-		.addFunction("立即复活", &gamecall::immdia_rebirth)
 		//.addFunction("SubmitInputbox", &gamecall::SubmitInputbox)
 		.endClass()
 				    
-	    .beginClass<lua_interface>("lua_interface")// 导出 lua_interface 类
-		.addConstructor<void(*)()>()
-		.addFunction("presskey", &lua_interface::presskey)
-		//.addData("exampleMember", &lua_interface::exampleMember)
+		.beginClass<lua_interface>("LuaInterface") // 注册本类方法到 Lua
+		.addConstructor<void(*)(void)>()
+		.addFunction("模拟按键", &lua_interface::presskey)
+		.addFunction("交赏金", &lua_interface::applySJLP)
+		.addFunction("买药", &lua_interface::buyMedicine)
+		.addFunction("回城整理背包", &lua_interface::getGoodsProcessIndex) //回城调用 获取物品处理方式写入index_vec_store .. 之后才能调用下面的待存待卖物品
+		.addFunction("待存物品数量", &lua_interface::getStoreGoodsNumber)
+		.addFunction("待卖首饰数量", &lua_interface::getSellJewelryNumber)
+		.addFunction("待卖衣服数量", &lua_interface::getSellClothesNumber)
+		.addFunction("待卖武器数量", &lua_interface::getSellWeaponNumber)
+		.addFunction("存仓库", static_cast<bool(lua_interface::*)()>(&lua_interface::storeGoods))
+		.addFunction("卖衣服", static_cast<bool(lua_interface::*)()>(&lua_interface::sellClothes))
+		.addFunction("卖首饰", static_cast<bool(lua_interface::*)()>(&lua_interface::sellJewelry))
+		.addFunction("卖武器", static_cast<bool(lua_interface::*)()>(&lua_interface::sellWeapon))
+		.addFunction("卖药", static_cast<bool(lua_interface::*)()>(&lua_interface::sellMedicine))
+		.addFunction("当前坐标X", &lua_interface::getCurrentX)
+		.addFunction("当前坐标Y", &lua_interface::getCurrentY)
+		.addFunction("当前地图名", &lua_interface::getCurrentMapName)
+		.addFunction("背包剩余格子", &lua_interface::getBagSpace)
+		.addFunction("当前背包负重", &lua_interface::getBagWeightRemain)
+		.addFunction("最大背包负重", &lua_interface::getBagWeightMax)
+		.addFunction("计算物品数量", &lua_interface::getBagGoodsNumber)
+		.addFunction("红药数量", &lua_interface::getBagHpMedcine)
+		.addFunction("蓝药数量", &lua_interface::getBagMpMedcine)
+		.addFunction("当前金币", &lua_interface::getGoldNumber)
+		.addFunction("当前元宝", &lua_interface::getYbNumber)
+		.addFunction("当前绑定金币", &lua_interface::getBindGoldNumber)
+		.addFunction("当前绑定元宝", &lua_interface::getBindYbNumber)
+		.addFunction("使用物品", &lua_interface::useBagGoods)
+		.addFunction("对自己使用技能", &lua_interface::useSkillToMyself)
+		.addFunction("对目标使用技能", &lua_interface::useSkillToTarget)
+		.addFunction("小退", &lua_interface::smallExit)
+		.addFunction("立即复活", &lua_interface::immdiaRebirth)
+		.addFunction("跑到目标点", &lua_interface::runTo)
+		.addFunction("走到目标点", &lua_interface::walkTo)
+		.addFunction("寻路到", &lua_interface::gotoMapXY)
+		.addFunction("开始战斗", &lua_interface::startAttack)
+		.addFunction("结束战斗", &lua_interface::endAttack)
+		.addFunction("计算距离", &lua_interface::getDistance)
 		.endClass();
-
-	// 将对象导出到 Lua
-	getGlobalNamespace(L)
-		.beginNamespace("app")
-		.addVariable("role", &m_role, false)
-		.addVariable("bag", &m_bag, false)
-		.addVariable("tools", &m_tools, false)
-		.addVariable("gamecall", &m_gcall, false)
-		.endNamespace();
 }
 
-
-
-lua_State* lua_interface::getLuaState() const
-{
-	return L;
-}
 
 //重定向lua的print函数
 int lua_interface::lua_print(lua_State* L) {
@@ -141,9 +117,8 @@ int lua_interface::lua_print(lua_State* L) {
 //封装presskey
 bool lua_interface::presskey(int vkcode)
 {
-	return m_gcall.presskey(::GetCurrentProcessId(),vkcode);
+	return mfun.presskey(::GetCurrentProcessId(),vkcode);
 }
-
 
 
 // 加载并解析的lua map文件 包含地图编号与名字的映射关系 以及地图之间的路径关系
@@ -507,7 +482,6 @@ bool lua_interface::sellClothes(const std::vector<DWORD>& bagIndexCloSell) {
 		});
 }
 
-
 //卖首饰 待卖物品的背包索引容器
 bool lua_interface::sellJewelry(const std::vector<DWORD>& bagIndexJeSell) {
 	return interactWithNPC("首饰店掌柜", "@sell", [&](int npcId) {
@@ -515,13 +489,13 @@ bool lua_interface::sellJewelry(const std::vector<DWORD>& bagIndexJeSell) {
 		});
 }
 
-
 //卖武器 待卖物品的背包索引容器
 bool lua_interface::sellWeapon(const std::vector<DWORD>& bagIndexWpSell) {
 	return interactWithNPC("铁匠", "@sell", [&](int npcId) {
 		return sellItems(bagIndexWpSell, npcId);
 		});
 }
+
 
 //解析storeANDsell.ini 解析需要存仓和卖出的物品名字列表
 std::vector<std::string>  bag::StoreVec, bag::SellWeaponVec, bag::SellClothesVec, bag::SellJewelryVec;//分别存储 存仓物品 卖武器 衣服 首饰 名字
