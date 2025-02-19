@@ -19,7 +19,13 @@ public:
 	enum { IDD = IDD_DLGTEST };
 
 public:
-	lua_State* L; // Lua 状态变量
+	lua_State* L; // Lua 状态变量 用于主程序
+	
+
+private:
+	lua_State* LLua; // Lua 状态变量 用于运行lua脚本
+	std::atomic<bool> stopScript{ false };
+	static void RunLuaScriptInThread(LPVOID p,lua_State* L, const std::string& scriptPath, std::function<void(const std::string&)> errorCallback);
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
@@ -98,4 +104,5 @@ public:
 	DWORD mPid;
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnBnClickedBtnBagproc();
+	afx_msg void OnBnClickedButton6();
 };

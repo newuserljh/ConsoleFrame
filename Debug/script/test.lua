@@ -1,80 +1,361 @@
--- 获取当前文件的路径
-function get_current_directory()
-    local path = debug.getinfo(1, "S").source:sub(2)
-    local directory = path:match("(.*[/\\])")
-    return directory or ""
+function checkStopFlag()
+    if stopScript then
+        error("Script termination requested")
+    end
 end
 
--- 获取当前文件所在目录
-local dir = get_current_directory()
--- 动态添加当前目录到 package.path
-local sep = package.config:sub(1, 1) -- 获取路径分隔符
-local custom_path = dir .. sep .. "?.lua"
-if not package.path:find(custom_path, 1, true) then
-    package.path = package.path .. ";" .. custom_path
+-- 创建 lua_interface 对象
+local game = LuaInterface()
+
+-- 模拟 Sleep 函数（单位：毫秒）
+local function sleep(ms)
+    local start = os.clock()
+    while os.clock() - start < ms / 1000 do end
 end
 
--- 加载地图数据
-local map = require("map_data")
+-- 打印分隔线
+local function printSeparator()
+    print("--------------------------------------------------")
+end
 
--- 定义广度优先搜索函数
-function bfs(startRegion, endRegion, transitions)
-    local queue = {{region = startRegion, path = {region = startRegion}}}
-    local visited = {}
+-- 回城
+local function goHome()
+    printSeparator()
+    print("回城整理背包...")
+    game:使用物品("永久回城神石")
+    sleep(2000);
+	if (game:当前地图名()=="中州") and (game:计算距离(468, 226)<20) then
+		game:回城整理背包()
+	else
+		goHome()
+	end
+end
 
-    while #queue > 0 do
-        local current = table.remove(queue, 1)
-        local region = current.region
-        local path = current.path
+-- 存仓库
+local function storeGoods()
+    local maxAttempts = 5
+    local attempt = 1
 
-        if not visited[region] then
-            visited[region] = true
+    while attempt <= maxAttempts do
+        print("正在存仓库... (尝试次数: " .. attempt .. ")")
 
-            if region == endRegion then
-                return path -- 返回找到的路径
+        if game:存仓库() then
+            print("存仓库成功")
+            game:回城整理背包()
+
+            -- 检查是否有剩余物品需要存储
+            local remainingStoreCount = game:待存物品数量()
+            if remainingStoreCount == 0 then
+                print("所有物品已成功存入仓库")
+                break
+            else
+                print("仍有 " .. remainingStoreCount .. " 件物品需要存储")
             end
+        else
+            print("存仓库失败")
+        end
 
-            if transitions[region] then
-                for nextRegion, coords in pairs(transitions[region]) do
-                    if not visited[nextRegion] then
-                        local newPath = {}
-                        for _, v in ipairs(path) do
-                            table.insert(newPath, v)
-                        end
-                        table.insert(newPath, {region = nextRegion, coords = coords})
-                        table.insert(queue, {region = nextRegion, path = newPath})
-                    end
-                end
-            end
+        attempt = attempt + 1
+        if attempt > maxAttempts then
+            print("已达到最大尝试次数 (" .. maxAttempts .. ")，仍未能成功存入仓库")
+            break
         end
     end
-
-    return nil -- 如果没有找到路径，则返回nil
 end
 
--- 打印路径和过图点（含坐标）
-function printPathAndNodesWithCoordinates(path)
-    if path then
-        print("找到路径:")
-        for i, node in ipairs(path) do
-            print(string.format("%d. %s", i, node.region))
-            if node.coords then
-                for j, coord in ipairs(node.coords) do
-                    print(string.format("   - 坐标 %d: (%d, %d)", j, coord.x, coord.y))
+-- 卖物品的通用函数
+local function sellItems(itemType, maxAttempts, npcName, npcLocation)
+    local attempt = 1
+    while attempt <= maxAttempts do
+        print("正在卖" .. itemType .. "... (尝试次数: " .. attempt .. ")")
+        if game["卖" .. itemType]() then
+            print("卖" .. itemType .. "成功")
+            break
+        else
+            print("卖" .. itemType .. "失败")
+        end
+        attempt = attempt + 1
+        if attempt > maxAttempts then
+            print("已达到最大尝试次数 (" .. maxAttempts .. ")，仍未能成功卖出" .. itemType)
+            break
+        end
+    end
+end
+
+-- 卖药
+local function sellMedicine()
+    print("正在卖药...")
+    if game:卖药() then
+	    sleep(1000)
+		game:卖药()
+		sleep(1000)
+		game:卖药()
+		sleep(1000)
+		game:卖药()
+        print("卖药成功")
+    else
+        print("卖药失败")
+    end
+end
+
+-- 购买药品
+local function buyMedicines(name, count)
+    local maxAttempts = 5
+    local attempt = 1
+
+    -- 买药
+    local bagCount = game:计算物品数量(name)
+    if bagCount < count then
+        while attempt <= maxAttempts do
+            print(name.."数量不足，正在购买,尝试次数: ("..attempt..")")
+
+            -- 计算需要购买的数量
+            local needToBuy = count - bagCount
+            if game:买药(name, needToBuy) then
+                print("购买"..name.."成功")
+                bagCount = game:计算物品数量(name)  -- 更新当前数量
+                if bagCount >= count then
+                    print(name.."数量已满足需求: " .. count)
+                    break  -- 成功后退出循环
                 end
+            else
+                print("买药失败")
+            end
+
+            attempt = attempt + 1
+            if attempt > maxAttempts then
+                print("已达到最大尝试次数 (" .. maxAttempts .. ")，仍未能购买足够的药")
+                break
             end
         end
     else
-        print("未找到路径")
+        print(name.."数量充足: " .. count)
+    end
+
+end
+
+-- 移动到目标点（异步检测）
+local function moveToTargetAsync(x, y)
+    printSeparator()
+    print("正在移动到目标点 (" .. x .. ", " .. y .. ")...")
+
+    -- 计算初始距离
+    local distance = game:计算距离(x, y)
+    print("与目标点的距离: " .. distance)
+    -- 寻路到目标点
+	local threshold = 5 -- 允许的误差范围
+    if distance > threshold  then
+        if game:寻路到(x, y) then
+            print("寻路到目标点成功")
+
+            -- 异步检测是否到达目标点
+
+            while  not stopScript do
+                sleep(500) -- 每 500 毫秒检测一次
+                local currentX = game:当前坐标X()
+                local currentY = game:当前坐标Y()
+                local currentDistance = game:计算距离(x, y)
+                print("当前位置: (" .. currentX .. ", " .. currentY .. "), 剩余距离: " .. currentDistance)
+
+                if currentDistance <= threshold then
+                    print("到达目标点")
+                    break
+                end
+            end
+        else
+            print("寻路到目标点失败")
+        end
+    else
+        print("已经在目标点")
     end
 end
 
--- 使用示例
-local startRegion = "1"
-local endRegion = "L004"
-local path = bfs(startRegion, endRegion, map.transitions)
 
-printPathAndNodesWithCoordinates(path)
+-- 过图
+local function passMap(currentMapName,targetMapName,x,y,x1,y1)
+    local maxAttempts = 5
+    local attempt = 1
+	 -- 设置默认值
+	x1 = x1 or 0
+    y1 = y1 or 0
+          moveToTargetAsync(x, y)
+    while attempt <= maxAttempts do
+        print("正在过图... (尝试次数: " .. attempt .. ")")
+		game:走到目标点(x,y)
+		sleep(1000)
+
+        if game:当前地图名()==targetMapName then
+            print("过图成功")
+            break  -- 成功后退出循环
+        else
+			if(x1~=0 and y1~=0) then
+				game:走到目标点(x,y)
+				sleep(1000)
+			end
+        end
+
+        attempt = attempt + 1
+        if attempt > maxAttempts then
+            print("已达到最大尝试次数 (" .. maxAttempts .. ")，仍未能成功过图")
+            break
+        end
+    end
+end
+
+-- 战斗
+function startCombat()
+    while not stopScript do
+	-- 检查是否需要暂停或终止
+        if stopScript then
+            if game:停止战斗() then
+                print("战斗停止成功")
+            else
+                print("战斗停止失败")
+            end
+            break
+        end
+
+        checkStopFlag()
+        sleep(5000)  -- 每 5000 毫秒检查一次停止标志
+    end
+end
+
+local function 出发()
+	if game:当前地图名()=="中州" and game:计算距离(470,221)<20 and not stopScript then
+	 	moveToTargetAsync(470,223)
+		game:对话NPC选择命令("老兵","@main1")
+		sleep(500)
+		game:选择命令("@west")
+		sleep(500)
+		game:选择命令("@west1")
+		sleep(1000)
+	 end
+
+	 if game:当前地图名()=="西域奇境" and game:计算距离(463,110)<20 and not stopScript  then
+	 	moveToTargetAsync(463,110)
+		game:对话NPC选择命令("老兵","@main1")
+		sleep(500)
+		game:选择命令("@ttta")
+		sleep(500)
+		game:选择命令("@ta")
+		sleep(1000)
+	 end
+
+	if game:当前地图名()=="西域奇境" and game:计算距离(140, 107)<20 and not stopScript  then
+	 	passMap("西域奇境","一手遮天", 137, 102 , 137, 103)
+	 end
+
+	if stopScript then
+	   return
+	end
+
+	if game:当前地图名()=="一手遮天"  and not stopScript then
+    -- 开始战斗
+        print("到达战斗地图")
+	else
+		goHome()
+	end
+end
 
 
+-- 主函数
+local function 卖物补给()
+        -- 回城整理背包
+        goHome()
+        -- 获取待存和待卖物品数量
+        local storeCount = game:待存物品数量()
+        local sellJewelryCount = game:待卖首饰数量()
+        local sellClothesCount = game:待卖衣服数量()
+        local sellWeaponCount = game:待卖武器数量()
 
+        print("待存物品数量: " .. storeCount)
+        print("待卖首饰数量: " .. sellJewelryCount)
+        print("待卖衣服数量: " .. sellClothesCount)
+        print("待卖武器数量: " .. sellWeaponCount)
+
+        -- 存仓库
+        if storeCount > 0 then
+            moveToTargetAsync(455, 228)
+            game:对话NPC选择命令("便捷传送门", "@Shop_GO&0&378&217")
+            sleep(1000)
+            moveToTargetAsync(375, 211)
+            storeGoods()
+            game:使用物品("永久回城神石")
+            sleep(1000)
+        end
+
+        -- 卖物品
+    if sellJewelryCount > 0 then
+        moveToTargetAsync(438, 249)
+        sellItems("首饰", 5, "首饰店老板", {438, 249})
+        game:使用物品("永久回城神石")
+        sleep(1000)
+    end
+
+    if sellClothesCount > 0 then
+        moveToTargetAsync(417, 206)
+        passMap("中州", "服装店", 418, 205)
+        sellItems("衣服", 5, "服装店老板", {418, 205})
+        game:使用物品("永久回城神石")
+        sleep(1000)
+    end
+
+    if sellWeaponCount > 0 then
+        moveToTargetAsync(419, 246)
+        sellItems("武器", 5, "武器店老板", {419, 246})
+        game:使用物品("永久回城神石")
+        sleep(1000)
+    end
+
+        -- 购买药品
+        moveToTargetAsync(455, 228)
+        game:对话NPC选择命令("便捷传送门", "@Shop_GO&0&502&266")
+        sleep(1000)
+        moveToTargetAsync(498, 268)
+        sellMedicine()
+        sleep(1000)
+        buyMedicines("特级金创药包", 6)
+        buyMedicines("特级魔法药包", 6)
+        game:使用物品("永久回城神石")
+        sleep(1000)
+
+	-- 检查停止标志
+        checkStopFlag()
+end
+
+-- 运行主循环
+local combatCoroutine = nil
+while not stopScript do
+    print("Running...")
+   卖物补给()
+
+    -- 移动到战斗点
+    出发()
+    ---开始战斗
+   if game:开始战斗() then
+   	print("开始战斗--------")
+   else
+	print("开始战斗失败---正在结束脚本...")
+	break
+   end
+
+-- 启动战斗协程（如果还没有启动）
+    if not combatCoroutine or coroutine.status(combatCoroutine) == "dead" then
+        combatCoroutine = coroutine.create(startCombat)
+    end
+
+    -- 恢复战斗协程
+    if coroutine.status(combatCoroutine) ~= "dead" then
+        coroutine.resume(combatCoroutine)
+    end
+
+    -- 检查停止标志
+    checkStopFlag()
+
+    -- 模拟脚本执行一段时间
+    sleep(5000)
+end
+-- 清理协程
+if combatCoroutine and coroutine.status(combatCoroutine) ~= "dead" then
+    coroutine.close(combatCoroutine)
+end

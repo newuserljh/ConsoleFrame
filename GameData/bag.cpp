@@ -1,5 +1,5 @@
 ﻿#include "bag.h"
-
+#include <iostream>
 bag::bag()
 {
 	bSpace = 0;
@@ -39,45 +39,53 @@ bool bag::init()
 			m_bag[i].ID = (DWORD*)(bagBase + i * 0x688 + 0x2c);
 			m_bag[i].Use_Num = (WORD*)(bagBase + i * 0x688 + 0x30);
 			m_bag[i].Use_Num_Max = (WORD*)(bagBase + i * 0x688 + 0x32);
-
-			if (*m_bag[i].ID!=0)
-			{
-				if (std::find(StoreVec.begin(), StoreVec.end(), std::string(m_bag[i].pName)) != StoreVec.end())m_bag[i].howProcess = 1;
-				else if (std::find(SellWeaponVec.begin(), SellWeaponVec.end(), std::string(m_bag[i].pName)) != SellWeaponVec.end())
-				{
-					m_bag[i].howProcess = 2;
-					m_bag[i].goods_type = 1;
-				}
-				else if (std::find(SellClothesVec.begin(), SellClothesVec.end(), std::string(m_bag[i].pName)) != SellClothesVec.end())
-				{
-					m_bag[i].howProcess = 2;
-					m_bag[i].goods_type = 3;
-				}
-				else if (std::find(SellJewelryVec.begin(), SellJewelryVec.end(), std::string(m_bag[i].pName)) != SellJewelryVec.end())
-				{
-					m_bag[i].howProcess = 2;
-					m_bag[i].goods_type =2 ;
-				}
-				else if (SellMedicineVec.count(std::string(m_bag[i].pName)) > 0)
-				{
-					auto it= SellMedicineVec.find(std::string(m_bag[i].pName));
-					m_bag[i].howProcess = 4;
-					m_bag[i].goods_type = 4;
-					m_bag[i].remainNumbers = it->second;
-				}
-				else
-				{
-					m_bag[i].howProcess = 5;
-				}
-			}
-
 		}
 	}
 	catch (...)
 	{
 		return false;
 	}
+    classifyBagItems();
 	return true;
+}
+
+//分类背包物品
+void bag::classifyBagItems()
+{
+	for (size_t i = 0; i < maxSize; i++)
+	{
+
+		if (*m_bag[i].ID != 0)
+		{
+			if (std::find(StoreVec.begin(), StoreVec.end(), std::string(m_bag[i].pName)) != StoreVec.end())m_bag[i].howProcess = 1;
+			else if (std::find(SellWeaponVec.begin(), SellWeaponVec.end(), std::string(m_bag[i].pName)) != SellWeaponVec.end())
+			{
+				m_bag[i].howProcess = 2;
+				m_bag[i].goods_type = 1;
+			}
+			else if (std::find(SellClothesVec.begin(), SellClothesVec.end(), std::string(m_bag[i].pName)) != SellClothesVec.end())
+			{
+				m_bag[i].howProcess = 2;
+				m_bag[i].goods_type = 3;
+			}
+			else if (std::find(SellJewelryVec.begin(), SellJewelryVec.end(), std::string(m_bag[i].pName)) != SellJewelryVec.end())
+			{
+				m_bag[i].howProcess = 2;
+				m_bag[i].goods_type = 2;
+			}
+			else if (SellMedicineVec.count(std::string(m_bag[i].pName)) > 0)
+			{
+				auto it = SellMedicineVec.find(std::string(m_bag[i].pName));
+				m_bag[i].howProcess = 4;
+				m_bag[i].goods_type = 4;
+				m_bag[i].remainNumbers = it->second;
+			}
+			else
+			{
+				m_bag[i].howProcess = 5;
+			}
+		}
+	}
 }
 
 /*
@@ -188,10 +196,10 @@ void  bag::getGoodsProcessIndex()
 	index_vec_sell_cloth.clear();
 	index_vec_sell_jewel.clear();
 	index_vec_sell_medci.clear();
-	this->init();
+	classifyBagItems();
     for (size_t i = 0; i < maxSize; i++)
     {
-        if (m_bag[i].ID)
+        if ((m_bag[i].ID && *m_bag[i].ID != 0))
         {
             if (m_bag[i].howProcess == 1)
             {
@@ -215,7 +223,4 @@ void  bag::getGoodsProcessIndex()
 			}
         }
     }
-
-
-
 }

@@ -1,0 +1,210 @@
+-- 创建 lua_interface 对象
+local game = lua_interface()
+
+-- 测试模拟按键
+print("测试模拟按键...")
+game:模拟按键(65) -- 假设 65 是按键 'A' 的虚拟键码
+
+-- 测试交赏金
+print("测试交赏金...")
+game:交赏金()
+
+-- 测试买药
+print("测试买药...")
+local success = game:买药("红药", 10) -- 购买 10 个红药
+if success then
+    print("买药成功")
+else
+    print("买药失败")
+end
+
+-- 测试回城整理背包
+print("测试回城整理背包...")
+game:回城整理背包()
+
+-- 测试待存物品数量
+local storeCount = game:待存物品数量()
+print("待存物品数量: " .. storeCount)
+
+-- 测试待卖首饰数量
+local jewelryCount = game:待卖首饰数量()
+print("待卖首饰数量: " .. jewelryCount)
+
+-- 测试待卖衣服数量
+local clothesCount = game:待卖衣服数量()
+print("待卖衣服数量: " .. clothesCount)
+
+-- 测试待卖武器数量
+local weaponCount = game:待卖武器数量()
+print("待卖武器数量: " .. weaponCount)
+
+-- 测试存仓库
+print("测试存仓库...")
+success = game:存仓库()
+if success then
+    print("存仓库成功")
+else
+    print("存仓库失败")
+end
+
+-- 测试卖衣服
+print("测试卖衣服...")
+success = game:卖衣服()
+if success then
+    print("卖衣服成功")
+else
+    print("卖衣服失败")
+end
+
+-- 测试卖首饰
+print("测试卖首饰...")
+success = game:卖首饰()
+if success then
+    print("卖首饰成功")
+else
+    print("卖首饰失败")
+end
+
+-- 测试卖武器
+print("测试卖武器...")
+success = game:卖武器()
+if success then
+    print("卖武器成功")
+else
+    print("卖武器失败")
+end
+
+-- 测试卖药
+print("测试卖药...")
+success = game:卖药()
+if success then
+    print("卖药成功")
+else
+    print("卖药失败")
+end
+
+-- 测试获取当前坐标
+local x = game:当前坐标X()
+local y = game:当前坐标Y()
+print("当前坐标: (" .. x .. ", " .. y .. ")")
+
+-- 测试获取当前地图名
+local mapName = game:当前地图名()
+print("当前地图名: " .. mapName)
+
+-- 测试获取背包剩余格子
+local bagSpace = game:背包剩余格子()
+print("背包剩余格子: " .. bagSpace)
+
+-- 测试获取当前背包负重
+local bagWeight = game:当前背包负重()
+print("当前背包负重: " .. bagWeight)
+
+-- 测试获取最大背包负重
+local maxBagWeight = game:最大背包负重()
+print("最大背包负重: " .. maxBagWeight)
+
+-- 测试计算物品数量
+local itemCount = game:计算物品数量("红药")
+print("红药数量: " .. itemCount)
+
+-- 测试获取红药数量
+local hpMedicineCount = game:红药数量()
+print("红药数量: " .. hpMedicineCount)
+
+-- 测试获取蓝药数量
+local mpMedicineCount = game:蓝药数量()
+print("蓝药数量: " .. mpMedicineCount)
+
+-- 测试获取当前金币
+local gold = game:当前金币()
+print("当前金币: " .. gold)
+
+-- 测试获取当前元宝
+local yb = game:当前元宝()
+print("当前元宝: " .. yb)
+
+-- 测试获取当前绑定金币
+local bindGold = game:当前绑定金币()
+print("当前绑定金币: " .. bindGold)
+
+-- 测试获取当前绑定元宝
+local bindYb = game:当前绑定元宝()
+print("当前绑定元宝: " .. bindYb)
+
+-- 测试使用物品
+print("测试使用物品...")
+success = game:使用物品("红药")
+if success then
+    print("使用物品成功")
+else
+    print("使用物品失败")
+end
+
+-- 测试对自己使用技能
+print("测试对自己使用技能...")
+success = game:对自己使用技能("治疗术")
+if success then
+    print("对自己使用技能成功")
+else
+    print("对自己使用技能失败")
+end
+
+-- 测试对目标使用技能
+print("测试对目标使用技能...")
+local targetX, targetY = 100, 200
+local targetId = 12345 -- 假设目标 ID 是 12345
+success = game:对目标使用技能("火球术", targetX, targetY, targetId)
+if success then
+    print("对目标使用技能成功")
+else
+    print("对目标使用技能失败")
+end
+
+-- 测试小退
+print("测试小退...")
+game:小退()
+
+-- 测试立即复活
+print("测试立即复活...")
+game:立即复活()
+
+-- 测试跑到目标点
+print("测试跑到目标点...")
+local targetX, targetY = 150, 250
+success = game:跑到目标点(targetX, targetY)
+if success then
+    print("跑到目标点成功")
+else
+    print("跑到目标点失败")
+end
+
+-- 测试走到目标点
+print("测试走到目标点...")
+success = game:走到目标点(targetX, targetY)
+if success then
+    print("走到目标点成功")
+else
+    print("走到目标点失败")
+end
+
+-- 测试寻路到
+print("测试寻路到...")
+success = game:寻路到(targetX, targetY)
+if success then
+    print("寻路到成功")
+else
+    print("寻路到失败")
+end
+
+-- 测试开始战斗
+print("测试开始战斗...")
+game:开始战斗()
+
+-- 测试结束战斗
+print("测试结束战斗...")
+game:结束战斗()
+
+-- 测试计算距离
+local distance = game:计算距离(targetX, targetY)
+print("与目标点的距离: " .. distance)

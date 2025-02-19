@@ -32,5 +32,6 @@ public:
 public:
 	std::vector<DWORD> index_vec_store, index_vec_sell_weapon, index_vec_sell_cloth, index_vec_sell_jewel, index_vec_sell_medci; //存仓、卖武器、卖衣服、卖首饰、卖药品的物品的背包索引
 	void  getGoodsProcessIndex();
+	void classifyBagItems();
 };
 

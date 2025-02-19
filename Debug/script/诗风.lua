@@ -5,3 +5,17 @@ NPC ID: cfdceb0  @main1
 NPC ID: cfdceb0  @lingmuall
 NPC ID: cfdceb0  @lingmus
 NPC ID: cfdceb0  @lms
+NPC ID: cf097a0  @storage
+NPC ID: cf097a0  @main
+NPC ID: cf097a0  @storage
+NPC ID: cf097a0  @main
+NPC ID: cf097a0  @storage
+NPC ID: cf44300  @Shop_GO&0&378&217
+NPC ID: cf44300  @Shop_GO&0&502&266
+NPC ID: cf44300  @Shop_GO&0&502&266
+NPC ID: cfdceb0  @main1
+NPC ID: cfdceb0  @west
+NPC ID: cfdceb0  @west1
+NPC ID: cfc4c40  @main1
+NPC ID: cfc4c40  @ttta
+NPC ID: cfc4c40  @ta

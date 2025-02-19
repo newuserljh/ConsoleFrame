@@ -42,6 +42,9 @@ std::mutex team_mutex;  // 队伍文件变量互斥
 MapNames map_names; //地图名称映射
 Transitions transitions; //地图转换
 
+// 定义一个回调函数类型 用于Lua处理错误回调
+using ErrorCallback = std::function<void(const std::string&)>;
+
 _declspec(naked) void CallTest()
 {
 	_asm pushad
@@ -91,6 +94,7 @@ BEGIN_MESSAGE_MAP(CTestDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_LUATST, &CTestDlg::OnBnClickedBtnLuatst)
 	ON_WM_ERASEBKGND()
 	ON_BN_CLICKED(IDC_BTN_BAGPROC, &CTestDlg::OnBnClickedBtnBagproc)
+	ON_BN_CLICKED(IDC_BUTTON6, &CTestDlg::OnBnClickedButton6)
 END_MESSAGE_MAP()
 
 // CTestDlg 消息处理程序
@@ -189,7 +193,7 @@ BOOL CTestDlg::OnInitDialog()
 	CDialogEx::OnInitDialog();
 	m_luaInterface.registerClasses();// 初始化 lua接口对象
 	L = m_luaInterface.getLuaState(); //初始化Lua状态
-
+	LLua = m_luaInterface.getLuaState(); //初始化Lua状态
 
 	//初始化 线程标志
 	tflag_attack = true;
@@ -917,8 +921,20 @@ void  CTestDlg::RoleIsDeath(void)
 	shareCli.m_pSMAllData->m_sm_data[shareindex].server_alive = false;//由控制台大退
 }
 
-
-
+// Lua脚本线程 
+void CTestDlg::RunLuaScriptInThread(LPVOID p, lua_State* L, const std::string& scriptPath, std::function<void(const std::string&)> errorCallback)
+{
+	// 加载并执行 Lua 脚本
+	if (luaL_loadfile(L, scriptPath.c_str()) || lua_pcall(L, 0, 0, 0)) {
+		if (errorCallback) {
+			errorCallback(lua_tostring(L, -1));
+		}
+		lua_pop(L, 1); // 清除错误消息
+		return;
+	}
+	CTestDlg* pdlg = (CTestDlg*)p;
+	pdlg->GetDlgItem(IDC_BTN_LUATST)->EnableWindow(TRUE);
+}
 /*寻路线程*/
 UINT __cdecl CTestDlg::threadGoto(LPVOID p)
 {
@@ -1106,11 +1122,16 @@ void CTestDlg::OnBnClickedButton9()
 	r_bag.maxSize = *r.m_roleproperty.Bag_Size;
 	r_bag.bagBase = (DWORD)r.m_roleproperty.p_Bag_Base;
 	r_bag.init();
-	m_skill.skillBase = (DWORD)r.m_roleproperty.p_Skill_Base;
-	m_skill.init();
-	m_team.team_Base = r.m_roleproperty.Team_pointer;
-	CString s;
+	//m_skill.skillBase = (DWORD)r.m_roleproperty.p_Skill_Base;
+	//m_skill.init();
+	//m_team.team_Base = r.m_roleproperty.Team_pointer;
+	//CString s;
 
+	m_luaInterface.getGoodsProcessIndex();
+	//std::cout<<m_luaInterface.getStoreGoodsNumber()<<std::endl;
+	//std::cout << m_luaInterface.getSellClothesNumber() << std::endl;
+	//std::cout << m_luaInterface.getSellJewelryNumber() << std::endl;
+	//std::cout << m_luaInterface.getSellWeaponNumber() << std::endl;
 
 
 
@@ -1390,16 +1411,62 @@ void CTestDlg::OnBnClickedBtnRecnpc()
 //lua脚本测试
 void CTestDlg::OnBnClickedBtnLuatst()
 {
-	// 执行 lua 脚本 .\\script\\test.lua
-	std::string scriptpath = (std::string)shareCli.m_pSMAllData->currDir + "script\\test.lua";
-	if (luaL_dofile(L, scriptpath.c_str()) != LUA_OK)
-	{
-		const char* error = lua_tostring(L, -1);
-		AfxMessageBox(CString(error));
-		lua_pop(L, 1);
+	if (!LLua) {
+		std::cerr << "Failed to create Lua state" << std::endl;
+		return;
 	}
+
+
+	std::string scriptPath = (std::string)shareCli.m_pSMAllData->currDir + "script\\test.lua";
+	// 定义错误回调函数
+	auto errorCallback = [](const std::string& errorMessage) {
+		std::cerr << "Error in Lua script: " << errorMessage << std::endl;
+		};
+
+	stopScript.store(false);//重置停止标志
+
+	// 在 Lua 状态中设置全局变量 stopScript
+	lua_pushboolean(LLua, stopScript.load());
+	lua_setglobal(LLua, "stopScript");
+	std::cout<< shareCli.m_pSMAllData->currDir <<std::endl;
+
+	// 在 Lua 状态中设置全局变量 currentDir
+	std::string s = (std::string)shareCli.m_pSMAllData->currDir;
+	s.pop_back();
+	std::cout << s << std::endl;
+	lua_pushstring(LLua, s.c_str());
+	lua_setglobal(LLua, "currentDir");
+
+
+
+	//初始化lua的设置
+	std::string initPath = (std::string)shareCli.m_pSMAllData->currDir + "script\\init.lua";
+	if (luaL_loadfile(L, initPath.c_str()) || lua_pcall(L, 0, 0, 0)) {
+		std::cerr << "Failed to load and run script: " << lua_tostring(L, -1) << std::endl;
+		lua_pop(L, 1); // 清除错误消息
+		return;
+	}
+	std::cout << "初始化Lua环境成功！" << std::endl;
+		// 使用 lambda 表达式调用成员函数
+	std::thread scriptThread([this,scriptPath, errorCallback]() {this->RunLuaScriptInThread(LPVOID(this), LLua, scriptPath, errorCallback); });
+	scriptThread.detach();  // 分离线程，使其独立运行
+	// 主线程可以继续执行其他任务
+	GetDlgItem(IDC_BTN_LUATST)->EnableWindow(FALSE); // 禁用按钮并设置为灰色
 }
 
+//停止lua脚本
+void CTestDlg::OnBnClickedButton6()
+{
+	// 设置停止标志
+	stopScript.store(true);
+	// 更新 Lua 状态中的全局变量 stopScript
+	if (LLua) {
+		lua_pushboolean(LLua, stopScript.load());
+		lua_setglobal(LLua, "stopScript");
+	}
+	// 线程结束?重新启用按钮
+    GetDlgItem(IDC_BTN_LUATST)->EnableWindow(TRUE);
+}
 
 BOOL CTestDlg::OnEraseBkgnd(CDC* pDC)
 {
@@ -1427,3 +1494,6 @@ void CTestDlg::OnBnClickedBtnBagproc()
 		m_threadBagProcess = NULL;
 	}
 }
+
+
+

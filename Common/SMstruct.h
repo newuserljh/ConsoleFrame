@@ -4,7 +4,11 @@
 #include <string>
 #pragma pack(4)
 
-#define  FILE_MAP_NAME	 "xxooyy"
+#ifdef _DEBUG
+#define FILE_MAP_NAME "xxooyy_debug"
+#else
+#define FILE_MAP_NAME "xxooyy"
+#endif
 #define  MORE_OPEN_NUMBER 10
 //¹²ÏíÄÚ´æ
 typedef struct _SM_SHARE_DATA

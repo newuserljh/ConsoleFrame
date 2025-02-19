@@ -111,8 +111,6 @@ public:
 	bool sellJewelry() { return sellJewelry(r_bag.index_vec_sell_jewel); }//卖首饰
 	bool sellWeapon() { return sellWeapon(r_bag.index_vec_sell_weapon); }//卖武器
 	bool buyMedicine(const std::string& med_name, BYTE num);//买药
-
-
 	int getCurrentX() { return *r.m_roleproperty.Object.X; }//获取当前坐标X
 	int getCurrentY() { return *r.m_roleproperty.Object.Y; }// 获取当前坐标Y
 	std::string getCurrentMapName() { return r.m_roleproperty.p_Current_Map; }//获取当前地图名称
@@ -137,7 +135,8 @@ public:
 	bool startAttack() { return mfun.start_end_AutoAttack(1); }//开始战斗
 	bool endAttack() { return mfun.start_end_AutoAttack(0); }//结束战斗
 	float getDistance(int x, int y) { return mfun.caclDistance(getCurrentX(), getCurrentY(), x, y); }	//计算与坐标(x,y)的距离 ,直线距离 无法计算实际距离
-
+	bool interactNPC(const std::string& npcName, const std::string& command);//对话NPC 并选择一个命令
+	bool chooseNpcCommand(const std::string& command) { return mfun.ChooseCmd(command.c_str()); }//选择NPC对话
 
 private:
 	//买卖存仓辅助函数

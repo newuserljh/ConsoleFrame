@@ -98,6 +98,8 @@ void lua_interface::registerClasses()
 		.addFunction("开始战斗", &lua_interface::startAttack)
 		.addFunction("结束战斗", &lua_interface::endAttack)
 		.addFunction("计算距离", &lua_interface::getDistance)
+		.addFunction("对话NPC选择命令", &lua_interface::interactNPC) //交互NPC并选择一个命令
+		.addFunction("选择命令", &lua_interface::chooseNpcCommand)
 		.endClass();
 }
 
@@ -359,14 +361,14 @@ bool lua_interface::interactWithNPC(const std::string& npcName, const std::strin
 		return false;
 	}
 
-	Sleep(50);
+	Sleep(100);
 
 	if (!mfun.ChooseCmd(command.c_str())) {
 		std::cerr << "选择命令失败: " << command << std::endl;
 		return false;
 	}
 
-	Sleep(50);
+	Sleep(100);
 
 	return action(npcId);
 }
@@ -441,7 +443,7 @@ bool lua_interface::storeGoods(const std::vector<DWORD>& bagIndexStore) {
 				return false;
 			}
 			memset((DWORD*)item.Name_Length, 0, 0x688); // 清空相关字段
-			Sleep(50);
+			Sleep(100);
 		}
 		return true;
 		});
@@ -496,6 +498,28 @@ bool lua_interface::sellWeapon(const std::vector<DWORD>& bagIndexWpSell) {
 		});
 }
 
+// 通用 NPC 交互函数
+bool lua_interface::interactNPC(const std::string& npcName, const std::string& command) {
+	auto npcId = getEviroNPCIdByName(npcName);
+	if (npcId == -1) {
+		std::cerr << "无法找到 NPC: " << npcName << std::endl;
+		return false;
+	}
+
+	if (!mfun.OpendNPC(npcId)) {
+		std::cerr << "打开 NPC 对话框失败: " << npcName << std::endl;
+		return false;
+	}
+
+	Sleep(800);
+
+	if (!mfun.ChooseCmd(command.c_str())) {
+		std::cerr << "选择命令失败: " << command << std::endl;
+		return false;
+	}
+	Sleep(500);
+	return true;
+}
 
 //解析storeANDsell.ini 解析需要存仓和卖出的物品名字列表
 std::vector<std::string>  bag::StoreVec, bag::SellWeaponVec, bag::SellClothesVec, bag::SellJewelryVec;//分别存储 存仓物品 卖武器 衣服 首饰 名字
