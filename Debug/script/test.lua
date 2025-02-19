@@ -1,11 +1,12 @@
+-- 创建 lua_interface 对象
+local game = LuaInterface()
+
 function checkStopFlag()
     if stopScript then
+	game:停止战斗()
         error("Script termination requested")
     end
 end
-
--- 创建 lua_interface 对象
-local game = LuaInterface()
 
 -- 模拟 Sleep 函数（单位：毫秒）
 local function sleep(ms)

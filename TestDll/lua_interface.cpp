@@ -96,7 +96,7 @@ void lua_interface::registerClasses()
 		.addFunction("走到目标点", &lua_interface::walkTo)
 		.addFunction("寻路到", &lua_interface::gotoMapXY)
 		.addFunction("开始战斗", &lua_interface::startAttack)
-		.addFunction("结束战斗", &lua_interface::endAttack)
+		.addFunction("停止战斗", &lua_interface::endAttack)
 		.addFunction("计算距离", &lua_interface::getDistance)
 		.addFunction("对话NPC选择命令", &lua_interface::interactNPC) //交互NPC并选择一个命令
 		.addFunction("选择命令", &lua_interface::chooseNpcCommand)
