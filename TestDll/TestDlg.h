@@ -23,8 +23,7 @@ public:
 	
 
 private:
-	lua_State* LLua; // Lua 状态变量 用于运行lua脚本
-	std::atomic<bool> stopScript{ false };
+	std::atomic<bool> luaStopFlag{ false };
 	static void RunLuaScriptInThread(LPVOID p,lua_State* L, const std::string& scriptPath, std::function<void(const std::string&)> errorCallback);
 
 protected:

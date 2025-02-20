@@ -193,7 +193,6 @@ BOOL CTestDlg::OnInitDialog()
 	CDialogEx::OnInitDialog();
 	m_luaInterface.registerClasses();// 初始化 lua接口对象
 	L = m_luaInterface.getLuaState(); //初始化Lua状态
-	LLua = m_luaInterface.getLuaState(); //初始化Lua状态
 
 	//初始化 线程标志
 	tflag_attack = true;
@@ -924,15 +923,16 @@ void  CTestDlg::RoleIsDeath(void)
 // Lua脚本线程 
 void CTestDlg::RunLuaScriptInThread(LPVOID p, lua_State* L, const std::string& scriptPath, std::function<void(const std::string&)> errorCallback)
 {
+	CTestDlg* pdlg = (CTestDlg*)p;
 	// 加载并执行 Lua 脚本
 	if (luaL_loadfile(L, scriptPath.c_str()) || lua_pcall(L, 0, 0, 0)) {
 		if (errorCallback) {
 			errorCallback(lua_tostring(L, -1));
 		}
 		lua_pop(L, 1); // 清除错误消息
+		pdlg->GetDlgItem(IDC_BTN_LUATST)->EnableWindow(TRUE);
 		return;
 	}
-	CTestDlg* pdlg = (CTestDlg*)p;
 	pdlg->GetDlgItem(IDC_BTN_LUATST)->EnableWindow(TRUE);
 }
 /*寻路线程*/
@@ -1411,7 +1411,7 @@ void CTestDlg::OnBnClickedBtnRecnpc()
 //lua脚本测试
 void CTestDlg::OnBnClickedBtnLuatst()
 {
-	if (!LLua) {
+	if (!L) {
 		std::cerr << "Failed to create Lua state" << std::endl;
 		return;
 	}
@@ -1423,19 +1423,19 @@ void CTestDlg::OnBnClickedBtnLuatst()
 		std::cerr << "Error in Lua script: " << errorMessage << std::endl;
 		};
 
-	stopScript.store(false);//重置停止标志
+	luaStopFlag.store(false);//重置停止标志
 
 	// 在 Lua 状态中设置全局变量 stopScript
-	lua_pushboolean(LLua, stopScript.load());
-	lua_setglobal(LLua, "stopScript");
+	lua_pushboolean(L, luaStopFlag.load());
+	lua_setglobal(L, "luaStopFlag");
 	std::cout<< shareCli.m_pSMAllData->currDir <<std::endl;
 
 	// 在 Lua 状态中设置全局变量 currentDir
 	std::string s = (std::string)shareCli.m_pSMAllData->currDir;
 	s.pop_back();
 	std::cout << s << std::endl;
-	lua_pushstring(LLua, s.c_str());
-	lua_setglobal(LLua, "currentDir");
+	lua_pushstring(L, s.c_str());
+	lua_setglobal(L, "currentDir");
 
 
 
@@ -1448,7 +1448,7 @@ void CTestDlg::OnBnClickedBtnLuatst()
 	}
 	std::cout << "初始化Lua环境成功！" << std::endl;
 		// 使用 lambda 表达式调用成员函数
-	std::thread scriptThread([this,scriptPath, errorCallback]() {this->RunLuaScriptInThread(LPVOID(this), LLua, scriptPath, errorCallback); });
+	std::thread scriptThread([this,scriptPath, errorCallback]() {this->RunLuaScriptInThread(LPVOID(this), L, scriptPath, errorCallback); });
 	scriptThread.detach();  // 分离线程，使其独立运行
 	// 主线程可以继续执行其他任务
 	GetDlgItem(IDC_BTN_LUATST)->EnableWindow(FALSE); // 禁用按钮并设置为灰色
@@ -1458,14 +1458,13 @@ void CTestDlg::OnBnClickedBtnLuatst()
 void CTestDlg::OnBnClickedButton6()
 {
 	// 设置停止标志
-	stopScript.store(true);
+	luaStopFlag.store(true);
 	// 更新 Lua 状态中的全局变量 stopScript
-	if (LLua) {
-		lua_pushboolean(LLua, stopScript.load());
-		lua_setglobal(LLua, "stopScript");
+	if (L) {
+		lua_pushboolean(L, luaStopFlag.load());
+		lua_setglobal(L, "stopScript");
 	}
-	// 线程结束?重新启用按钮
-    GetDlgItem(IDC_BTN_LUATST)->EnableWindow(TRUE);
+
 }
 
 BOOL CTestDlg::OnEraseBkgnd(CDC* pDC)

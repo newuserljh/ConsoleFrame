@@ -32,10 +32,10 @@ function add_directories_to_package_paths(directory)
 end
 
 
-print("currentDir: " ..currentDir)
+-- print("currentDir: " ..currentDir)
 
 -- 打印当前的 package.path
-print("Current package.path: " .. package.path)
+-- print("Current package.path: " .. package.path)
 
 -- 动态添加当前目录到 package.path
 -- 获取当前文件所在目录
@@ -48,8 +48,13 @@ end
 add_directories_to_package_paths(dir)
 
 -- 打印更新后的 package.path
-print("Updated package.path: " .. package.path)
+-- print("Updated package.path: " .. package.path)
 
 
-
+--停止脚本功能
+function stopScript()
+    if not luaStopFlag then
+		luaStopFlag=true
+    end
+end
 

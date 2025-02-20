@@ -1,12 +1,6 @@
 -- 创建 lua_interface 对象
 local game = LuaInterface()
 
-function checkStopFlag()
-    if stopScript then
-	game:停止战斗()
-        error("Script termination requested")
-    end
-end
 
 -- 模拟 Sleep 函数（单位：毫秒）
 local function sleep(ms)
@@ -151,7 +145,7 @@ local function moveToTargetAsync(x, y)
 
             -- 异步检测是否到达目标点
 
-            while  not stopScript do
+            while  not luaStopFlag do
                 sleep(500) -- 每 500 毫秒检测一次
                 local currentX = game:当前坐标X()
                 local currentY = game:当前坐标Y()
@@ -205,24 +199,22 @@ end
 
 -- 战斗
 function startCombat()
-    while not stopScript do
+    while not luaStopFlag do
 	-- 检查是否需要暂停或终止
-        if stopScript then
+        if luaStopFlag then
             if game:停止战斗() then
                 print("战斗停止成功")
             else
                 print("战斗停止失败")
             end
-            break
+			return
         end
-
-        checkStopFlag()
         sleep(5000)  -- 每 5000 毫秒检查一次停止标志
     end
 end
 
 local function 出发()
-	if game:当前地图名()=="中州" and game:计算距离(470,221)<20 and not stopScript then
+	if game:当前地图名()=="中州" and game:计算距离(470,221)<20 then
 	 	moveToTargetAsync(470,223)
 		game:对话NPC选择命令("老兵","@main1")
 		sleep(500)
@@ -232,7 +224,7 @@ local function 出发()
 		sleep(1000)
 	 end
 
-	 if game:当前地图名()=="西域奇境" and game:计算距离(463,110)<20 and not stopScript  then
+	 if game:当前地图名()=="西域奇境" and game:计算距离(463,110)<20 then
 	 	moveToTargetAsync(463,110)
 		game:对话NPC选择命令("老兵","@main1")
 		sleep(500)
@@ -242,15 +234,15 @@ local function 出发()
 		sleep(1000)
 	 end
 
-	if game:当前地图名()=="西域奇境" and game:计算距离(140, 107)<20 and not stopScript  then
+	if game:当前地图名()=="西域奇境" and game:计算距离(140, 107)<20 then
 	 	passMap("西域奇境","一手遮天", 137, 102 , 137, 103)
 	 end
 
-	if stopScript then
+	if luaStopFlag then
 	   return
 	end
 
-	if game:当前地图名()=="一手遮天"  and not stopScript then
+	if game:当前地图名()=="一手遮天" then
     -- 开始战斗
         print("到达战斗地图")
 	else
@@ -259,7 +251,7 @@ local function 出发()
 end
 
 
--- 主函数
+-- 补给
 local function 卖物补给()
         -- 回城整理背包
         goHome()
@@ -320,18 +312,20 @@ local function 卖物补给()
         game:使用物品("永久回城神石")
         sleep(1000)
 
-	-- 检查停止标志
-        checkStopFlag()
 end
 
 -- 运行主循环
 local combatCoroutine = nil
-while not stopScript do
+
+local function main()
+-- 运行主循环
+	while not luaStopFlag do
     print("Running...")
    卖物补给()
 
     -- 移动到战斗点
     出发()
+
     ---开始战斗
    if game:开始战斗() then
    	print("开始战斗--------")
@@ -350,12 +344,13 @@ while not stopScript do
         coroutine.resume(combatCoroutine)
     end
 
-    -- 检查停止标志
-    checkStopFlag()
-
     -- 模拟脚本执行一段时间
     sleep(5000)
+	end
 end
+
+main()
+
 -- 清理协程
 if combatCoroutine and coroutine.status(combatCoroutine) ~= "dead" then
     coroutine.close(combatCoroutine)
