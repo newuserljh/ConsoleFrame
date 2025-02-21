@@ -11,6 +11,7 @@
 #include "LuaBridge/LuaBridge.h"
 #include <unordered_map>
 #include <queue>
+#include "LuaTrigger.h"
 
 
 // 声明外部对象 
@@ -68,9 +69,10 @@ public:
 			// 替换 Lua 的 print 函数
 			lua_pushcfunction(L.get(), &lua_interface::lua_print);
 			lua_setglobal(L.get(), "print");
-
 			registerClasses();
-		}
+			trigger.setLuaState(L.get());
+			luabridge::setGlobal(L.get(), &trigger, "trigger"); // 注册触发器到lua全局变量
+		} 
 	}
 	~lua_interface() = default;
 
@@ -83,6 +85,7 @@ public:
 	lua_interface& operator=(const lua_interface&) = delete;
 private:
 	std::unique_ptr<lua_State, decltype(&lua_close)> L;
+	LuaTrigger trigger;//触发器
 
 public:
 	//地图信息

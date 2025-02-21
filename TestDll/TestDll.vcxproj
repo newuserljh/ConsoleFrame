@@ -120,6 +120,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TestDlg.h" />
     <ClInclude Include="TestDll.h" />
+    <ClInclude Include="LuaTrigger.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
