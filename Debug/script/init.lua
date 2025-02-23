@@ -1,5 +1,3 @@
--- 创建全局 lua_interface 对象
-game=LuaInterface 
 -- 获取当前文件的路径
 function get_current_directory()
     local path = debug.getinfo(1, "S").source:sub(2)
@@ -20,118 +18,248 @@ end
 
 -- 添加目录及其子目录到 package.path 和 package.cpath
 function add_directories_to_package_paths(directory)
-    -- 获取所有子目录
-    local subdirs = get_subdirectories(directory)
+    local sep = package.config:sub(1, 1) -- 获取路径分隔符
+    local subdirs = get_subdirectories(directory)   -- 获取所有子目录
     -- 添加到 package.path
     for _, subdir in ipairs(subdirs) do
-        local sep = package.config:sub(1, 1) -- 获取路径分隔符
+
         local custom_path = subdir .. sep .. "?.lua"
         if not package.path:find(custom_path, 1, true) then
             package.path = package.path .. ";" .. custom_path
         end
     end
-end
 
--- 触发器协程
-local function trigger_coroutine()
-    while true do
-        -- 模拟触发器逻辑
-        local event = wait_for_event() -- 假设有一个函数 wait_for_event 来等待事件
-        if event == "trigger_event" then
-            print("Trigger event detected!")
-            -- 执行触发器逻辑
-            -- 例如：trigger:trigger("my_trigger", "my_label")
+-- 添加到 package.cpath
+    for _, subdir in ipairs(subdirs) do
+        local custom_dll_path = subdir .. sep .. "?" .. (sep == "\\" and ".dll" or ".so")
+        if not package.cpath:find(custom_dll_path, 1, true) then
+            package.cpath = package.cpath .. ";" .. custom_dll_path
         end
-        coroutine.yield() -- 暂停协程，等待下一次恢复
     end
 end
+
+add_directories_to_package_paths(currentDir) --初始化目录
+
+socket = require("socket")  -- 引入 LuaSocket
+
+sleepers = {}
+-- 非阻塞 sleep 函数（使用 socket.gettime 提高精度）
+sleep=function(ms)
+    -- 将毫秒转换为秒，因为 socket.gettime 返回的是秒数
+    local resume_time = socket.gettime() + (ms / 1000.0)
+    table.insert(sleepers, {coroutine.running(), resume_time})
+    coroutine.yield()
+end
+
+
+
+-- 定义全局触发器类
+TriggerSystem = {}
+TriggerSystem.__index = TriggerSystem
+
+-- 构造函数
+function TriggerSystem:new()
+    local obj = {
+        triggers = {},  -- 触发器表
+        isRunning = false  -- 定时器运行状态
+    }
+    setmetatable(obj, self)
+    return obj
+end
+
+-- 添加触发器的函数
+function TriggerSystem:addTrigger(conditionFunc, label)
+    table.insert(self.triggers, { condition = conditionFunc, label = label })
+end
+
+-- 清除所有触发器的函数
+function TriggerSystem:clearTriggers()
+    self.triggers = {}  -- 清空触发器表
+	self.isRunning = false  -- 停止定时器
+    print("已清除所有触发器!")
+end
+
+function TriggerSystem:checkTriggers()
+    while self.isRunning do
+        for i, trigger in ipairs(self.triggers) do
+            if trigger.condition() then
+                goto(trigger.label)
+            end
+        end
+        sleep(3000)
+    end
+end
+
+
+-- 创建全局 lua_interface 对象
+game=LuaInterface()
+ScriptFLag=false --控制脚本执行的协程标志
+AutoFlag=false --控制自动打怪的协程标志
+
+
+-- 创建一个新协程，并设置其执行环境为全局环境
+local function create_global_coroutine(func)
+    local co_func = function(...)
+        if setfenv then
+            setfenv(1, _G) -- 设置当前函数的环境为全局环境
+        else
+            _ENV = _G -- 对于 Lua 5.2 及以上版本
+        end
+        return func(...)
+    end
+    return coroutine.create(co_func)
+end
+
 
 -- 自动打怪协程
-local function auto_combat_coroutine()
-        if(game:开始战斗()) then
-            print("开始自动打怪...")
-        else
-            print("开启自动打怪失败.正在结束脚本...")
-        end
-    while true do
-        -- 模拟自动打怪逻辑
-        if not luaStopFlag then
-            -- 执行自动打怪逻辑
-            -- 例如：attack_nearest_monster()
-        else
-            game:停止战斗()
-            print("停止打怪...")
-            break -- 停止协程
-        end
-        coroutine.yield() -- 暂停协程，等待下一次恢复
+function auto_combat_coroutine()
+    while not AutoFlag do
+	game:开始战斗()
+        sleep(1000)
     end
+ game:停止战斗()
+ coroutine.yield() -- 暂停协程，等待下一次恢复
 end
 
 -- 执行脚本的协程
-local function script_executor_coroutine()
+function script_executor_coroutine()
     while true do
         -- 接收脚本路径
         local script_path = coroutine.yield()
-        if not luaStopFlag then
-            if script_path then
-                print("Script executor: Running script...")
-                -- 执行脚本逻辑
-                local status, err = pcall(dofile, script_path)
-                if not status then
-                    print("Script execution failed: " .. err)
-                end
-            else
-                print("No script path provided.")
-            end
-        else
-            print("Script executor stopped.")
-            break -- 停止协程
-        end
+		if script_path then
+			if not ScriptFLag then
+					-- 加载脚本
+					local chunk, err = loadfile(script_path)
+					if not chunk then
+						print("Failed to load script: " .. (err or "no error message"))
+					else
+						-- 执行脚本
+						local status, err = pcall(chunk)
+						if not status then
+							print("Script execution failed: " .. err)
+							print("Stack trace:", debug.traceback())
+						else
+							print("Script executed successfully.")
+							return
+						end
+					end
+			else
+				print("Script executor stopped.")
+				break
+			end
+		end
+		coroutine.yield()
     end
 end
 
--- 启动协程
-local function start_coroutines()
-    coroutine.resume(trigger_co) -- 启动触发器协程
-    coroutine.resume(auto_combat_co) -- 启动自动打怪协程）
-    coroutine.resume(script_executor_co) -- 启动脚本执行协程-- 启动协程（第一次恢复时不传递参数)
+
+
+-- 创建全局 触发器
+ 触发器 = TriggerSystem:new()
+
+添加触发器=function(condition, label)
+	触发器:addTrigger(condition, label)  -- 添加触发器1
 end
+
+
+-- 启动触发器检测
+启动触发器=function()
+	触发器.isRunning = true  -- 启动定时器
+	触发器:checkTriggers()
+	print("已启动触发器检测...")
+end
+
+-- 启动触发器检测
+清除触发器= function()
+	触发器:clearTriggers()
+	print("已清除所有触发器...")
+end
+
 
 -- 动态传递脚本路径
-local function 运行脚本(path)
-    coroutine.resume(script_executor_co, path)
-end
-
--- 停止协程
-local function 停止脚本()
-    luaStopFlag = true -- 设置停止标志
-    print("All coroutines stopped.")
-end
-
--- 初始化
-local function init()
-    -- 获取当前目录
-    local currentDir = get_current_directory()
-    print("Current directory: " .. currentDir)
-
-    -- 动态添加目录到 package.path
-    local sep = package.config:sub(1, 1) -- 获取路径分隔符
-    local custom_path = currentDir .. sep .. "?.lua"
-    if not package.path:find(custom_path, 1, true) then
-        package.path = package.path .. ";" .. custom_path
+function 运行脚本(path)
+    ScriptFLag = false -- 设置停止标志
+    if coroutine.status(script_executor_co) == "dead" then
+        -- 如果协程已停止，重新创建
+        script_executor_co = create_global_coroutine(script_executor_coroutine)
     end
-    add_directories_to_package_paths(currentDir)
 
-    -- 启动协程
-    start_coroutines()
+	--coroutine.resume(script_executor_co)
+
+    -- 将脚本路径传递给协程
+    local success, err = coroutine.resume(script_executor_co, path)
+    if not success then
+        print("协程执行失败: " .. tostring(err))
+    end
 end
+
+-- 停止脚本
+停止脚本=function()
+    ScriptFLag = true -- 设置停止标志
+    print("脚本正在停止...")
+end
+
+-- 自动战斗
+自动战斗=function()
+    AutoFlag = false -- 设置停止标志
+    if coroutine.status(auto_combat_co) == "dead" then
+        -- 如果协程已停止，重新创建
+          auto_combat_co = create_global_coroutine(auto_combat_coroutine)
+    end
+    local status, err = coroutine.resume(auto_combat_co)
+    if not status then
+        print("Failed to start auto combat: " .. err)
+        print("Stack trace:", debug.traceback())
+    end
+end
+
+-- 停止战斗
+停止战斗=function()
+    AutoFlag = true -- 设置停止标志
+    print("停止战斗...")
+end
+
 
 -- 创建协程
-local trigger_co = coroutine.create(trigger_coroutine) --触发器
-local auto_combat_co = coroutine.create(auto_combat_coroutine) --自动打怪
+function init()
+auto_combat_co = create_global_coroutine(auto_combat_coroutine) --自动打怪协程
+script_executor_co = create_global_coroutine(script_executor_coroutine) --执行脚本协程
 
--- 创建执行脚本的协程
-local script_executor_co = coroutine.create(script_executor_coroutine)
+
+-- 启动协程
+  --coroutine.resume(auto_combat_co)
+  coroutine.resume(script_executor_co)
+  --coroutine.resume(res_chedul_co)
+
+end
 
 -- 运行初始化
 init()
+
+print(package.path)
+print("\n")
+print(package.cpath)
+
+-- 调度器主循环
+-- 测试调用
+运行脚本("D:\\LJH\\VS_PROJECT\\ConsoleFrame\\Debug\\script\\1.lua")
+print("1111111111111")
+
+while true do
+    local now = socket.gettime()
+    local processed = 0
+    for i = #sleepers, 1, -1 do
+        if sleepers[i][2] <= now then
+            local co = sleepers[i][1]
+            table.remove(sleepers, i)
+            local ok, err = coroutine.resume(co)
+            if not ok then
+                print("协程错误:", err)
+            end
+            processed = processed + 1
+            if processed >= 100 then break end -- 防止一次性处理太多任务
+        end
+    end
+    socket.sleep(0.01) -- 使用 socket.sleep 来避免高CPU占用
+end
+

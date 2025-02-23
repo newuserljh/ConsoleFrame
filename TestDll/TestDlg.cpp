@@ -1416,9 +1416,7 @@ void CTestDlg::OnBnClickedBtnLuatst()
 		return;
 	}
 
-
-	std::string scriptPath = (std::string)shareCli.m_pSMAllData->currDir + "script\\test.lua";
-	// 定义错误回调函数
+   // 定义错误回调函数
 	auto errorCallback = [](const std::string& errorMessage) {
 		std::cerr << "Error in Lua script: " << errorMessage << std::endl;
 		};
@@ -1428,16 +1426,12 @@ void CTestDlg::OnBnClickedBtnLuatst()
 	// 在 Lua 状态中设置全局变量 stopScript
 	lua_pushboolean(L, luaStopFlag.load());
 	lua_setglobal(L, "luaStopFlag");
-	std::cout<< shareCli.m_pSMAllData->currDir <<std::endl;
 
 	// 在 Lua 状态中设置全局变量 currentDir
 	std::string s = (std::string)shareCli.m_pSMAllData->currDir;
 	s.pop_back();
-	std::cout << s << std::endl;
 	lua_pushstring(L, s.c_str());
 	lua_setglobal(L, "currentDir");
-
-
 
 	//初始化lua的设置
 	std::string initPath = (std::string)shareCli.m_pSMAllData->currDir + "script\\init.lua";
@@ -1446,9 +1440,10 @@ void CTestDlg::OnBnClickedBtnLuatst()
 		lua_pop(L, 1); // 清除错误消息
 		return;
 	}
-	std::cout << "初始化Lua环境成功！" << std::endl;
+	/*std::cout << "初始化Lua环境成功！" << std::endl;*/
+	//std::string scriptPath = (std::string)shareCli.m_pSMAllData->currDir + "script\\test.lua";
 		// 使用 lambda 表达式调用成员函数
-	std::thread scriptThread([this,scriptPath, errorCallback]() {this->RunLuaScriptInThread(LPVOID(this), L, scriptPath, errorCallback); });
+	std::thread scriptThread([this, initPath, errorCallback]() {this->RunLuaScriptInThread(LPVOID(this), L, initPath, errorCallback); });
 	scriptThread.detach();  // 分离线程，使其独立运行
 	// 主线程可以继续执行其他任务
 	GetDlgItem(IDC_BTN_LUATST)->EnableWindow(FALSE); // 禁用按钮并设置为灰色
