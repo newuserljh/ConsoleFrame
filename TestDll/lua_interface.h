@@ -1,4 +1,6 @@
 #pragma once
+#include <unordered_map>
+#include <queue>
 #include "../GameData/bag.h"
 #include "../GameData/role.h"
 #include "../GameData/m_object.h"
@@ -9,9 +11,7 @@
 #include "../luajit/src/lua.hpp"
 #include "../Common/shareMemoryCli.h"
 #include "LuaBridge/LuaBridge.h"
-#include <unordered_map>
-#include <queue>
-#include "LuaTrigger.h"
+#include "scriptManager.h"
 
 
 // 声明外部对象 
@@ -70,8 +70,6 @@ public:
 			lua_pushcfunction(L.get(), &lua_interface::lua_print);
 			lua_setglobal(L.get(), "print");
 			registerClasses();
-			trigger.setLuaState(L.get());
-			luabridge::setGlobal(L.get(), &trigger, "trigger"); // 注册触发器到lua全局变量
 		} 
 	}
 	~lua_interface() = default;
@@ -85,7 +83,7 @@ public:
 	lua_interface& operator=(const lua_interface&) = delete;
 private:
 	std::unique_ptr<lua_State, decltype(&lua_close)> L;
-	LuaTrigger trigger;//触发器
+
 
 public:
 	//地图信息

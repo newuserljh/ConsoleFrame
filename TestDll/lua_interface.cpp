@@ -59,11 +59,7 @@ void lua_interface::registerClasses()
 		//.addFunction("SubmitInputbox", &gamecall::SubmitInputbox)
 		.endClass()
 		
-		.beginClass<LuaTrigger>("LuaTrigger") //注册触发器类
-		.addConstructor<void(*)()>()
-		.addFunction("register_label", &LuaTrigger::register_label)
-		.addFunction("trigger", &LuaTrigger::trigger)
-		.endClass()
+	
 
 		.beginClass<lua_interface>("LuaInterface") // 注册本类方法到 Lua
 		.addConstructor<void(*)(void)>()
